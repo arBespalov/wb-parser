@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_search"
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_sort"
+        android:title="@string/sort"
+        android:icon="@drawable/ic_baseline_sort_24"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="@string/refresh"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_new_group"
+        android:title="@string/new_group"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_delete_group"
+        android:title="@string/delete_group"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_backup"
+        android:title="@string/backup_and_sync"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_theme"
+        android:title="@string/theme"
+        app:showAsAction="never"/>
+</menu>

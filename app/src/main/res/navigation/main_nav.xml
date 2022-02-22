@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/itemsFragment">
+    <fragment
+        android:id="@+id/itemsFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.itemsfrag.ItemsFragment"
+        tools:layout="@layout/items_fragment">
+        <action
+            android:id="@+id/action_itemsFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_confirmRemoveDialogFragment2"
+            app:destination="@id/confirmRemoveDialogFragment2" />
+        <action
+            android:id="@+id/action_itemsFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_editItemFragment"
+            app:destination="@id/editItemFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_newGroupDialogFragment"
+            app:destination="@id/newGroupDialogFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_confirmDeleteGroupDialogFrag"
+            app:destination="@id/confirmDeleteGroupDialogFrag" />
+        <action
+            android:id="@+id/action_itemsFragment_to_groupPickerDialogFragment"
+            app:destination="@id/groupPickerDialogFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_addItemFragment"
+            app:destination="@id/addItemFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_themeSelectorFragment"
+            app:destination="@id/themeSelectorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailFragment">
+        <argument
+            android:name="itemid"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_detailFragment_to_confirmRemoveDialogFragment2"
+            app:destination="@id/confirmRemoveDialogFragment2"
+            app:launchSingleTop="true"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_detailFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+        <action
+            android:id="@+id/action_detailFragment_to_editItemFragment"
+            app:destination="@id/editItemFragment" />
+        <action
+            android:id="@+id/action_detailFragment_to_chartFragment"
+            app:destination="@id/chartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addItemFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.additemfrag.AddItemFragment"
+        android:label="@string/add">
+        <action
+            android:id="@+id/action_addItemFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+        <argument
+            android:name="groupName"
+            app:argType="string" />
+        <argument
+            android:name="url"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <dialog
+        android:id="@+id/confirmRemoveDialogFragment2"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.confirmremovedialogfrag.ConfirmRemoveDialogFragment"
+        android:label="ConfirmRemoveDialogFragment" >
+        <argument
+            android:name="itemsIdToDelete"
+            app:argType="string[]" />
+    </dialog>
+    <dialog
+        android:id="@+id/errorDialogFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.errordialogfrag.ErrorDialogFragment"
+        android:label="ErrorDialogFragment" >
+        <argument
+            android:name="errorCode"
+            app:argType="string" />
+    </dialog>
+    <fragment
+        android:id="@+id/editItemFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.edititemfrag.EditItemFragment"
+        android:label="@string/edit">
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+    </fragment>
+    <dialog
+        android:id="@+id/newGroupDialogFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag.NewGroupDialogFragment"
+        android:label="NewGroupDialogFragment" >
+        <action
+            android:id="@+id/action_newGroupDialogFragment_to_itemsFragment"
+            app:destination="@id/itemsFragment"
+            app:popUpTo="@id/itemsFragment"
+            app:popUpToInclusive="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/confirmDeleteGroupDialogFrag"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.confirmdeletegroupdialogfrag.ConfirmDeleteGroupDialogFragment"
+        android:label="ConfirmDeleteGroupDialogFrag" >
+        <argument
+            android:name="groupName"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_confirmDeleteGroupDialogFrag_to_itemsFragment"
+            app:destination="@id/itemsFragment"
+            app:popUpTo="@id/itemsFragment"
+            app:popUpToInclusive="true" />
+    </dialog>
+    <dialog
+        android:id="@+id/groupPickerDialogFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.grouppickerfrag.GroupPickerDialogFragment"
+        android:label="GroupPickerDialogFragment" >
+        <argument
+            android:name="itemsId"
+            app:argType="string[]" />
+    </dialog>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.signinfrag.SignInFragment"
+        android:label="@string/backup_and_sync" >
+        <action
+            android:id="@+id/action_signInFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/themeSelectorFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.themeselectorfragment.ThemeSelectorFragment"
+        android:label="@string/theme" />
+    <fragment
+        android:id="@+id/chartFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.chartfragment.ChartFragment"
+        android:label="@string/orders">
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_chartFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+    </fragment>
+</navigation>
