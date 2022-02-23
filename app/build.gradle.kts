@@ -50,7 +50,6 @@ android {
 dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
@@ -61,8 +60,6 @@ dependencies {
     kapt("androidx.room:room-compiler:2.3.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("com.squareup.picasso:picasso:2.71828")
-
-    //implementation("org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION")
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.appcompat:appcompat:1.3.1")
     implementation("com.google.android.material:material:1.4.0")
@@ -74,7 +71,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
-    implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.google.android.gms:play-services-auth:19.2.0")
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
