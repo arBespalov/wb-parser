@@ -12,7 +12,7 @@ class EditItemViewModelFactory (
     private val itemsRepository: ItemsRepository,
 ): ViewModelProvider.NewInstanceFactory(){
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return EditItemViewModel(
             ObserveSingleItemUseCase(itemsRepository),
             itemId,

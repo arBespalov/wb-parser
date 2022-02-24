@@ -1,2 +1,2 @@
 include(":app")
-rootProject.name = "WB Parser"
+rootProject.name = "wb-parser"

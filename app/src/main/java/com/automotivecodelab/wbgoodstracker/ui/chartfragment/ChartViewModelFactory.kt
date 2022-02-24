@@ -13,7 +13,7 @@ class ChartViewModelFactory(
     private val itemId: String
 ): ViewModelProvider.NewInstanceFactory(){
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ChartViewModel(
             GetOrdersChartDataUseCase(itemsRepository),
             itemId

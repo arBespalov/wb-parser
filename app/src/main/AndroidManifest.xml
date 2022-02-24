@@ -15,8 +15,10 @@
         android:supportsRtl="false"
         android:theme="@style/Theme.WBParser"
         android:name="com.automotivecodelab.wbgoodstracker.MyApplication">
-        <activity android:name="com.automotivecodelab.wbgoodstracker.ui.MainActivity"
-            android:windowSoftInputMode="adjustResize">
+        <activity
+            android:name="com.automotivecodelab.wbgoodstracker.ui.MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

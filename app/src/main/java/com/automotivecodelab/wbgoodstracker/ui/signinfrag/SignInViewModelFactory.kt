@@ -12,7 +12,7 @@ class SignInViewModelFactory(
     private val itemsRepository: ItemsRepository,
     private val userRepository: UserRepository
     ): ViewModelProvider.NewInstanceFactory(){
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return SignInViewModel(
             SignInUseCase(userRepository, itemsRepository),
             GetUserUseCase(userRepository),

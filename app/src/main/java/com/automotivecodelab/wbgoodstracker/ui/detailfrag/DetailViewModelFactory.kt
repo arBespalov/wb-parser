@@ -12,7 +12,7 @@ class DetailViewModelFactory (
     private val itemId: String
 ): ViewModelProvider.NewInstanceFactory(){
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return DetailViewModel(
             RefreshSingleItemUseCase(itemsRepository),
             ObserveSingleItemUseCase(itemsRepository),

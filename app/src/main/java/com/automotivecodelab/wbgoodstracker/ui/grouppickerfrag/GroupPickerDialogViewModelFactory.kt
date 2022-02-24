@@ -10,7 +10,7 @@ class GroupPickerDialogViewModelFactory (
     private val itemsRepository: ItemsRepository
 ): ViewModelProvider.NewInstanceFactory(){
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GroupPickerDialogViewModel(
             GetGroupsUseCase(itemsRepository),
             AddItemsToGroupUseCase(itemsRepository)

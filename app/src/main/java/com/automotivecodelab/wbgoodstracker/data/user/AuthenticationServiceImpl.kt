@@ -32,7 +32,7 @@ class AuthenticationServiceImpl(val context: Context): AuthenticationService {
             throw AuthenticationException()
         }
 
-        return User(googleSignInAccount.idToken, googleSignInAccount.email)
+        return User(googleSignInAccount.idToken!!, googleSignInAccount.email)
     }
 
     override suspend fun updateToken(user: User): User {

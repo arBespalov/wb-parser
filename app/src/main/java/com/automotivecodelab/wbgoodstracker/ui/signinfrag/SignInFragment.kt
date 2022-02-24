@@ -184,7 +184,7 @@ class SignInFragment : Fragment() {
                 try {
                     val credential = oneTapClient.getSignInCredentialFromIntent(data)
 
-                    val user = User(credential.googleIdToken, email = null)
+                    val user = User(credential.googleIdToken!!, email = null)
 
                     viewModel.handleSignInResult(user)
                 } catch (e: ApiException) {

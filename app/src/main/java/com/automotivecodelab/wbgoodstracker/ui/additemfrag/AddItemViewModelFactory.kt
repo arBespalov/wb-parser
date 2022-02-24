@@ -12,7 +12,7 @@ class AddItemViewModelFactory (
     private val userRepository: UserRepository
 ): ViewModelProvider.NewInstanceFactory(){
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return AddItemViewModel(
             AddItemUseCase(itemsRepository, userRepository),
             SignOutUseCase(userRepository)
