@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.GetOrdersChartDataUseCase
 import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class ChartViewModel(

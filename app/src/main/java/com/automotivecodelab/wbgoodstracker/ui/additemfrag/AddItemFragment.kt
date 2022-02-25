@@ -2,38 +2,39 @@ package com.automotivecodelab.wbgoodstracker.ui.additemfrag
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import androidx.transition.Slide
 import com.automotivecodelab.wbgoodstracker.*
-import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.databinding.AddItemFragmentBinding
-import com.automotivecodelab.wbgoodstracker.ui.KeyboardToggle
+import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.SignOutSnackbar
-import com.automotivecodelab.wbgoodstracker.ui.confirmremovedialogfrag.ConfirmRemoveDialogFragmentArgs
 import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialSharedAxis
 
 class AddItemFragment : Fragment() {
 
-    private val viewModel: AddItemViewModel by viewModels { AddItemViewModelFactory(getItemsRepository(), getUserRepository()) }
+    private val viewModel: AddItemViewModel by viewModels {
+        AddItemViewModelFactory(getItemsRepository(), getUserRepository())
+    }
     private var viewDataBinding: AddItemFragmentBinding? = null
     private val args: AddItemFragmentArgs by navArgs()
     private var isArgsUrlHandled = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.add_item_fragment, container, false)
 
         viewDataBinding = AddItemFragmentBinding.bind(view).apply {
@@ -53,31 +54,41 @@ class AddItemFragment : Fragment() {
 
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
-        val cancelButton = getDrawable(resources, R.drawable.ic_baseline_close_24, requireActivity().theme)
+        val cancelButton = getDrawable(
+            resources,
+            R.drawable.ic_baseline_close_24,
+            requireActivity().theme
+        )
 
         viewDataBinding?.apply {
             toolbar.setupWithNavController(navController, appBarConfiguration)
-            toolbar.navigationIcon =  cancelButton
+            toolbar.navigationIcon = cancelButton
             swipeRefresh.isEnabled = false
             fabSave.setOnClickListener { viewModel.saveItem(args.groupName) }
 
-            viewModel.invalidUrl.observe(viewLifecycleOwner, Observer {
-                if (it) {
-                    textInputLayout.error = getString(R.string.invalid_url)
-                } else {
-                    textInputLayout.error = null
+            viewModel.invalidUrl.observe(
+                viewLifecycleOwner,
+                Observer {
+                    if (it) {
+                        textInputLayout.error = getString(R.string.invalid_url)
+                    } else {
+                        textInputLayout.error = null
+                    }
                 }
-            })
+            )
 
-            viewModel.dataLoading.observe(viewLifecycleOwner, Observer {
-                if (it) {
-                    swipeRefresh.isRefreshing = true
-                    fabSave.hide()
-                } else {
-                    swipeRefresh.isRefreshing = false
-                    fabSave.show()
+            viewModel.dataLoading.observe(
+                viewLifecycleOwner,
+                Observer {
+                    if (it) {
+                        swipeRefresh.isRefreshing = true
+                        fabSave.hide()
+                    } else {
+                        swipeRefresh.isRefreshing = false
+                        fabSave.show()
+                    }
                 }
-            })
+            )
 
             fabSave.isEnabled = false
 
@@ -90,7 +101,6 @@ class AddItemFragment : Fragment() {
                 args.url?.let { URL.setText(it) }
                 isArgsUrlHandled = true
             }
-
 
             sharedElementEnterTransition = MaterialContainerTransform().apply {
                 scrimColor = Color.TRANSPARENT
@@ -107,9 +117,12 @@ class AddItemFragment : Fragment() {
             }
         }
 
-        viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
-        })
+        viewModel.authorizationErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
+            }
+        )
 
         setupNavigation()
 
@@ -118,13 +131,20 @@ class AddItemFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.saveSuccessfulEvent.observe(viewLifecycleOwner, EventObserver {
-            findNavController().navigateUp()
-        })
+        viewModel.saveSuccessfulEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                findNavController().navigateUp()
+            }
+        )
 
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            val action = AddItemFragmentDirections.actionAddItemFragmentToErrorDialogFragment(it)
-            navigate(action)
-        })
+        viewModel.networkErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                val action = AddItemFragmentDirections
+                    .actionAddItemFragmentToErrorDialogFragment(it)
+                navigate(action)
+            }
+        )
     }
 }

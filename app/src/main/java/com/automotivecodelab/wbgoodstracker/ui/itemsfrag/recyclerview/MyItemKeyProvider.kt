@@ -4,7 +4,7 @@ import androidx.recyclerview.selection.ItemKeyProvider
 import androidx.recyclerview.widget.SortedList
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
-class MyItemKeyProvider(): ItemKeyProvider<String>(ItemKeyProvider.SCOPE_CACHED) {
+class MyItemKeyProvider() : ItemKeyProvider<String>(ItemKeyProvider.SCOPE_CACHED) {
 
     var sortedListItems: SortedList<Item>? = null
     var items: List<Item>? = null

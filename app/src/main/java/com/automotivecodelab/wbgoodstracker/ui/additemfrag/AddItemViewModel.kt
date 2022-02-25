@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.automotivecodelab.wbgoodstracker.ui.Event
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.util.Result
+import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class AddItemViewModel(
@@ -41,11 +41,12 @@ class AddItemViewModel(
                 is Result.Error -> {
                     when (result.exception) {
                         is InvalidUrlException -> _invalidUrl.value = true
-                        else -> _networkErrorEvent.value = Event(result.exception.message.toString())
+                        else ->
+                            _networkErrorEvent.value =
+                                Event(result.exception.message.toString())
                     }
                 }
                 is Result.Success -> _saveSuccessfulEvent.value = Event(Unit)
-
             }
             _dataLoading.value = false
         }

@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.automotivecodelab.wbgoodstracker.ui.Event
 import com.automotivecodelab.wbgoodstracker.domain.EditItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
+import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class EditItemViewModel(

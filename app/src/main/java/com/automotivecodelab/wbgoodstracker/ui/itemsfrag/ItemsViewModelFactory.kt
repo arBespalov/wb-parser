@@ -6,10 +6,10 @@ import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 
-class ItemsViewModelFactory (
+class ItemsViewModelFactory(
     private val itemsRepository: ItemsRepository,
     private val userRepository: UserRepository
-): ViewModelProvider.NewInstanceFactory(){
+) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ItemsViewModel(

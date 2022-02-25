@@ -6,9 +6,9 @@ import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 
-class GroupPickerDialogViewModelFactory (
+class GroupPickerDialogViewModelFactory(
     private val itemsRepository: ItemsRepository
-): ViewModelProvider.NewInstanceFactory(){
+) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GroupPickerDialogViewModel(

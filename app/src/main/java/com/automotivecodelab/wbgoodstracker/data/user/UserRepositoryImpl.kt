@@ -1,14 +1,14 @@
 package com.automotivecodelab.wbgoodstracker.data.user
 
 import com.automotivecodelab.wbgoodstracker.data.user.local.UserLocalDataSource
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
-import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import com.automotivecodelab.wbgoodstracker.domain.models.User
+import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
+import com.automotivecodelab.wbgoodstracker.domain.util.Result
 
 class UserRepositoryImpl(
     private val localDataSource: UserLocalDataSource,
     private val authenticationService: AuthenticationService
-): UserRepository {
+) : UserRepository {
 
     override suspend fun getUser(): Result<User?> {
         if (localDataSource.isUserSignedIn()) {

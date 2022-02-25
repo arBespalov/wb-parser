@@ -2,11 +2,12 @@ package com.automotivecodelab.wbgoodstracker.data.items.remote
 
 import com.automotivecodelab.wbgoodstracker.data.NetworkStatusListener
 import com.automotivecodelab.wbgoodstracker.data.SafeApiRequest
-import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
 import com.automotivecodelab.wbgoodstracker.data.util.NoInternetConnectionException
+import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
-class ItemsRemoteDataSourceImpl(private val networkStatusListener: NetworkStatusListener): SafeApiRequest(), ItemsRemoteDataSource {
+class ItemsRemoteDataSourceImpl(private val networkStatusListener: NetworkStatusListener) :
+    SafeApiRequest(), ItemsRemoteDataSource {
 
     private val api = ServerApi()
 
@@ -39,5 +40,4 @@ class ItemsRemoteDataSourceImpl(private val networkStatusListener: NetworkStatus
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.getItemWithFullData(itemId) }
     }
-
 }

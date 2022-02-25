@@ -6,7 +6,10 @@ interface ViewHolderWithDetails<TItem> {
     fun getItemDetail(): ItemDetailsLookup.ItemDetails<TItem>
 }
 
-class MyItemDetails(private val adapterPosition: Int, private val selectedKey: String?): ItemDetailsLookup.ItemDetails<String>() {
+class MyItemDetails(
+    private val adapterPosition: Int,
+    private val selectedKey: String?
+) : ItemDetailsLookup.ItemDetails<String>() {
 
     override fun getSelectionKey() = selectedKey
 

@@ -7,10 +7,10 @@ import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 
-class EditItemViewModelFactory (
+class EditItemViewModelFactory(
     private val itemId: String,
     private val itemsRepository: ItemsRepository,
-): ViewModelProvider.NewInstanceFactory(){
+) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return EditItemViewModel(

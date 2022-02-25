@@ -7,11 +7,10 @@ import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.automotivecodelab.wbgoodstracker.ui.EventObserver
-import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.getItemsRepository
 import com.automotivecodelab.wbgoodstracker.getUserRepository
+import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -20,8 +19,8 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
 
     private val args: ConfirmRemoveDialogFragmentArgs by navArgs()
     private val viewModel: ConfirmRemoveDialogViewModel by viewModels {
-        ConfirmRemoveDialogViewModelFactory(getItemsRepository(), getUserRepository()) }
-
+        ConfirmRemoveDialogViewModelFactory(getItemsRepository(), getUserRepository())
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
@@ -32,8 +31,11 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
             viewModel.deleteItems(args.itemsIdToDelete)
         }
 
-        bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)?.let {
-            BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED }
+        bottomSheetDialog.findViewById<FrameLayout>(
+            com.google.android.material.R.id.design_bottom_sheet
+        )?.let {
+            BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         setupNavigation()
 
@@ -41,9 +43,13 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.taskCompletedEvent.observe(this, EventObserver {//"this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog won't be initialized
-            findNavController().navigateUp()
-            findNavController().navigateUp()
-        })
+        // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog won't be initialized
+        viewModel.taskCompletedEvent.observe(
+            this,
+            EventObserver {
+                findNavController().navigateUp()
+                findNavController().navigateUp()
+            }
+        )
     }
 }

@@ -6,7 +6,7 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 
 class ObserveSingleItemUseCase(
     private val itemsRepository: ItemsRepository
-){
+) {
     operator fun invoke(itemId: String): LiveData<Item> {
         return itemsRepository.observeSingleItem(itemId)
     }

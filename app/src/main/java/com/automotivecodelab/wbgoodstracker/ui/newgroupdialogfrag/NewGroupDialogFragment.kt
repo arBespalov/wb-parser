@@ -8,12 +8,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.automotivecodelab.wbgoodstracker.ui.EventObserver
-import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.getItemsRepository
 import com.automotivecodelab.wbgoodstracker.navigate
+import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.KeyboardToggle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,15 +19,20 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class NewGroupDialogFragment : BottomSheetDialogFragment() {
 
-    private val viewModel: NewGroupDialogViewModel by viewModels { NewGroupDialogViewModelFactory(getItemsRepository()) }
+    private val viewModel: NewGroupDialogViewModel by viewModels {
+        NewGroupDialogViewModelFactory(getItemsRepository())
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(R.layout.fragment_new_group_dialog)
 
-        bottomSheetDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        bottomSheetDialog.window?.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        )
         bottomSheetDialog.setOnShowListener {
-            val bottomSheet = (bottomSheetDialog as? BottomSheetDialog)?.findViewById<View>(R.id.design_bottom_sheet) as? FrameLayout
+            val bottomSheet = (bottomSheetDialog as? BottomSheetDialog)
+                ?.findViewById<View>(R.id.design_bottom_sheet) as? FrameLayout
             bottomSheet?.let {
                 BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED
             }
@@ -58,9 +61,15 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.taskCompletedEvent.observe(this, EventObserver {//"this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog won't be initialized
-            val action = NewGroupDialogFragmentDirections.actionNewGroupDialogFragmentToItemsFragment()
-            navigate(action)
-        })
+        // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
+        // won't be initialized
+        viewModel.taskCompletedEvent.observe(
+            this,
+            EventObserver {
+                val action = NewGroupDialogFragmentDirections
+                    .actionNewGroupDialogFragmentToItemsFragment()
+                navigate(action)
+            }
+        )
     }
 }

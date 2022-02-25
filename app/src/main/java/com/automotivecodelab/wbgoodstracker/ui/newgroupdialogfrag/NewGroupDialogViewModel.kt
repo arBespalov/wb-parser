@@ -3,11 +3,11 @@ package com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.automotivecodelab.wbgoodstracker.ui.Event
 import com.automotivecodelab.wbgoodstracker.domain.CreateNewGroupUseCase
+import com.automotivecodelab.wbgoodstracker.ui.Event
 
 class NewGroupDialogViewModel(
-        private val createNewGroupUseCase: CreateNewGroupUseCase
+    private val createNewGroupUseCase: CreateNewGroupUseCase
 ) : ViewModel() {
 
     private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()

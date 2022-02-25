@@ -9,7 +9,10 @@ class DeleteItemsUseCase(
     private val itemsRepository: ItemsRepository,
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(itemsIdToDelete: Array<String>, onAuthenticationFailureCallback: ()-> Unit = {}) {
+    suspend operator fun invoke(
+        itemsIdToDelete: Array<String>,
+        onAuthenticationFailureCallback: () -> Unit = {}
+    ) {
         return when (val authenticationResult = userRepository.getUser()) {
             is Result.Error -> {
                 onAuthenticationFailureCallback()

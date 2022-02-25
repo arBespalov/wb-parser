@@ -2,8 +2,8 @@ package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
+import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,7 +15,7 @@ const val IS_USER_SIGNED_IN = "isUserSignedIn"
 class ItemsLocalDataSourceImpl(
     private val itemDao: ItemDao,
     private val sharedPreferences: SharedPreferences
-): ItemsLocalDataSource {
+) : ItemsLocalDataSource {
     override fun observeAll(): LiveData<List<Item>> {
         return itemDao.observeAll()
     }
@@ -33,11 +33,11 @@ class ItemsLocalDataSourceImpl(
     }
 
     override suspend fun addItem(item: Item) {
-        return withContext(Dispatchers.IO) {itemDao.insert(item)}
+        return withContext(Dispatchers.IO) { itemDao.insert(item) }
     }
 
     override suspend fun getItem(id: String): Item {
-        return withContext(Dispatchers.IO){ itemDao.getById(id) }
+        return withContext(Dispatchers.IO) { itemDao.getById(id) }
     }
 
     override fun observeItem(id: String): LiveData<Item> {
@@ -45,7 +45,7 @@ class ItemsLocalDataSourceImpl(
     }
 
     override suspend fun deleteItems(itemsId: Array<String>) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             itemsId.forEach {
                 val item = getItem(it)
                 itemDao.delete(item)
@@ -54,11 +54,11 @@ class ItemsLocalDataSourceImpl(
     }
 
     override suspend fun updateItem(item: Item): Int {
-        return withContext(Dispatchers.IO){ itemDao.update(item) }
+        return withContext(Dispatchers.IO) { itemDao.update(item) }
     }
 
     override suspend fun updateItems(items: List<Item>): Int {
-        return withContext(Dispatchers.IO){ itemDao.batchUpdate(items) }
+        return withContext(Dispatchers.IO) { itemDao.batchUpdate(items) }
     }
 
     override fun getCurrentGroup(): String? {
@@ -95,7 +95,8 @@ class ItemsLocalDataSourceImpl(
 
     override fun deleteGroup(groupName: String) {
         val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
-        val newGroupNames = HashSet<String>(groupNames)//modifying groupNames is not allowed according to docs
+        // modifying groupNames is not allowed according to docs
+        val newGroupNames = HashSet<String>(groupNames)
         newGroupNames.remove(groupName)
         sharedPreferences.edit()
             .putStringSet(GROUP_NAMES, newGroupNames)
@@ -105,7 +106,8 @@ class ItemsLocalDataSourceImpl(
 
     override fun addGroup(groupName: String) {
         val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
-        val newGroupNames = HashSet<String>(groupNames)//modifying groupNames is not allowed according to docs
+        // modifying groupNames is not allowed according to docs
+        val newGroupNames = HashSet<String>(groupNames)
         newGroupNames.add(groupName)
         sharedPreferences.edit()
             .putStringSet(GROUP_NAMES, newGroupNames)

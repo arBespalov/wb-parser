@@ -2,12 +2,12 @@ package com.automotivecodelab.wbgoodstracker.ui.themeselectorfragment
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -22,7 +22,8 @@ class ThemeSelectorFragment : Fragment() {
     private var viewDataBinding: ThemeSelectorFragmentBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.theme_selector_fragment, container, false)
@@ -44,7 +45,8 @@ class ThemeSelectorFragment : Fragment() {
 
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
-        val cancelButton = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_close_24, requireActivity().theme)
+        val cancelButton = ResourcesCompat
+            .getDrawable(resources, R.drawable.ic_baseline_close_24, requireActivity().theme)
         viewDataBinding?.apply {
             toolbar.setupWithNavController(navController, appBarConfiguration)
             toolbar.navigationIcon = cancelButton
@@ -56,12 +58,12 @@ class ThemeSelectorFragment : Fragment() {
                 AppCompatDelegate.MODE_NIGHT_UNSPECIFIED -> systemDefault.isChecked = true
             }
 
-            systemDefault.setOnClickListener { setUIMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }
+            systemDefault.setOnClickListener {
+                setUIMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
             day.setOnClickListener { setUIMode(AppCompatDelegate.MODE_NIGHT_NO) }
             night.setOnClickListener { setUIMode(AppCompatDelegate.MODE_NIGHT_YES) }
         }
-
-
 
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
@@ -73,6 +75,4 @@ class ThemeSelectorFragment : Fragment() {
             .putInt(SAVED_UI_MODE, mode)
             .apply()
     }
-
 }
-

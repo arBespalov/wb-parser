@@ -14,8 +14,6 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
-import com.automotivecodelab.wbgoodstracker.ui.MainActivity
-import com.automotivecodelab.wbgoodstracker.ui.additemfrag.AddItemFragmentDirections
 import kotlin.math.ceil
 
 fun httpToHttps(url: String): String {
@@ -42,7 +40,7 @@ fun Fragment.getUserRepository(): UserRepository {
     return (requireActivity().application as MyApplication).appContainer.userRepository
 }
 
-//avoiding duplicate navigation to prevent crashes when click 2 views simultaneously
+// avoiding duplicate navigation to prevent crashes when click 2 views simultaneously
 fun Fragment.navigate(directions: NavDirections) {
     val controller = findNavController()
     when (val currentDestination = controller.currentDestination) {

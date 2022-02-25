@@ -5,21 +5,21 @@ import com.automotivecodelab.wbgoodstracker.data.ResourcesManager
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
+import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.util.Result
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.log
+import java.util.*
+import kotlin.Comparator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import java.util.*
-import kotlin.Comparator
 
 class ItemsRepositoryImpl(
     private val localDataSource: ItemsLocalDataSource,
     private val remoteDataSource: ItemsRemoteDataSource,
     private val resourcesManager: ResourcesManager
-): ItemsRepository {
+) : ItemsRepository {
 
     override fun observeItems(groupName: String): LiveData<List<Item>> {
         return if (groupName == resourcesManager.getAllItemsString()) {
@@ -49,7 +49,6 @@ class ItemsRepositoryImpl(
                     remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
                 }
             } catch (e: Exception) {
-
             }
         }
     }
@@ -72,7 +71,11 @@ class ItemsRepositoryImpl(
         return addItemWithNullableToken(url, groupName, token)
     }
 
-    private suspend fun addItemWithNullableToken(url: String, groupName: String, token: String?): Result<Unit> {
+    private suspend fun addItemWithNullableToken(
+        url: String,
+        groupName: String,
+        token: String?
+    ): Result<Unit> {
         try {
             withContext(Dispatchers.IO) {
                 val newItemDeferred = async { remoteDataSource.addItem(url, token) }
@@ -81,7 +84,9 @@ class ItemsRepositoryImpl(
                 val newItem = newItemDeferred.await()
                 val localItems = localItemsDeferred.await()
 
-                val nullableGroupName = if (groupName == resourcesManager.getAllItemsString()) null else groupName
+                val nullableGroupName = if (groupName == resourcesManager.getAllItemsString())
+                    null
+                else groupName
 
                 localItems.find { item -> newItem._id == item._id }?.also {
                     val result = handleLocalValues(it, newItem)
@@ -89,12 +94,17 @@ class ItemsRepositoryImpl(
                     return@withContext
                 }
 
-                localDataSource.addItem(newItem.copy(local_creationTimeInMs = Date().time, local_groupName = nullableGroupName))
+                localDataSource.addItem(
+                    newItem.copy(
+                        local_creationTimeInMs = Date().time,
+                        local_groupName = nullableGroupName
+                    )
+                )
             }
             return Result.Success(Unit)
         } catch (e: Exception) {
             log(e.message.toString())
-            return Result.Error(Exception(""))//hided error message in prod
+            return Result.Error(Exception("")) // hided error message in prod
         }
     }
 
@@ -137,7 +147,10 @@ class ItemsRepositoryImpl(
                 itemIdsToUpdate.map { id ->
                     val updatedItem = serverItems.find { item -> item._id == id }!!
 
-                    handleLocalValues(localItems.find { oldItem -> oldItem._id == id }!!, updatedItem)
+                    handleLocalValues(
+                        localItems.find { oldItem -> oldItem._id == id }!!,
+                        updatedItem
+                    )
                 }.also {
                     localDataSource.updateItems(it)
                 }
@@ -156,7 +169,10 @@ class ItemsRepositoryImpl(
                 val updatedItems = remoteDataSource.updateItems(itemIds)
 
                 updatedItems.map { updatedItem ->
-                    handleLocalValues(items.find { oldItem -> oldItem._id == updatedItem._id }!!, updatedItem)
+                    handleLocalValues(
+                        items.find { oldItem -> oldItem._id == updatedItem._id }!!,
+                        updatedItem
+                    )
                 }.also {
                     localDataSource.updateItems(it)
                 }
@@ -207,7 +223,6 @@ class ItemsRepositoryImpl(
         setGroupNameToItemsList(itemIds.map { localDataSource.getItem(it) }, groupName)
     }
 
-
     private suspend fun setGroupNameToItemsList(items: List<Item>, groupName: String) {
         withContext(Dispatchers.IO) {
             if (groupName == resourcesManager.getAllItemsString()) {
@@ -238,10 +253,18 @@ class ItemsRepositoryImpl(
         return when (localDataSource.getSortingMode()) {
             SortingMode.BY_NAME_ASC -> Comparator { o1, o2 -> o1.name.compareTo(o2.name) }
             SortingMode.BY_NAME_DESC -> Comparator { o1, o2 -> o2.name.compareTo(o1.name) }
-            SortingMode.BY_DATE_ASC -> Comparator { o1, o2 -> o2.local_creationTimeInMs.compareTo(o1.local_creationTimeInMs) }
-            SortingMode.BY_DATE_DESC -> Comparator { o1, o2 -> o1.local_creationTimeInMs.compareTo(o2.local_creationTimeInMs) }
-            SortingMode.BY_ORDERS_COUNT -> Comparator { o1, o2 -> o2.info!![0].ordersCount.compareTo(o1.info!![0].ordersCount) }
-            SortingMode.BY_ORDERS_COUNT_PER_DAY -> Comparator { o1, o2 -> o2.averageOrdersCountInDay.compareTo(o1.averageOrdersCountInDay) }
+            SortingMode.BY_DATE_ASC -> Comparator { o1, o2 ->
+                o2.local_creationTimeInMs.compareTo(o1.local_creationTimeInMs)
+            }
+            SortingMode.BY_DATE_DESC -> Comparator { o1, o2 ->
+                o1.local_creationTimeInMs.compareTo(o2.local_creationTimeInMs)
+            }
+            SortingMode.BY_ORDERS_COUNT -> Comparator { o1, o2 ->
+                o2.info!![0].ordersCount.compareTo(o1.info!![0].ordersCount)
+            }
+            SortingMode.BY_ORDERS_COUNT_PER_DAY -> Comparator { o1, o2 ->
+                o2.averageOrdersCountInDay.compareTo(o1.averageOrdersCountInDay)
+            }
         }
     }
 
@@ -276,9 +299,11 @@ class ItemsRepositoryImpl(
     override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {
         return try {
             val item = remoteDataSource.getItemWithFullData(itemId)
-            Result.Success(item.info!!.map {
-                Pair(it.timeOfCreationInMs, it.ordersCount)
-            })
+            Result.Success(
+                item.info!!.map {
+                    Pair(it.timeOfCreationInMs, it.ordersCount)
+                }
+            )
         } catch (e: Exception) {
             log(e.message.toString())
             Result.Error(Exception(""))

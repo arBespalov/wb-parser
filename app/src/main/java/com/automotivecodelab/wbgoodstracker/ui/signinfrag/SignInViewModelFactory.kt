@@ -11,7 +11,7 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 class SignInViewModelFactory(
     private val itemsRepository: ItemsRepository,
     private val userRepository: UserRepository
-    ): ViewModelProvider.NewInstanceFactory(){
+) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return SignInViewModel(
             SignInUseCase(userRepository, itemsRepository),

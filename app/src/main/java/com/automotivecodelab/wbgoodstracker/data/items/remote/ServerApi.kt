@@ -12,20 +12,26 @@ interface ServerApi {
     companion object {
         operator fun invoke(): ServerApi {
             return Retrofit.Builder()
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl(BuildConfig.SERVER_URL)
-                    .build()
-                    .create(ServerApi::class.java)
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(BuildConfig.SERVER_URL)
+                .build()
+                .create(ServerApi::class.java)
         }
     }
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/add_item")
-    suspend fun addItem(@Query("url") url: String, @Query("id_token") idToken: String?): Response<Item>
+    suspend fun addItem(
+        @Query("url") url: String,
+        @Query("id_token") idToken: String?
+    ): Response<Item>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/delete_items")
-    suspend fun deleteItems(@Body itemIds: Wrapper<List<Int>>, @Query("id_token") idToken: String): Response<Unit>
+    suspend fun deleteItems(
+        @Body itemIds: Wrapper<List<Int>>,
+        @Query("id_token") idToken: String
+    ): Response<Unit>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/update_items")
@@ -37,7 +43,10 @@ interface ServerApi {
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/merge_items")
-    suspend fun mergeItems(@Body itemIds: Wrapper<List<Int>>, @Query("id_token") idToken: String): Response<List<Item>>
+    suspend fun mergeItems(
+        @Body itemIds: Wrapper<List<Int>>,
+        @Query("id_token") idToken: String
+    ): Response<List<Item>>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/get_full_data_item")

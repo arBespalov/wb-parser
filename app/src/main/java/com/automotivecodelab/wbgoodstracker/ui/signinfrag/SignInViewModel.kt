@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.automotivecodelab.wbgoodstracker.ui.Event
 import com.automotivecodelab.wbgoodstracker.domain.GetUserUseCase
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.domain.SignInUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignOutUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.User
+import com.automotivecodelab.wbgoodstracker.domain.util.Result
+import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class SignInViewModel(
@@ -37,7 +37,6 @@ class SignInViewModel(
                 else -> _viewState.value = SignInViewState.SignedOutState
             }
         }
-
     }
 
     fun signOut() {

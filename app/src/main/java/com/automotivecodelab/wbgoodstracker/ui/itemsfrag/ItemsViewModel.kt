@@ -1,37 +1,39 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
 import androidx.lifecycle.*
-import androidx.navigation.fragment.FragmentNavigator
-import com.automotivecodelab.wbgoodstracker.ui.Event
-import com.automotivecodelab.wbgoodstracker.domain.models.Item
+import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
 import com.automotivecodelab.wbgoodstracker.domain.*
+import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.util.Result
-import kotlinx.coroutines.launch
+import com.automotivecodelab.wbgoodstracker.ui.Event
 import java.util.*
 import kotlin.Comparator
+import kotlinx.coroutines.launch
 
 class ItemsViewModel(
-        observeItemsByGroupUseCase: ObserveItemsByGroupUseCase,
-        private val getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
-        private val setSortingModeUseCase: SetSortingModeUseCase,
-        private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
-        private val getGroupsUseCase: GetGroupsUseCase,
-        getCurrentGroupUseCase: GetCurrentGroupUseCase,
-        private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
-        private val signOutUseCase: SignOutUseCase
+    observeItemsByGroupUseCase: ObserveItemsByGroupUseCase,
+    private val getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
+    private val setSortingModeUseCase: SetSortingModeUseCase,
+    private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
+    private val getGroupsUseCase: GetGroupsUseCase,
+    getCurrentGroupUseCase: GetCurrentGroupUseCase,
+    private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
+    private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
     private val _currentGroup = MutableLiveData(getCurrentGroupUseCase())
     val currentGroup: LiveData<String> = _currentGroup
 
-    val items: LiveData<List<Item>> = Transformations.switchMap(_currentGroup) { groupName -> observeItemsByGroupUseCase(groupName) }
+    val items: LiveData<List<Item>> = Transformations.switchMap(_currentGroup) { groupName ->
+        observeItemsByGroupUseCase(groupName)
+    }
 
     private val _openItemEvent = MutableLiveData<Event<Int>>()
     val openItemEvent: LiveData<Event<Int>> = _openItemEvent
 
-    private val _addItemEvent = MutableLiveData<Event<com.automotivecodelab.wbgoodstracker.data.util.Wrapper<String?>>>()
-    val addItemEvent: LiveData<Event<com.automotivecodelab.wbgoodstracker.data.util.Wrapper<String?>>> = _addItemEvent
+    private val _addItemEvent = MutableLiveData<Event<Wrapper<String?>>>()
+    val addItemEvent: LiveData<Event<Wrapper<String?>>> = _addItemEvent
 
     private val _confirmDeleteEvent = MutableLiveData<Event<List<String>>>()
     val confirmDeleteEvent: LiveData<Event<List<String>>> = _confirmDeleteEvent
@@ -66,16 +68,12 @@ class ItemsViewModel(
     var cachedSearchQuery: String? = null
         private set
 
-//    fun openItem(openItemDTO: OpenItemDTO) {
-//        _openItemEvent.value = Event(openItemDTO)
-//    }
-
     fun openItem(position: Int) {
         _openItemEvent.value = Event(position)
     }
 
     fun addItem(url: String?) {
-        _addItemEvent.value = Event(com.automotivecodelab.wbgoodstracker.data.util.Wrapper(url))
+        _addItemEvent.value = Event(Wrapper(url))
     }
 
     fun confirmDelete(itemsIdToDelete: List<String>) {
@@ -155,8 +153,3 @@ class ItemsViewModel(
         _changeThemeEvent.value = Event(Unit)
     }
 }
-
-data class OpenItemDTO (
-    val itemId: String,
-    val extras: FragmentNavigator.Extras
-    )

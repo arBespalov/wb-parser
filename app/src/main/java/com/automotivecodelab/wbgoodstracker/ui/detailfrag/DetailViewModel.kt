@@ -1,11 +1,11 @@
 package com.automotivecodelab.wbgoodstracker.ui.detailfrag
 
 import androidx.lifecycle.*
-import com.automotivecodelab.wbgoodstracker.ui.Event
-import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.RefreshSingleItemUseCase
+import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.util.Result
+import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.*
 
 class DetailViewModel(
@@ -30,7 +30,6 @@ class DetailViewModel(
     private val _showOrdersChartEvent = MutableLiveData<Event<String>>()
     val showOrdersChartEvent: LiveData<Event<String>> = _showOrdersChartEvent
 
-
     fun confirmDelete() {
         _confirmDeleteEvent.value = Event(itemId)
     }
@@ -44,7 +43,9 @@ class DetailViewModel(
             _dataLoading.value = true
             if (item.value != null) {
                 when (val result = refreshSingleItemUseCase(item.value!!)) {
-                    is Result.Error -> _updateErrorEvent.value = Event(result.exception.message.toString())
+                    is Result.Error ->
+                        _updateErrorEvent.value =
+                            Event(result.exception.message.toString())
                     is Result.Success -> { }
                 }
             }

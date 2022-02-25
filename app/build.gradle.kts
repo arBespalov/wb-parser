@@ -1,11 +1,16 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
-    id ("com.android.application")
-    id ("kotlin-android")
-    id ("kotlin-kapt")
-    id ("androidx.navigation.safeargs")
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("androidx.navigation.safeargs")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+}
+
+ktlint {
+    android.set(true)
+    disabledRules.add("no-wildcard-imports")
 }
 
 android {
@@ -19,10 +24,14 @@ android {
         versionCode = 2
         versionName = "1.01"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "SERVER_URL",
-            gradleLocalProperties(rootDir).getProperty("SERVER_URL"))
-        buildConfigField("String", "SERVER_CLIENT_ID",
-            gradleLocalProperties(rootDir).getProperty("SERVER_CLIENT_ID"))
+        buildConfigField(
+            "String", "SERVER_URL",
+            gradleLocalProperties(rootDir).getProperty("SERVER_URL")
+        )
+        buildConfigField(
+            "String", "SERVER_CLIENT_ID",
+            gradleLocalProperties(rootDir).getProperty("SERVER_CLIENT_ID")
+        )
     }
 
     buildTypes {
@@ -31,7 +40,8 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro")
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -52,7 +62,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.google.android.material:material:1.5.0")
-    //implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    // implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")

@@ -11,7 +11,11 @@ class AddItemUseCase(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(url: String, groupName: String, onAuthenticationFailureCallback: ()-> Unit = {}): Result<Unit> {
+    suspend operator fun invoke(
+        url: String,
+        groupName: String,
+        onAuthenticationFailureCallback: () -> Unit = {}
+    ): Result<Unit> {
         if (url.contains("https://wildberries.") ||
             url.contains("https://www.wildberries.") ||
             url.contains("http://wildberries.") ||
@@ -35,11 +39,10 @@ class AddItemUseCase(
                     }
                 }
             }
-
         } else {
             return Result.Error(InvalidUrlException())
         }
     }
 }
 
-class InvalidUrlException: Exception()
+class InvalidUrlException : Exception()
