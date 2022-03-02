@@ -38,7 +38,6 @@ import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.MyItemDeta
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.MyItemKeyProvider
 import com.google.android.material.transition.MaterialElevationScale
 import com.google.android.material.transition.MaterialSharedAxis
-import java.util.*
 
 class ItemsFragment : Fragment() {
 
@@ -329,7 +328,7 @@ class ItemsFragment : Fragment() {
                 ) = false
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     (viewDataBinding?.recyclerViewItems?.adapter as ItemsAdapter).sortedList
-                        .get(viewHolder.bindingAdapterPosition)?.let { viewModel.editItem(it._id) }
+                        .get(viewHolder.bindingAdapterPosition)?.let { viewModel.editItem(it.id) }
                 }
                 override fun onChildDraw(
                     c: Canvas,
@@ -388,7 +387,7 @@ class ItemsFragment : Fragment() {
                 val viewHolder = viewDataBinding!!.recyclerViewItems
                     .findViewHolderForAdapterPosition(it) as ItemsAdapter.ItemsViewHolder
                 val itemId = (viewDataBinding!!.recyclerViewItems.adapter as ItemsAdapter)
-                    .sortedList[it]._id
+                    .sortedList[it].id
                 val extras = FragmentNavigatorExtras(
                     viewHolder.recyclerViewItemBinding.card to
                         getString(R.string.shared_element_container_detail_fragment)

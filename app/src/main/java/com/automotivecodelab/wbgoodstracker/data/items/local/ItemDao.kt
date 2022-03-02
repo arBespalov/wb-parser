@@ -2,37 +2,40 @@ package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
 @Dao
 interface ItemDao {
+    //todo make suspend
+    @Transaction
     @Query("SELECT * FROM item")
-    fun observeAll(): LiveData<List<Item>>
+    fun observeAll(): LiveData<List<ItemWithSizesDBModel>>
 
+    @Transaction
     @Query("SELECT * FROM item")
-    fun getAll(): List<Item>
+    fun getAll(): List<ItemWithSizesDBModel>
+
+    @Transaction
+    @Query("SELECT * FROM item WHERE id IN (:id)")
+    fun getById(id: String): ItemWithSizesDBModel
+
+    @Transaction
+    @Query("SELECT * FROM item WHERE id IN (:id)")
+    fun observeById(id: String): LiveData<ItemWithSizesDBModel>
+
+    @Transaction
+    @Query("SELECT * FROM item WHERE groupName IN (:group)")
+    fun observeByGroup(group: String): LiveData<List<ItemWithSizesDBModel>>
+
+    @Transaction
+    @Query("SELECT * FROM item WHERE groupName IN (:group)")
+    fun getByGroup(group: String): List<ItemWithSizesDBModel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(item: Item)
+    fun insert(vararg item: ItemDBModel)
 
     @Delete
-    fun delete(vararg items: Item)
+    fun delete(vararg item: ItemDBModel)
 
     @Update
-    fun update(item: Item): Int
-
-    @Update
-    fun batchUpdate(items: List<Item>): Int
-
-    @Query("SELECT * FROM item WHERE _id IN (:id)")
-    fun getById(id: String): Item
-
-    @Query("SELECT * FROM item WHERE _id IN (:id)")
-    fun observeById(id: String): LiveData<Item>
-
-    @Query("SELECT * FROM item WHERE local_groupName IN (:group)")
-    fun observeByGroup(group: String): LiveData<List<Item>>
-
-    @Query("SELECT * FROM item WHERE local_groupName IN (:group)")
-    fun getByGroup(group: String): List<Item>
+    fun update(vararg item: ItemDBModel): Int
 }

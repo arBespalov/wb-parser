@@ -24,7 +24,7 @@ interface ServerApi {
     suspend fun addItem(
         @Query("url") url: String,
         @Query("id_token") idToken: String?
-    ): Response<Item>
+    ): Response<ItemRemoteModel>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/delete_items")
@@ -35,20 +35,21 @@ interface ServerApi {
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/update_items")
-    suspend fun updateItems(@Body itemIds: Wrapper<List<Int>>): Response<List<Item>>
+    suspend fun updateItems(@Body itemIds: Wrapper<List<Int>>): Response<List<ItemRemoteModel>>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @GET("wbparserapi/update_items")
-    suspend fun getItemsForUserId(@Query("id_token") idToken: String): Response<List<Item>>
+    suspend fun getItemsForUserId(@Query("id_token") idToken: String)
+    : Response<List<ItemRemoteModel>>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/merge_items")
     suspend fun mergeItems(
         @Body itemIds: Wrapper<List<Int>>,
         @Query("id_token") idToken: String
-    ): Response<List<Item>>
+    ): Response<List<ItemRemoteModel>>
 
     @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/get_full_data_item")
-    suspend fun getItemWithFullData(@Query("id") itemId: String): Response<Item>
+    suspend fun getItemWithFullData(@Query("id") itemId: String): Response<ItemRemoteModel>
 }

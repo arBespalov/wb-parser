@@ -24,4 +24,4 @@
 -keep class com.automotivecodelab.wbgoodstracker.domain.models.User {*;}
 -keep class com.automotivecodelab.wbgoodstracker.data.util.Wrapper {*;}
 -keep class com.automotivecodelab.wbgoodstracker.domain.models.Info {*;}
--keep class com.automotivecodelab.wbgoodstracker.domain.models.Sizes {*;}
+-keep class com.automotivecodelab.wbgoodstracker.domain.models.Size {*;}

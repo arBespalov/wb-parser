@@ -1,5 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.data
 
-interface ResourcesManager {
+interface ResourceManager {
     fun getAllItemsString(): String
 }

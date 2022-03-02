@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.automotivecodelab.wbgoodstracker.data.NetworkStatusListener
-import com.automotivecodelab.wbgoodstracker.data.ResourcesManagerImpl
+import com.automotivecodelab.wbgoodstracker.data.ResourceManagerImpl
 import com.automotivecodelab.wbgoodstracker.data.items.ItemsRepositoryImpl
 import com.automotivecodelab.wbgoodstracker.data.items.local.AppDatabase
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
@@ -16,7 +16,6 @@ import com.automotivecodelab.wbgoodstracker.data.user.local.UserLocalDataSourceI
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
-import java.util.*
 
 const val PREFS_NAME = "prefs"
 const val SAVED_UI_MODE = "savedUiMode"
@@ -27,14 +26,16 @@ class AppContainer(context: Context) {
     val userRepository: UserRepository
 
     init {
-        val itemDao = AppDatabase(context).itemDao()
+        val db = AppDatabase(context)
+        val itemDao = db.itemDao()
+        val sizeDao = db.sizeDao()
         // encrypted SP is not necessary here
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val itemsLocalDataSource = ItemsLocalDataSourceImpl(itemDao, sharedPreferences)
+        val itemsLocalDataSource = ItemsLocalDataSourceImpl(itemDao, sizeDao, sharedPreferences)
         val networkStatusListener = NetworkStatusListener(context)
         val itemsRemoteDataSource = ItemsRemoteDataSourceImpl(networkStatusListener)
-        val resourcesManager = ResourcesManagerImpl(context)
+        val resourcesManager = ResourceManagerImpl(context)
         itemsRepository = ItemsRepositoryImpl(
             itemsLocalDataSource,
             itemsRemoteDataSource,

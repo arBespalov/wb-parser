@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/default_margin"
         android:id="@+id/card"
-        android:transitionName="@{item._id}">
+        android:transitionName="@{item.id}">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -29,7 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/name"
-                    android:text="@{item.local_name ?? item.name}"
+                    android:text="@{item.localName ?? item.name}"
                     tools:text="name"
                     android:textAppearance="@style/Subtitle"
                     android:layout_centerHorizontal="true"
@@ -68,7 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/average_price_delta"
-                    android:text="@{item.local_averagePriceDelta ?? ``}"
+                    android:text="@{item.averagePriceDelta ?? ``}"
                     tools:text="+1000"
                     android:textColor="@color/red"
                     android:layout_margin="@dimen/default_margin"
@@ -97,7 +97,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/orders_count"
-                        android:text="@{`` + item.info[0].ordersCount}"
+                        android:text="@{`` + item.ordersCount}"
                         tools:text="20"
 
                         android:textAppearance="@style/Accent"
@@ -109,7 +109,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/orders_count_delta"
-                    android:text="@{item.local_ordersCountDelta ?? ``}"
+                    android:text="@{item.ordersCountDelta ?? ``}"
                     tools:text="+50"
                     android:textColor="@color/red"
                     android:layout_below="@id/price_container"
@@ -139,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/average_orders_count_per_day"
-                        android:text="@{`` + item.averageOrdersCountInDay}"
+                        android:text="@{`` + item.averageOrdersCountPerDay}"
                         tools:text="1"
 
                         android:textAppearance="@style/Accent"
@@ -178,7 +178,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/total_quantity_delta"
-                    android:text="@{item.local_totalQuantityDelta ?? ``}"
+                    android:text="@{item.totalQuantityDelta ?? ``}"
                     tools:text="+5"
                     android:textColor="@color/red"
                     android:layout_below="@id/average_orders_count_per_day_container"

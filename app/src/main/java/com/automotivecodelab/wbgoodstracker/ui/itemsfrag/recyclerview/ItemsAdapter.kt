@@ -26,7 +26,7 @@ class ItemsAdapter(
         Item::class.java,
         object : SortedList.Callback<Item>() {
             override fun areItemsTheSame(item1: Item?, item2: Item?): Boolean {
-                return item1?._id == item2?._id
+                return item1?.id == item2?.id
             }
 
             override fun onMoved(fromPosition: Int, toPosition: Int) {
@@ -52,15 +52,15 @@ class ItemsAdapter(
             override fun areContentsTheSame(oldItem: Item?, newItem: Item?): Boolean {
                 return (
                     oldItem != null && newItem != null &&
-                        oldItem.local_name == newItem.local_name &&
+                        oldItem.localName == newItem.localName &&
                         oldItem.name == newItem.name &&
                         oldItem.averagePrice == newItem.averagePrice &&
-                        oldItem.local_averagePriceDelta == newItem.local_averagePriceDelta &&
-                        oldItem.info?.get(0)?.ordersCount == newItem.info?.get(0)?.ordersCount &&
-                        oldItem.local_ordersCountDelta == newItem.local_ordersCountDelta &&
-                        oldItem.averageOrdersCountInDay == newItem.averageOrdersCountInDay &&
+                        oldItem.averagePriceDelta == newItem.averagePriceDelta &&
+                        oldItem.ordersCount == newItem.ordersCount &&
+                        oldItem.ordersCountDelta == newItem.ordersCountDelta &&
+                        oldItem.averageOrdersCountPerDay == newItem.averageOrdersCountPerDay &&
                         oldItem.totalQuantity == newItem.totalQuantity &&
-                        oldItem.local_totalQuantityDelta == newItem.local_totalQuantityDelta
+                        oldItem.totalQuantityDelta == newItem.totalQuantityDelta
                     )
             }
         }
@@ -99,7 +99,7 @@ class ItemsAdapter(
 
         override fun getItemDetail() = MyItemDetails(
             bindingAdapterPosition,
-            sortedList.get(bindingAdapterPosition)._id
+            sortedList.get(bindingAdapterPosition).id
         )
     }
 
@@ -128,7 +128,7 @@ class ItemsAdapter(
                 .into(holder.recyclerViewItemBinding.imageView)
         }
         tracker?.let {
-            if (it.isSelected(sortedList[position]._id)) {
+            if (it.isSelected(sortedList[position].id)) {
                 holder.recyclerViewItemBinding.card.setCardBackgroundColor(
                     MaterialColors.getColor(
                         holder.recyclerViewItemBinding.root,

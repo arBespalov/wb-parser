@@ -129,7 +129,7 @@ class ItemsViewModel(
         val lowerCaseQuery = query?.lowercase(Locale.ROOT) ?: ""
         val filteredList = mutableListOf<Item>()
         items.value?.forEach { item ->
-            val text = (item.local_name ?: item.name).lowercase(Locale.ROOT)
+            val text = (item.localName ?: item.name).lowercase(Locale.ROOT)
             if (text.contains(lowerCaseQuery)) {
                 filteredList.add(item)
             }

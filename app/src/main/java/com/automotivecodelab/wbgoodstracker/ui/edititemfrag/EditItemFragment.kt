@@ -78,12 +78,12 @@ class EditItemFragment : Fragment() {
                 viewLifecycleOwner,
                 Observer { item: Item? ->
                     if (item != null) {
-                        val string = viewModel.cachedName ?: item.local_name ?: item.name
+                        val string = viewModel.cachedName ?: item.localName ?: item.name
                         name.setText(string)
                         name.post { name.setSelection(string.length) }
                         val currentGroup =
                             viewModel.cachedGroupName
-                                ?: item.local_groupName
+                                ?: item.groupName
                                 ?: getString(R.string.all_items)
                         autoCompleteTextView.apply {
                             setText(currentGroup)

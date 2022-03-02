@@ -6,7 +6,7 @@
     <data>
         <variable
             name="size"
-            type="com.automotivecodelab.wbgoodstracker.domain.models.Sizes" />
+            type="com.automotivecodelab.wbgoodstracker.domain.models.Size" />
     </data>
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

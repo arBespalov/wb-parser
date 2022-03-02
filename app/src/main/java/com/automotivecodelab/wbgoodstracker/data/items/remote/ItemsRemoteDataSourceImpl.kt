@@ -11,7 +11,7 @@ class ItemsRemoteDataSourceImpl(private val networkStatusListener: NetworkStatus
 
     private val api = ServerApi()
 
-    override suspend fun addItem(url: String, idToken: String?): Item {
+    override suspend fun addItem(url: String, idToken: String?): ItemRemoteModel {
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.addItem(url, idToken) }
     }
@@ -21,22 +21,22 @@ class ItemsRemoteDataSourceImpl(private val networkStatusListener: NetworkStatus
         return apiRequest { api.deleteItems(Wrapper(itemsId), idToken) }
     }
 
-    override suspend fun getItemsForUserId(idToken: String): List<Item> {
+    override suspend fun getItemsForUserId(idToken: String): List<ItemRemoteModel> {
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.getItemsForUserId(idToken) }
     }
 
-    override suspend fun updateItems(itemsId: List<Int>): List<Item> {
+    override suspend fun updateItems(itemsId: List<Int>): List<ItemRemoteModel> {
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.updateItems(Wrapper(itemsId)) }
     }
 
-    override suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<Item> {
+    override suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<ItemRemoteModel> {
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.mergeItems(Wrapper(itemsId), idToken) }
     }
 
-    override suspend fun getItemWithFullData(itemId: String): Item {
+    override suspend fun getItemWithFullData(itemId: String): ItemRemoteModel {
         if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
         return apiRequest { api.getItemWithFullData(itemId) }
     }

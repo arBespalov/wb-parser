@@ -97,7 +97,7 @@ class DetailFragment : Fragment() {
                         .error(R.drawable.ic_baseline_error_outline_24)
                         .into(viewDataBinding?.imageView)
 
-                    viewDataBinding?.collapsingToolbar?.title = item.local_name ?: item.name
+                    viewDataBinding?.collapsingToolbar?.title = item.localName ?: item.name
 
                     viewDataBinding?.daysObserving?.count?.text =
                         millisToDays(item.observingTimeInMs).toString()
@@ -105,10 +105,10 @@ class DetailFragment : Fragment() {
                         SimpleDateFormat(
                             "dd.MM HH:mm",
                             Locale("en")
-                        ).format(item.info?.get(0)?.timeOfCreationInMs)
+                        ).format(item.lastUpdateTimestamp)
 
                     viewDataBinding?.sizesLayout?.removeAllViews()
-                    item.info?.get(0)?.sizes?.forEach {
+                    item.sizes.forEach {
                         val cardSizeLayoutBinding = DataBindingUtil.inflate<CardSizeLayoutBinding>(
                             layoutInflater,
                             R.layout.card_size_layout,
@@ -117,13 +117,13 @@ class DetailFragment : Fragment() {
                         )
 
                         cardSizeLayoutBinding.size = it
-                        val storeIds = it.storeIds
+                        val storeIds = it.storesWithQuantity
                         if (storeIds == null) {
                             cardSizeLayoutBinding.warehousesInfo.visibility = View.GONE
                         } else {
                             cardSizeLayoutBinding.warehousesInfo.visibility = View.VISIBLE
                             cardSizeLayoutBinding.count5.text =
-                                storeIds.joinToString(separator = ", ")
+                                storeIds
                         }
                     }
                 }

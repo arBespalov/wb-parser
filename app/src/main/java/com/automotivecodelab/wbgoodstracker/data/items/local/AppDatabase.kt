@@ -2,15 +2,17 @@ package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
 @Database(
-    entities = [Item::class],
-    version = 1
+    entities = [ItemDBModel::class, SizeDBModel::class],
+    version = 2
 )
-@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
+    abstract fun sizeDao(): SizeDao
 
     companion object {
         @Volatile
@@ -26,44 +28,13 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java,
                 "db"
             )
-//                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2)
                 .build()
     }
 }
 
-// val MIGRATION_1_2 = object : Migration(1, 2) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN local_creationTimeInMs INTEGER")
-//    }
-// }
-//
-// val MIGRATION_2_3 = object : Migration(2, 3) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN averagePrice INTEGER")
-//    }
-// }
-//
-// val MIGRATION_3_4 = object : Migration(3, 4) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN local_ordersCountDelta INTEGER")
-//        database.execSQL("ALTER TABLE item ADD COLUMN local_name TEXT")
-//    }
-// }
-//
-// val MIGRATION_4_5 = object : Migration(4, 5) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN local_averagePriceDelta TEXT")
-//    }
-// }
-//
-// val MIGRATION_5_6 = object : Migration(5, 6) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN totalQuantity INTEGER")
-//    }
-// }
-//
-// val MIGRATION_6_7 = object : Migration(6, 7) {
-//    override fun migrate(database: SupportSQLiteDatabase) {
-//        database.execSQL("ALTER TABLE item ADD COLUMN local_GroupName TEXT")
-//    }
-// }
+ val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE item ADD COLUMN local_creationTimeInMs INTEGER")
+    }
+ }

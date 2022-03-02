@@ -34,8 +34,8 @@ class EditItemViewModel(
             }
 
             item.value!!.copy(
-                local_name = sName,
-                local_groupName = cachedGroupName
+                localName = sName,
+                groupName = cachedGroupName
             ).also {
                 editItemUseCase(it)
             }

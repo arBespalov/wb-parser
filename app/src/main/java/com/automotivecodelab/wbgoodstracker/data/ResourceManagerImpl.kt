@@ -3,7 +3,7 @@ package com.automotivecodelab.wbgoodstracker.data
 import android.content.Context
 import com.automotivecodelab.wbgoodstracker.R
 
-class ResourcesManagerImpl(context: Context) : ResourcesManager {
+class ResourceManagerImpl(context: Context) : ResourceManager {
     private val resources = context.resources
 
     override fun getAllItemsString(): String {

@@ -65,8 +65,8 @@
                             android:id="@+id/orders_count"
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/orders_count}"
-                            bind:count="@{`` + viewmodel.item.info[0].ordersCount}"
-                            bind:delta="@{viewmodel.item.local_ordersCountDelta}"
+                            bind:count="@{`` + viewmodel.item.ordersCount}"
+                            bind:delta="@{viewmodel.item.ordersCountDelta}"
                             android:clickable="true"
                             android:focusable="true" />
                         <include
@@ -102,7 +102,7 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/price}"
                             bind:count="@{`` + viewmodel.item.averagePrice}"
-                            bind:delta="@{viewmodel.item.local_averagePriceDelta}"
+                            bind:delta="@{viewmodel.item.averagePriceDelta}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -113,7 +113,7 @@
                             android:id="@+id/average_orders_count_per_day"
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/average_orders_count_per_day}"
-                            bind:count="@{`` + viewmodel.item.averageOrdersCountInDay}"
+                            bind:count="@{`` + viewmodel.item.averageOrdersCountPerDay}"
                             bind:delta="@{null}"
                             />
                         <include
@@ -138,7 +138,7 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/quantity_in_warehouse}"
                             bind:count="@{`` + viewmodel.item.totalQuantity}"
-                            bind:delta="@{viewmodel.item.local_totalQuantityDelta}"
+                            bind:delta="@{viewmodel.item.totalQuantityDelta}"
                             />
                         <include
                             android:layout_width="0dp"

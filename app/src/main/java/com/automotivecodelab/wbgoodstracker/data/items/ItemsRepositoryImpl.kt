@@ -1,9 +1,14 @@
 package com.automotivecodelab.wbgoodstracker.data.items
 
 import androidx.lifecycle.LiveData
-import com.automotivecodelab.wbgoodstracker.data.ResourcesManager
+import androidx.lifecycle.map
+import com.automotivecodelab.wbgoodstracker.data.ResourceManager
+import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
+import com.automotivecodelab.wbgoodstracker.data.items.local.toDBModel
+import com.automotivecodelab.wbgoodstracker.data.items.local.toDomainModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
+import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
@@ -18,19 +23,29 @@ import kotlinx.coroutines.withContext
 class ItemsRepositoryImpl(
     private val localDataSource: ItemsLocalDataSource,
     private val remoteDataSource: ItemsRemoteDataSource,
-    private val resourcesManager: ResourcesManager
+    private val resourceManager: ResourceManager
 ) : ItemsRepository {
 
     override fun observeItems(groupName: String): LiveData<List<Item>> {
-        return if (groupName == resourcesManager.getAllItemsString()) {
-            localDataSource.observeAll()
+        return if (groupName == resourceManager.getAllItemsString()) {
+            localDataSource.observeAll().map { list ->
+                list.map { dbModel ->
+                    dbModel.toDomainModel()
+                }
+            }
         } else {
-            localDataSource.observeByGroup(groupName)
+            localDataSource.observeByGroup(groupName).map { list ->
+                list.map { dbModel ->
+                    dbModel.toDomainModel()
+                }
+            }
         }
     }
 
     override fun observeSingleItem(id: String): LiveData<Item> {
-        return localDataSource.observeItem(id)
+        return localDataSource.observeItem(id).map { dbModel ->
+            dbModel.toDomainModel()
+        }
     }
 
     override suspend fun deleteItems(itemsId: Array<String>) {
@@ -48,18 +63,17 @@ class ItemsRepositoryImpl(
                 if (token != null) {
                     remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
                 }
-            } catch (e: Exception) {
-            }
+            } catch (e: Exception) { }
         }
     }
 
     override suspend fun updateItem(item: Item) {
-        if (item.local_name == resourcesManager.getAllItemsString()) {
-            item.copy(local_name = null)
+        if (item.localName == resourceManager.getAllItemsString()) {
+            item.copy(localName = null)
         } else {
             item
         }.also {
-            localDataSource.updateItem(it)
+            localDataSource.updateItem(it.toDBModel())
         }
     }
 
@@ -84,27 +98,38 @@ class ItemsRepositoryImpl(
                 val newItem = newItemDeferred.await()
                 val localItems = localItemsDeferred.await()
 
-                val nullableGroupName = if (groupName == resourcesManager.getAllItemsString())
+                val nullableGroupName = if (groupName == resourceManager.getAllItemsString())
                     null
                 else groupName
 
-                localItems.find { item -> newItem._id == item._id }?.also {
-                    val result = handleLocalValues(it, newItem)
-                    localDataSource.updateItem(result.copy(local_groupName = nullableGroupName))
-                    return@withContext
-                }
+                localItems.find { itemWithSizes -> newItem._id == itemWithSizes.item.id }
+                    ?.also { dbModel ->
+                        localDataSource.updateItem(newItem.toDBModel(
+                            creationTimestamp = dbModel.item.creationTimestamp,
+                            previousOrdersCount = dbModel.item.ordersCount,
+                            previousAveragePrice = dbModel.item.averagePrice,
+                            previousTotalQuantity = dbModel.item.totalQuantity,
+                            localName = dbModel.item.localName,
+                            groupName = nullableGroupName
+                        ))
+                        return@withContext
+                    }
 
                 localDataSource.addItem(
-                    newItem.copy(
-                        local_creationTimeInMs = Date().time,
-                        local_groupName = nullableGroupName
+                    newItem.toDBModel(
+                        creationTimestamp = Date().time,
+                        previousOrdersCount = newItem.info[0].ordersCount,
+                        previousAveragePrice = newItem.averagePrice,
+                        previousTotalQuantity = newItem.totalQuantity,
+                        localName = null,
+                        groupName = nullableGroupName
                     )
                 )
             }
             return Result.Success(Unit)
         } catch (e: Exception) {
             log(e.message.toString())
-            return Result.Error(Exception("")) // hided error message in prod
+            return Result.Error(Exception("")) // todo hided error message in prod
         }
     }
 
@@ -114,10 +139,11 @@ class ItemsRepositoryImpl(
 
     override suspend fun refreshAllItems(): Result<Unit> {
         localDataSource.getAll().also {
-            return refreshItems(it)
+            return refreshItems(it.map { dbItem -> dbItem.toDomainModel() })
         }
     }
 
+    //todo test
     override suspend fun syncItems(token: String): Result<Unit> {
         return try {
             withContext(Dispatchers.IO) {
@@ -128,7 +154,7 @@ class ItemsRepositoryImpl(
                 val localItems = localItemsDeferred.await()
 
                 val serverItemIds = serverItems.map { it._id }
-                val localItemIds = localItems.map { it._id }
+                val localItemIds = localItems.map { it.item.id }
 
                 val itemIdsToDelete = localItemIds.minus(serverItemIds)
                 val itemIdsToAdd = serverItemIds.minus(localItemIds)
@@ -140,19 +166,33 @@ class ItemsRepositoryImpl(
                 localDataSource.deleteItems(itemIdsToDelete.toTypedArray())
 
                 itemIdsToAdd.forEach { id ->
-                    val item = serverItems.find { item -> item._id == id }!!
-                    localDataSource.addItem(item.copy(local_creationTimeInMs = Date().time))
+                    val item = serverItems.find { remoteItem -> remoteItem._id == id }!!
+                    localDataSource.addItem(
+                        item.toDBModel(
+                            creationTimestamp = Date().time,
+                            previousOrdersCount = item.info[0].ordersCount,
+                            previousAveragePrice = item.averagePrice,
+                            previousTotalQuantity = item.totalQuantity,
+                            localName = null,
+                            groupName = null
+                        )
+                    )
                 }
 
                 itemIdsToUpdate.map { id ->
-                    val updatedItem = serverItems.find { item -> item._id == id }!!
+                    val localItem = localItems.find { localItem -> localItem.item.id == id }!!
+                    val updatedItem = serverItems.find { remoteItem -> remoteItem._id == id }!!
 
-                    handleLocalValues(
-                        localItems.find { oldItem -> oldItem._id == id }!!,
-                        updatedItem
+                    updatedItem.toDBModel(
+                        creationTimestamp = localItem.item.creationTimestamp,
+                        previousOrdersCount = localItem.item.ordersCount,
+                        previousAveragePrice = localItem.item.averagePrice,
+                        previousTotalQuantity = localItem.item.totalQuantity,
+                        localName = localItem.item.localName,
+                        groupName = localItem.item.groupName
                     )
                 }.also {
-                    localDataSource.updateItems(it)
+                    localDataSource.updateItem(*it.toTypedArray())
                 }
             }
             Result.Success(Unit)
@@ -165,16 +205,21 @@ class ItemsRepositoryImpl(
     private suspend fun refreshItems(items: List<Item>): Result<Unit> {
         return try {
             withContext(Dispatchers.IO) {
-                val itemIds = items.map { item -> item._id.toInt() }
+                val itemIds = items.map { item -> item.id.toInt() }
                 val updatedItems = remoteDataSource.updateItems(itemIds)
 
                 updatedItems.map { updatedItem ->
-                    handleLocalValues(
-                        items.find { oldItem -> oldItem._id == updatedItem._id }!!,
-                        updatedItem
+                    val localItem = items.find { localItem -> localItem.id == updatedItem._id }!!
+                    updatedItem.toDBModel(
+                        creationTimestamp = localItem.creationTimestamp,
+                        previousOrdersCount = localItem.ordersCount,
+                        previousAveragePrice = localItem.averagePrice,
+                        previousTotalQuantity = localItem.totalQuantity,
+                        localName = localItem.localName,
+                        groupName = localItem.groupName
                     )
                 }.also {
-                    localDataSource.updateItems(it)
+                    localDataSource.updateItem(*it.toTypedArray())
                 }
             }
             Result.Success(Unit)
@@ -184,17 +229,18 @@ class ItemsRepositoryImpl(
         }
     }
 
+    //todo test
     override suspend fun mergeItems(token: String): Result<Unit> {
         try {
             withContext(Dispatchers.IO) {
                 val localItems = localDataSource.getAll()
                 val mergedItems = remoteDataSource.mergeItems(
-                    localItems.map { item -> item._id.toInt() },
+                    localItems.map { localItem -> localItem.item.id.toInt() },
                     token
                 )
 
-                val localItemIds = localItems.map { item -> item._id }
-                val mergedItemIds = mergedItems.map { item -> item._id }
+                val localItemIds = localItems.map { localItem -> localItem.item.id }
+                val mergedItemIds = mergedItems.map { remoteItem -> remoteItem._id }
 
                 val itemIdsToAdd = mergedItemIds.minus(localItemIds)
                 val itemIdsToUpdate = mergedItemIds.minus(itemIdsToAdd)
@@ -202,13 +248,29 @@ class ItemsRepositoryImpl(
                 log("items to add: ${itemIdsToAdd.size}")
 
                 itemIdsToAdd.forEach { id ->
-                    val item = mergedItems.find { item -> item._id == id }!!
-                    localDataSource.addItem(item.copy(local_creationTimeInMs = Date().time))
+                    val item = mergedItems.find { remoteItem -> remoteItem._id == id }!!
+                    localDataSource.addItem(
+                        item.toDBModel(
+                            creationTimestamp = Date().time,
+                            previousOrdersCount = item.info[0].ordersCount,
+                            previousAveragePrice = item.averagePrice,
+                            previousTotalQuantity = item.totalQuantity,
+                            localName = null,
+                            groupName = null
+                        )
+                    )
                 }
                 itemIdsToUpdate.forEach { id ->
-                    val updatedItem = mergedItems.find { item -> item._id == id }!!
-                    localItems.find { oldItem -> oldItem._id == id }?.also {
-                        localDataSource.updateItem(handleLocalValues(it, updatedItem))
+                    val updatedItem = mergedItems.find { remoteItem -> remoteItem._id == id }!!
+                    localItems.find { localItem -> localItem.item.id == id }?.also { localItem ->
+                        localDataSource.updateItem(updatedItem.toDBModel(
+                            creationTimestamp = localItem.item.creationTimestamp,
+                            previousOrdersCount = localItem.item.ordersCount,
+                            previousAveragePrice = localItem.item.averagePrice,
+                            previousTotalQuantity = localItem.item.totalQuantity,
+                            localName = localItem.item.localName,
+                            groupName = localItem.item.groupName
+                        ))
                     }
                 }
             }
@@ -223,30 +285,38 @@ class ItemsRepositoryImpl(
         setGroupNameToItemsList(itemIds.map { localDataSource.getItem(it) }, groupName)
     }
 
-    private suspend fun setGroupNameToItemsList(items: List<Item>, groupName: String) {
+    private suspend fun setGroupNameToItemsList(
+        items: List<ItemWithSizesDBModel>,
+        groupName: String
+    ) {
         withContext(Dispatchers.IO) {
-            if (groupName == resourcesManager.getAllItemsString()) {
+            if (groupName == resourceManager.getAllItemsString()) {
                 null
             } else {
                 groupName
             }.also {
-                localDataSource.updateItems(items.map { item -> item.copy(local_groupName = it) })
+                localDataSource.updateItem(*items.map { item ->
+                    item.copy(
+                        item = item.item.copy(groupName = it)
+                    )
+                }.toTypedArray())
             }
         }
     }
 
     override suspend fun deleteGroup(groupName: String) {
-        if (groupName != resourcesManager.getAllItemsString()) {
+        // todo move to local data source
+        if (groupName != resourceManager.getAllItemsString()) {
             withContext(Dispatchers.IO) {
                 val items = localDataSource.getByGroup(groupName)
-                setGroupNameToItemsList(items, resourcesManager.getAllItemsString())
+                setGroupNameToItemsList(items, resourceManager.getAllItemsString())
                 localDataSource.deleteGroup(groupName)
             }
         }
     }
 
     override fun getGroups(): Array<String> {
-        return localDataSource.getGroups().plus(resourcesManager.getAllItemsString())
+        return localDataSource.getGroups().plus(resourceManager.getAllItemsString())
     }
 
     override fun getSortingModeComparator(): Comparator<Item> {
@@ -254,16 +324,16 @@ class ItemsRepositoryImpl(
             SortingMode.BY_NAME_ASC -> Comparator { o1, o2 -> o1.name.compareTo(o2.name) }
             SortingMode.BY_NAME_DESC -> Comparator { o1, o2 -> o2.name.compareTo(o1.name) }
             SortingMode.BY_DATE_ASC -> Comparator { o1, o2 ->
-                o2.local_creationTimeInMs.compareTo(o1.local_creationTimeInMs)
+                o2.creationTimestamp.compareTo(o1.creationTimestamp)
             }
             SortingMode.BY_DATE_DESC -> Comparator { o1, o2 ->
-                o1.local_creationTimeInMs.compareTo(o2.local_creationTimeInMs)
+                o1.creationTimestamp.compareTo(o2.creationTimestamp)
             }
             SortingMode.BY_ORDERS_COUNT -> Comparator { o1, o2 ->
-                o2.info!![0].ordersCount.compareTo(o1.info!![0].ordersCount)
+                o2.ordersCount.compareTo(o1.ordersCount)
             }
             SortingMode.BY_ORDERS_COUNT_PER_DAY -> Comparator { o1, o2 ->
-                o2.averageOrdersCountInDay.compareTo(o1.averageOrdersCountInDay)
+                o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
             }
         }
     }
@@ -273,11 +343,11 @@ class ItemsRepositoryImpl(
     }
 
     override fun getCurrentGroup(): String {
-        return localDataSource.getCurrentGroup() ?: resourcesManager.getAllItemsString()
+        return localDataSource.getCurrentGroup() ?: resourceManager.getAllItemsString()
     }
 
     override fun setCurrentGroup(groupName: String) {
-        if (groupName == resourcesManager.getAllItemsString()) {
+        if (groupName == resourceManager.getAllItemsString()) {
             null
         } else {
             groupName
@@ -291,7 +361,7 @@ class ItemsRepositoryImpl(
     }
 
     override fun createNewGroup(groupName: String) {
-        if (groupName != resourcesManager.getAllItemsString()) {
+        if (groupName != resourceManager.getAllItemsString()) {
             localDataSource.addGroup(groupName)
         }
     }
@@ -300,7 +370,7 @@ class ItemsRepositoryImpl(
         return try {
             val item = remoteDataSource.getItemWithFullData(itemId)
             Result.Success(
-                item.info!!.map {
+                item.info.map {
                     Pair(it.timeOfCreationInMs, it.ordersCount)
                 }
             )
@@ -308,38 +378,5 @@ class ItemsRepositoryImpl(
             log(e.message.toString())
             Result.Error(Exception(""))
         }
-    }
-
-    private fun handleLocalValues(oldItem: Item, newItem: Item): Item {
-
-        val ordersCountDelta = newItem.info!![0].ordersCount - oldItem.info!![0].ordersCount
-        val sOrdersCountDelta: String? = when {
-            ordersCountDelta < 0 -> "$ordersCountDelta"
-            ordersCountDelta > 0 -> "+$ordersCountDelta"
-            else -> null
-        }
-
-        val averagePriceDelta = newItem.averagePrice - oldItem.averagePrice
-        val sAveragePriceDelta: String? = when {
-            averagePriceDelta < 0 -> "$averagePriceDelta"
-            averagePriceDelta > 0 -> "+$averagePriceDelta"
-            else -> null
-        }
-
-        val totalQuantityDelta = newItem.totalQuantity - oldItem.totalQuantity
-        val sTotalQuantityDelta: String? = when {
-            totalQuantityDelta < 0 -> "$totalQuantityDelta"
-            totalQuantityDelta > 0 -> "+$totalQuantityDelta"
-            else -> null
-        }
-
-        return newItem.copy(
-            local_creationTimeInMs = oldItem.local_creationTimeInMs,
-            local_name = oldItem.local_name,
-            local_groupName = oldItem.local_groupName,
-            local_ordersCountDelta = sOrdersCountDelta,
-            local_averagePriceDelta = sAveragePriceDelta,
-            local_totalQuantityDelta = sTotalQuantityDelta
-        )
     }
 }

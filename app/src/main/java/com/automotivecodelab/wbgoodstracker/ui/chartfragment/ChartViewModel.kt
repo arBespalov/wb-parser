@@ -27,7 +27,7 @@ class ChartViewModel(
         viewModelScope.launch {
             _dataLoading.value = true
             when (val result = getOrdersChartDataUseCase(itemId)) {
-                is Result.Success -> _chartData.value = result.data!!
+                is Result.Success -> _chartData.value = result.data
                 is Result.Error -> _networkErrorEvent.value = Event(result.exception.toString())
             }
             _dataLoading.value = false
