@@ -12,7 +12,6 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.log
 import java.util.*
 import kotlin.Comparator
@@ -59,11 +58,11 @@ class ItemsRepositoryImpl(
     private suspend fun deleteItemsWithNullableToken(itemsId: Array<String>, token: String?) {
         withContext(Dispatchers.IO) {
             localDataSource.deleteItems(itemsId)
-            try {
+            runCatching {
                 if (token != null) {
                     remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
                 }
-            } catch (e: Exception) { }
+            }
         }
     }
 
@@ -90,7 +89,7 @@ class ItemsRepositoryImpl(
         groupName: String,
         token: String?
     ): Result<Unit> {
-        try {
+        return runCatching {
             withContext(Dispatchers.IO) {
                 val newItemDeferred = async { remoteDataSource.addItem(url, token) }
                 val localItemsDeferred = async { localDataSource.getAll() }
@@ -126,10 +125,6 @@ class ItemsRepositoryImpl(
                     )
                 )
             }
-            return Result.Success(Unit)
-        } catch (e: Exception) {
-            log(e.message.toString())
-            return Result.Error(Exception("")) // todo hided error message in prod
         }
     }
 
@@ -145,7 +140,7 @@ class ItemsRepositoryImpl(
 
     //todo test
     override suspend fun syncItems(token: String): Result<Unit> {
-        return try {
+        return runCatching {
             withContext(Dispatchers.IO) {
                 val serverItemsDeferred = async { remoteDataSource.getItemsForUserId(token) }
                 val localItemsDeferred = async { localDataSource.getAll() }
@@ -195,15 +190,11 @@ class ItemsRepositoryImpl(
                     localDataSource.updateItem(*it.toTypedArray())
                 }
             }
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            log(e.message.toString())
-            Result.Error(Exception(""))
         }
     }
 
     private suspend fun refreshItems(items: List<Item>): Result<Unit> {
-        return try {
+        return runCatching {
             withContext(Dispatchers.IO) {
                 val itemIds = items.map { item -> item.id.toInt() }
                 val updatedItems = remoteDataSource.updateItems(itemIds)
@@ -222,16 +213,12 @@ class ItemsRepositoryImpl(
                     localDataSource.updateItem(*it.toTypedArray())
                 }
             }
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            log(e.message.toString())
-            Result.Error(Exception(""))
         }
     }
 
     //todo test
     override suspend fun mergeItems(token: String): Result<Unit> {
-        try {
+        return runCatching {
             withContext(Dispatchers.IO) {
                 val localItems = localDataSource.getAll()
                 val mergedItems = remoteDataSource.mergeItems(
@@ -274,10 +261,6 @@ class ItemsRepositoryImpl(
                     }
                 }
             }
-            return Result.Success(Unit)
-        } catch (e: Exception) {
-            log(e.message.toString())
-            return Result.Error(Exception(""))
         }
     }
 
@@ -367,16 +350,11 @@ class ItemsRepositoryImpl(
     }
 
     override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {
-        return try {
+        return runCatching {
             val item = remoteDataSource.getItemWithFullData(itemId)
-            Result.Success(
-                item.info.map {
-                    Pair(it.timeOfCreationInMs, it.ordersCount)
-                }
-            )
-        } catch (e: Exception) {
-            log(e.message.toString())
-            Result.Error(Exception(""))
+            item.info.map {
+                Pair(it.timeOfCreationInMs, it.ordersCount)
+            }
         }
     }
 }

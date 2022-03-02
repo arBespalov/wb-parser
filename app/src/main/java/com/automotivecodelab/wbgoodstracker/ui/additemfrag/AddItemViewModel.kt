@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.*
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
@@ -34,20 +33,22 @@ class AddItemViewModel(
     fun saveItem(groupName: String) {
         viewModelScope.launch {
             _dataLoading.value = true
-            val result = addItemUseCase(url, groupName) {
-                _authorizationErrorEvent.value = Event(Unit)
-            }
-            when (result) {
-                is Result.Error -> {
-                    when (result.exception) {
-                        is InvalidUrlException -> _invalidUrl.value = true
-                        else ->
-                            _networkErrorEvent.value =
-                                Event(result.exception.message.toString())
-                    }
+            addItemUseCase(
+                url = url,
+                groupName = groupName,
+                onAuthenticationFailureCallback =  {
+                    _authorizationErrorEvent.value = Event(Unit)
                 }
-                is Result.Success -> _saveSuccessfulEvent.value = Event(Unit)
+            )
+                .onFailure {
+                when (it) {
+                    is InvalidUrlException -> _invalidUrl.value = true
+                    else -> _networkErrorEvent.value = Event(it.message.toString())
+                }
             }
+                .onSuccess {
+                    _saveSuccessfulEvent.value = Event(Unit)
+                }
             _dataLoading.value = false
         }
     }

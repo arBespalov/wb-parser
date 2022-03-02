@@ -1,7 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.domain
 
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 
 class GetOrdersChartDataUseCase(
     private val itemsRepository: ItemsRepository

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.GetOrdersChartDataUseCase
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
@@ -26,10 +25,13 @@ class ChartViewModel(
     fun start() {
         viewModelScope.launch {
             _dataLoading.value = true
-            when (val result = getOrdersChartDataUseCase(itemId)) {
-                is Result.Success -> _chartData.value = result.data
-                is Result.Error -> _networkErrorEvent.value = Event(result.exception.toString())
-            }
+            getOrdersChartDataUseCase(itemId)
+                .onFailure {
+                    _networkErrorEvent.value = Event(it.message.toString())
+                }
+                .onSuccess {
+                    _chartData.value = it
+                }
             _dataLoading.value = false
         }
     }

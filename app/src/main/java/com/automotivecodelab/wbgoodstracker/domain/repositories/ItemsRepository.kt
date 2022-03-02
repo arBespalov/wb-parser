@@ -3,7 +3,6 @@ package com.automotivecodelab.wbgoodstracker.domain.repositories
 import androidx.lifecycle.LiveData
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import java.util.Comparator
 
 interface ItemsRepository {

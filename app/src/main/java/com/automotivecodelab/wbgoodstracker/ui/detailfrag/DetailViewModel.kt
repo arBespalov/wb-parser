@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.RefreshSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.*
 
@@ -42,12 +41,11 @@ class DetailViewModel(
         viewModelScope.launch {
             _dataLoading.value = true
             if (item.value != null) {
-                when (val result = refreshSingleItemUseCase(item.value!!)) {
-                    is Result.Error ->
+                refreshSingleItemUseCase(item.value!!)
+                    .onFailure {
                         _updateErrorEvent.value =
-                            Event(result.exception.message.toString())
-                    is Result.Success -> { }
-                }
+                            Event(it.message.toString())
+                    }
             }
             _dataLoading.value = false
         }

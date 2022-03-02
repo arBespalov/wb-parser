@@ -8,7 +8,6 @@ import com.automotivecodelab.wbgoodstracker.domain.GetUserUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignInUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignOutUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.User
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
@@ -26,16 +25,17 @@ class SignInViewModel(
 
     fun start() {
         viewModelScope.launch {
-            when (val userResult = getUserUseCase()) {
-                is Result.Success -> {
-                    if (userResult.data != null) {
-                        _viewState.value = SignInViewState.SignedInState(userResult.data.email)
+            getUserUseCase()
+                .onFailure {
+                    _viewState.value = SignInViewState.SignedOutState
+                }
+                .onSuccess { user ->
+                    if (user != null) {
+                        _viewState.value = SignInViewState.SignedInState(user.email)
                     } else {
                         _viewState.value = SignInViewState.SignedOutState
                     }
                 }
-                else -> _viewState.value = SignInViewState.SignedOutState
-            }
         }
     }
 
@@ -47,13 +47,14 @@ class SignInViewModel(
     fun handleSignInResult(user: User) {
         viewModelScope.launch {
             _viewState.value = SignInViewState.LoadingState
-            val result = signInUseCase(user)
-            if (result is Result.Error) {
-                _viewState.value = SignInViewState.SignedOutState
-                _networkErrorEvent.value = Event(result.exception.message.toString())
-            } else {
-                _viewState.value = SignInViewState.SignedInState(user.email)
-            }
+            signInUseCase(user)
+                .onFailure {
+                    _viewState.value = SignInViewState.SignedOutState
+                    _networkErrorEvent.value = Event(it.message.toString())
+                }
+                .onSuccess {
+                    _viewState.value = SignInViewState.SignedInState(user.email)
+                }
         }
     }
 }

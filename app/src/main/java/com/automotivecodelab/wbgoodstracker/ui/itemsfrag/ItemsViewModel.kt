@@ -5,7 +5,6 @@ import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import java.util.*
 import kotlin.Comparator
@@ -97,12 +96,12 @@ class ItemsViewModel(
     fun updateItems() {
         viewModelScope.launch {
             _dataLoading.value = true
-            val result = refreshAllItemsUseCase {
+            refreshAllItemsUseCase {
                 _authorizationErrorEvent.value = Event(Unit)
             }
-            if (result is Result.Error) {
-                _updateErrorEvent.value = Event(result.exception.message.toString())
-            }
+                .onFailure {
+                    _updateErrorEvent.value = Event(it.message.toString())
+                }
             _dataLoading.value = false
         }
     }

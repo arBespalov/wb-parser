@@ -3,7 +3,6 @@ package com.automotivecodelab.wbgoodstracker.data.user
 import com.automotivecodelab.wbgoodstracker.data.user.local.UserLocalDataSource
 import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
-import com.automotivecodelab.wbgoodstracker.domain.util.Result
 
 class UserRepositoryImpl(
     private val localDataSource: UserLocalDataSource,
@@ -12,23 +11,19 @@ class UserRepositoryImpl(
 
     override suspend fun getUser(): Result<User?> {
         if (localDataSource.isUserSignedIn()) {
-
             val localUser = localDataSource.user
-
-            try {
+            return runCatching {
                 if (localUser == null) {
                     authenticationService.signIn()
                 } else {
                     authenticationService.updateToken(localUser)
                 }.also {
                     localDataSource.user = it
-                    return Result.Success(it)
+                    return Result.success(it)
                 }
-            } catch (e: AuthenticationException) {
-                return Result.Error(e)
             }
         } else {
-            return Result.Success(null)
+            return Result.success(null)
         }
     }
 
