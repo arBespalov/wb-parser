@@ -4,6 +4,6 @@ import com.automotivecodelab.wbgoodstracker.domain.models.User
 
 interface UserRepository {
     suspend fun getUser(): Result<User?>
-    fun handleSignInResult(user: User)
-    fun signOut()
+    suspend fun handleSignInResult(user: User)
+    suspend fun signOut()
 }

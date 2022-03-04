@@ -1,49 +1,60 @@
 package com.automotivecodelab.wbgoodstracker.ui.edititemfrag
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.EditItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class EditItemViewModel(
     observeSingleItemUseCase: ObserveSingleItemUseCase,
+    getGroupsUseCase: GetGroupsUseCase,
     itemId: String,
     private val editItemUseCase: EditItemUseCase,
-    private val getGroupsUseCase: GetGroupsUseCase
 ) : ViewModel() {
 
-    val item = observeSingleItemUseCase(itemId)
+    private val _viewState = MutableLiveData(
+        EditItemViewState(
+            item = null,
+            groups = arrayOf()
+        )
+    )
+    val viewState: LiveData<EditItemViewState> = _viewState
+
+    var newName: String? = null
+    var newGroup: String? = null
 
     private val _saveItemEvent = MutableLiveData<Event<Unit>>()
     val saveItemEvent: LiveData<Event<Unit>> = _saveItemEvent
 
-    var cachedName: String? = null
-    var cachedGroupName: String? = null
-
-    fun saveItem() {
+    init {
         viewModelScope.launch {
-            val sName = if (cachedName.isNullOrEmpty()) {
-                null
-            } else {
-                cachedName
+            _viewState.value = _viewState.value?.copy(
+                groups = getGroupsUseCase()
+            )
+            observeSingleItemUseCase(itemId).collect {
+                _viewState.value = _viewState.value?.copy(item = it)
             }
-
-            item.value!!.copy(
-                localName = sName,
-                groupName = cachedGroupName
-            ).also {
-                editItemUseCase(it)
-            }
-            _saveItemEvent.value = Event(Unit)
         }
     }
 
-    fun getSavedGroupNames(): Array<String> {
-        return getGroupsUseCase()
+    fun saveItem() {
+        viewModelScope.launch {
+            val sName = if (newName.isNullOrEmpty()) {
+                null
+            } else {
+                newName
+            }
+            val item = viewState.value?.item
+            if (item != null) {
+                editItemUseCase(item.copy(
+                    localName = sName,
+                    groupName = newGroup
+                ))
+                _saveItemEvent.value = Event(Unit)
+            }
+        }
     }
 }

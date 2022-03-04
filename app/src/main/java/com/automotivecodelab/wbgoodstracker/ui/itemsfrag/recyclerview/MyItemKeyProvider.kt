@@ -4,17 +4,21 @@ import androidx.recyclerview.selection.ItemKeyProvider
 import androidx.recyclerview.widget.SortedList
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
-class MyItemKeyProvider : ItemKeyProvider<String>(ItemKeyProvider.SCOPE_CACHED) {
+class MyItemKeyProvider : ItemKeyProvider<String>(SCOPE_CACHED) {
 
     var sortedListItems: SortedList<Item>? = null
-    var items: List<Item>? = null
 
     override fun getKey(position: Int) = sortedListItems?.get(position)?.id
 
     override fun getPosition(key: String): Int {
-
-        val keyItem = items?.find { item -> item.id == key }
-
-        return sortedListItems!!.indexOf(keyItem)
+        var index = -1
+        for (i in 0 until (sortedListItems?.size() ?: 0)) {
+            val item = sortedListItems?.get(i)
+            if (item?.id == key) {
+                index = i
+                break
+            }
+        }
+        return index
     }
 }

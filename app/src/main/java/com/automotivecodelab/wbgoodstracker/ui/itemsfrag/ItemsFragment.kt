@@ -16,7 +16,6 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -48,7 +47,7 @@ class ItemsFragment : Fragment() {
     // references to views
     private var viewDataBinding: ItemsFragmentBinding? = null
     private var tracker: SelectionTracker<String>? = null
-    private var mItemKeyProvider: MyItemKeyProvider? = null
+    private var itemKeyProvider: MyItemKeyProvider? = null
     private var itemTouchHelper: ItemTouchHelper? = null
     private var actionMode: ActionMode? = null
 
@@ -72,15 +71,13 @@ class ItemsFragment : Fragment() {
     override fun onDestroyView() {
         viewDataBinding = null
         tracker = null
-        mItemKeyProvider = null
+        itemKeyProvider = null
         itemTouchHelper = null
         actionMode = null
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val intentValue = (requireActivity() as MainActivity).intentValue
         if (intentValue != null) {
             (requireActivity() as MainActivity).intentValue = null
@@ -102,17 +99,15 @@ class ItemsFragment : Fragment() {
 
         viewModel.items.observe(viewLifecycleOwner) { items: List<Item>? ->
             if (items != null) {
-                (viewDataBinding?.recyclerViewItems?.adapter as ItemsAdapter).replaceAll(items)
-                mItemKeyProvider?.sortedListItems =
-                    (viewDataBinding!!.recyclerViewItems.adapter as ItemsAdapter).sortedList
-                mItemKeyProvider?.items = items
+                (viewDataBinding?.recyclerViewItems?.adapter as ItemsAdapter).apply {
+                    replaceAll(items)
+                    itemKeyProvider?.sortedListItems = sortedList
+                }
             }
 
             if (!viewModel.cachedSearchQuery.isNullOrEmpty()) {
-                (
-                    viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as
-                        SearchView
-                    ).apply {
+                (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as
+                        SearchView).apply {
                     isIconified = false
                     setQuery(viewModel.cachedSearchQuery, false)
                 }
@@ -133,27 +128,22 @@ class ItemsFragment : Fragment() {
             }
         }
 
-        viewModel.dataLoading.observe(
-            viewLifecycleOwner,
-            Observer {
-                viewDataBinding?.swipeRefresh?.isRefreshing = it
-            }
-        )
+        viewModel.dataLoading.observe(viewLifecycleOwner) {
+            viewDataBinding?.swipeRefresh?.isRefreshing = it
+        }
 
-        viewModel.authorizationErrorEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
             }
         )
 
-        postponeEnterTransition()
-        view?.doOnPreDraw { startPostponedEnterTransition() }
+//        postponeEnterTransition()
+//        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     override fun onResume() {
         // bug: onQueryTextListener called when navigating back to this fragment.
-        // When setting listener in onResume, it works fine
+        // When set listener in onResume, it works fine
         (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as SearchView)
             .setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?) = false
@@ -172,13 +162,10 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupOptionsMenu() {
-        viewModel.currentGroup.observe(
-            viewLifecycleOwner,
-            Observer {
-                val menuItem = viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)
-                menuItem?.isEnabled = it != getString(R.string.all_items)
-            }
-        )
+        viewModel.currentGroup.observe(viewLifecycleOwner) {
+            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)?.isEnabled =
+                it != getString(R.string.all_items)
+        }
         viewDataBinding?.toolbar?.setOnMenuItemClickListener(
             object : Toolbar.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem?): Boolean {
@@ -246,24 +233,21 @@ class ItemsFragment : Fragment() {
                         else -> false
                     }
                 }
-            })
+            }
+        )
     }
 
     private fun setupSpinner() {
         viewDataBinding?.toolbar?.title = null
 
-        val groupNames = viewModel.getSavedGroupNames()
-
-        ArrayAdapter(
+        val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            groupNames
-        ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            viewDataBinding?.spinner?.adapter = it
-        }
+            mutableListOf<String>()
+        )
 
-        viewDataBinding?.spinner?.setSelection(groupNames.indexOf(viewModel.currentGroup.value))
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        viewDataBinding?.spinner?.adapter = adapter
 
         viewDataBinding?.spinner?.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -276,28 +260,33 @@ class ItemsFragment : Fragment() {
                     id: Long
                 ) {
                     if (view != null) {
-                        viewModel.changeCurrentGroup(groupNames[position])
+                        viewModel.changeCurrentGroup(position)
                     }
                 }
             }
+
+        viewModel.groups.observe(viewLifecycleOwner) { groups ->
+            adapter.clear()
+            adapter.addAll(groups.toList())
+            viewDataBinding?.spinner?.setSelection(groups.indexOf(viewModel.currentGroup.value))
+        }
     }
 
     private fun setupRecycler() {
-
         viewDataBinding?.recyclerViewItems?.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            adapter = ItemsAdapter(viewModel, viewModel.getItemsComparator())
+            adapter = ItemsAdapter(viewModel, null)
             adapter!!.stateRestorationPolicy =
                 RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
 
-        mItemKeyProvider = MyItemKeyProvider()
+        itemKeyProvider = MyItemKeyProvider()
 
         tracker = SelectionTracker.Builder(
             "id",
             viewDataBinding!!.recyclerViewItems,
-            mItemKeyProvider!!,
+            itemKeyProvider!!,
             MyItemDetailsLookup(viewDataBinding!!.recyclerViewItems),
             StorageStrategy.createStringStorage()
         ).build()
@@ -566,7 +555,9 @@ class ItemsFragment : Fragment() {
     private fun sortList(sortingMode: SortingMode) {
         val adapter = viewDataBinding?.recyclerViewItems?.adapter as ItemsAdapter
         viewModel.saveSortingMode(sortingMode)
-        adapter.comparator = viewModel.getItemsComparator()
+        viewModel.itemsComparator.observe(viewLifecycleOwner) { comparator ->
+            adapter.comparator = comparator
+        }
         val items = viewModel.items.value
         if (items != null) {
             adapter.replaceAll(items)

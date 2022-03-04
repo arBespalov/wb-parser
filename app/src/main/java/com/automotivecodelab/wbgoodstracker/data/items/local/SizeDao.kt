@@ -5,11 +5,11 @@ import androidx.room.*
 @Dao
 interface SizeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg size: SizeDBModel)
+    suspend fun insert(vararg size: SizeDBModel)
 
     @Delete
-    fun delete(vararg size: SizeDBModel)
+    suspend fun delete(vararg size: SizeDBModel)
 
     @Update
-    fun update(vararg size: SizeDBModel): Int
+    suspend fun update(vararg size: SizeDBModel): Int
 }

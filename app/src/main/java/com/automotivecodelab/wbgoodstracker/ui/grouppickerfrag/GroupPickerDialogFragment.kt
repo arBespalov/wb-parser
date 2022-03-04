@@ -26,14 +26,20 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
         bottomSheetDialog.setContentView(R.layout.group_picker_dialog_fragment)
 
         val listView = bottomSheetDialog.findViewById<ListView>(R.id.list_view)
-        val groupNames = viewModel.getGroupNames()
-        ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, groupNames).also {
-            listView?.adapter = it
+
+        viewModel.groups.observe(this) { groups ->
+            listView?.adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                groups
+            )
+
+            listView?.setOnItemClickListener { _, _, position, _ ->
+                viewModel.setGroupToItems(args.itemsId.toList(), groups[position])
+            }
         }
 
-        listView?.setOnItemClickListener { parent, view, position, id ->
-            viewModel.setGroupToItems(args.itemsId.toList(), groupNames[position])
-        }
+
 
         bottomSheetDialog.findViewById<FrameLayout>(
             com.google.android.material.R.id.design_bottom_sheet

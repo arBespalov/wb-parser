@@ -61,6 +61,8 @@ class AddItemViewModel(
     }
 
     fun signOut() {
-        signOutUseCase()
+        viewModelScope.launch {
+            signOutUseCase()
+        }
     }
 }

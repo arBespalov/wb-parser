@@ -37,8 +37,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/name"
-                    android:text="@={viewmodel.cachedName}"/>
+                    android:id="@+id/name"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -50,8 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
-                    android:id="@+id/auto_complete_text_view"
-                    android:text="@={viewmodel.cachedGroupName}"/>
+                    android:id="@+id/auto_complete_text_view"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

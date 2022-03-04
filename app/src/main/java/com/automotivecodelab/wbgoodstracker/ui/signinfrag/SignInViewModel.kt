@@ -40,8 +40,10 @@ class SignInViewModel(
     }
 
     fun signOut() {
-        signOutUseCase()
-        _viewState.value = SignInViewState.SignedOutState
+        viewModelScope.launch {
+            signOutUseCase()
+            _viewState.value = SignInViewState.SignedOutState
+        }
     }
 
     fun handleSignInResult(user: User) {

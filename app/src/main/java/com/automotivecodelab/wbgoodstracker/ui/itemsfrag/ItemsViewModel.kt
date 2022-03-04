@@ -15,17 +15,31 @@ class ItemsViewModel(
     private val getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
     private val setSortingModeUseCase: SetSortingModeUseCase,
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
-    private val getGroupsUseCase: GetGroupsUseCase,
+    getGroupsUseCase: GetGroupsUseCase,
     getCurrentGroupUseCase: GetCurrentGroupUseCase,
     private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
-    private val _currentGroup = MutableLiveData(getCurrentGroupUseCase())
+    private val _currentGroup = MutableLiveData<String>()
     val currentGroup: LiveData<String> = _currentGroup
 
+    private val _groups = MutableLiveData<Array<String>>()
+    val groups: LiveData<Array<String>> = _groups
+
+    private val _itemsComparator = MutableLiveData<Comparator<Item>>()
+    val itemsComparator: LiveData<Comparator<Item>> = _itemsComparator
+
+    init {
+        viewModelScope.launch {
+            _currentGroup.value = getCurrentGroupUseCase()
+            _groups.value = getGroupsUseCase()
+            _itemsComparator.value = getUserSortingModeComparatorUseCase()
+        }
+    }
+
     val items: LiveData<List<Item>> = Transformations.switchMap(_currentGroup) { groupName ->
-        observeItemsByGroupUseCase(groupName)
+        observeItemsByGroupUseCase(groupName).asLiveData()
     }
 
     private val _openItemEvent = MutableLiveData<Event<Int>>()
@@ -106,17 +120,21 @@ class ItemsViewModel(
         }
     }
 
-    fun changeCurrentGroup(groupName: String) {
-        _currentGroup.value = groupName
-        setCurrentGroupUseCase(groupName)
+    fun changeCurrentGroup(position: Int) {
+        val groups = groups.value
+        if (groups != null) {
+            val groupName = groups[position]
+            _currentGroup.value = groupName
+            viewModelScope.launch {
+                setCurrentGroupUseCase(groupName)
+            }
+        }
     }
 
     fun saveSortingMode(sortingMode: SortingMode) {
-        setSortingModeUseCase(sortingMode)
-    }
-
-    fun getSavedGroupNames(): Array<String> {
-        return getGroupsUseCase()
+        viewModelScope.launch {
+            setSortingModeUseCase(sortingMode)
+        }
     }
 
     fun addToGroup(itemsId: List<String>) {
@@ -141,11 +159,9 @@ class ItemsViewModel(
     }
 
     fun signOut() {
-        signOutUseCase()
-    }
-
-    fun getItemsComparator(): Comparator<Item> {
-        return getUserSortingModeComparatorUseCase()
+        viewModelScope.launch {
+            signOutUseCase()
+        }
     }
 
     fun changeTheme() {

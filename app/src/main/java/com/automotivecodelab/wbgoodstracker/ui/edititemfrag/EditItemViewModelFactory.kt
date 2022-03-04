@@ -15,9 +15,9 @@ class EditItemViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return EditItemViewModel(
             ObserveSingleItemUseCase(itemsRepository),
+            GetGroupsUseCase(itemsRepository),
             itemId,
-            EditItemUseCase(itemsRepository),
-            GetGroupsUseCase(itemsRepository)
+            EditItemUseCase(itemsRepository)
         ) as T
     }
 }

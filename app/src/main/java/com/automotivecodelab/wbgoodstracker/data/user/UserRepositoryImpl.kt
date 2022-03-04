@@ -18,7 +18,7 @@ class UserRepositoryImpl(
                 } else {
                     authenticationService.updateToken(localUser)
                 }.also {
-                    localDataSource.user = it
+                    localDataSource.setUser(it)
                     return Result.success(it)
                 }
             }
@@ -27,11 +27,11 @@ class UserRepositoryImpl(
         }
     }
 
-    override fun handleSignInResult(user: User) {
-        localDataSource.user = user
+    override suspend fun handleSignInResult(user: User) {
+        localDataSource.setUser(user)
     }
 
-    override fun signOut() {
-        localDataSource.user = null
+    override suspend fun signOut() {
+        localDataSource.setUser(null)
     }
 }

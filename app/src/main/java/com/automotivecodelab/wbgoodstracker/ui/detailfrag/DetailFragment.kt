@@ -61,9 +61,7 @@ class DetailFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         viewDataBinding?.collapsingToolbar?.setupWithNavController(
@@ -148,8 +146,8 @@ class DetailFragment : Fragment() {
             }
         }
 
-        postponeEnterTransition()
-        view?.doOnPreDraw { startPostponedEnterTransition() }
+//        postponeEnterTransition()
+//        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     private fun setupOptionsMenu() {

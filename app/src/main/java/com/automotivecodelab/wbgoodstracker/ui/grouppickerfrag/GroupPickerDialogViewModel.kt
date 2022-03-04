@@ -10,15 +10,20 @@ import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class GroupPickerDialogViewModel(
-    private val getGroupsUseCase: GetGroupsUseCase,
+    getGroupsUseCase: GetGroupsUseCase,
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase
 ) : ViewModel() {
 
     private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()
     val taskCompletedEvent: LiveData<Event<Unit>> = _taskCompletedEvent
 
-    fun getGroupNames(): Array<String> {
-        return getGroupsUseCase()
+    private val _groups = MutableLiveData<Array<String>>()
+    val groups: LiveData<Array<String>> = _groups
+
+    init {
+        viewModelScope.launch {
+            _groups.value = getGroupsUseCase()
+        }
     }
 
     fun setGroupToItems(itemsId: List<String>, groupName: String) {

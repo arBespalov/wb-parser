@@ -4,6 +4,9 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 const val SAVED_SORTING_MODE = "savedSortingMode"
@@ -15,44 +18,43 @@ class ItemsLocalDataSourceImpl(
     private val sizeDao: SizeDao,
     private val sharedPreferences: SharedPreferences
 ) : ItemsLocalDataSource {
-    override fun observeAll(): LiveData<List<ItemWithSizesDBModel>> {
+    override fun observeAll(): Flow<List<ItemWithSizesDBModel>> {
         return itemDao.observeAll()
     }
 
-    override fun observeByGroup(groupName: String): LiveData<List<ItemWithSizesDBModel>> {
+    override fun observeByGroup(groupName: String): Flow<List<ItemWithSizesDBModel>> {
         return itemDao.observeByGroup(groupName)
     }
 
     override suspend fun getAll(): List<ItemWithSizesDBModel> {
-        return withContext(Dispatchers.IO) { itemDao.getAll() }
+        return itemDao.getAll()
     }
 
     override suspend fun getByGroup(groupName: String): List<ItemWithSizesDBModel> {
-        return withContext(Dispatchers.IO) { itemDao.getByGroup(groupName) }
+        return itemDao.getByGroup(groupName)
     }
 
     override suspend fun addItem(item: ItemWithSizesDBModel) {
-        return withContext(Dispatchers.IO) {
-        // todo make async
-            itemDao.insert(item.item)
-            sizeDao.insert(*item.sizes.toTypedArray())
+        withContext(Dispatchers.IO) {
+            awaitAll(
+                async { itemDao.insert(item.item) },
+                async { sizeDao.insert(*item.sizes.toTypedArray()) }
+            )
         }
     }
 
     override suspend fun getItem(id: String): ItemWithSizesDBModel {
-        return withContext(Dispatchers.IO) { itemDao.getById(id) }
+        return itemDao.getById(id)
     }
 
-    override fun observeItem(id: String): LiveData<ItemWithSizesDBModel> {
+    override fun observeItem(id: String): Flow<ItemWithSizesDBModel> {
         return itemDao.observeById(id)
     }
 
     override suspend fun deleteItems(itemsId: Array<String>) {
-        withContext(Dispatchers.IO) {
-            itemsId.forEach {
-                val item = getItem(it)
-                itemDao.delete(item.item)
-            }
+        itemsId.forEach {
+            val item = getItem(it)
+            itemDao.delete(item.item)
         }
     }
 
@@ -94,56 +96,72 @@ class ItemsLocalDataSourceImpl(
         }
     }
 
-    override fun getCurrentGroup(): String? {
-        return sharedPreferences.getString(SAVED_CURRENT_GROUP, null)
+    override suspend fun getCurrentGroup(): String? {
+        return withContext(Dispatchers.IO) {
+            sharedPreferences.getString(SAVED_CURRENT_GROUP, null)
+        }
     }
 
-    override fun setCurrentGroup(groupName: String?) {
-        if (groupName.isNullOrEmpty()) {
+    override suspend fun setCurrentGroup(groupName: String?) {
+        withContext(Dispatchers.IO) {
+            if (groupName.isNullOrEmpty()) {
+                sharedPreferences.edit()
+                    .remove(SAVED_CURRENT_GROUP)
+                    .apply()
+            } else {
+                sharedPreferences.edit()
+                    .putString(SAVED_CURRENT_GROUP, groupName)
+                    .apply()
+            }
+        }
+    }
+
+    override suspend fun getSortingMode(): SortingMode {
+        return withContext(Dispatchers.IO) {
+            val ordinal = sharedPreferences.getInt(
+                SAVED_SORTING_MODE,
+                SortingMode.BY_DATE_DESC.ordinal)
+            SortingMode.values()[ordinal]
+        }
+    }
+
+    override suspend fun setSortingMode(sortingMode: SortingMode) {
+        withContext(Dispatchers.IO) {
             sharedPreferences.edit()
-                .remove(SAVED_CURRENT_GROUP)
-                .apply()
-        } else {
-            sharedPreferences.edit()
-                .putString(SAVED_CURRENT_GROUP, groupName)
+                .putInt(SAVED_SORTING_MODE, sortingMode.ordinal)
                 .apply()
         }
     }
 
-    override fun getSortingMode(): SortingMode {
-        val ordinal = sharedPreferences.getInt(SAVED_SORTING_MODE, SortingMode.BY_DATE_DESC.ordinal)
-        return SortingMode.values()[ordinal]
+    override suspend fun getGroups(): Array<String> {
+        return withContext(Dispatchers.IO) {
+            val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
+            groupNames?.toTypedArray() ?: arrayOf()
+        }
     }
 
-    override fun setSortingMode(sortingMode: SortingMode) {
-        sharedPreferences.edit()
-            .putInt(SAVED_SORTING_MODE, sortingMode.ordinal)
-            .apply()
+    override suspend fun deleteGroup(groupName: String) {
+        withContext(Dispatchers.IO) {
+            val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
+            // modifying groupNames is not allowed according to docs
+            val newGroupNames = HashSet<String>(groupNames)
+            newGroupNames.remove(groupName)
+            sharedPreferences.edit()
+                .putStringSet(GROUP_NAMES, newGroupNames)
+                .remove(SAVED_CURRENT_GROUP)
+                .apply()
+        }
     }
 
-    override fun getGroups(): Array<String> {
-        val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
-        return groupNames?.toTypedArray() ?: arrayOf()
-    }
-
-    override fun deleteGroup(groupName: String) {
-        val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
-        // modifying groupNames is not allowed according to docs
-        val newGroupNames = HashSet<String>(groupNames)
-        newGroupNames.remove(groupName)
-        sharedPreferences.edit()
-            .putStringSet(GROUP_NAMES, newGroupNames)
-            .remove(SAVED_CURRENT_GROUP)
-            .apply()
-    }
-
-    override fun addGroup(groupName: String) {
-        val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
-        // modifying groupNames is not allowed according to docs
-        val newGroupNames = HashSet<String>(groupNames)
-        newGroupNames.add(groupName)
-        sharedPreferences.edit()
-            .putStringSet(GROUP_NAMES, newGroupNames)
-            .apply()
+    override suspend fun addGroup(groupName: String) {
+        withContext(Dispatchers.IO) {
+            val groupNames = sharedPreferences.getStringSet(GROUP_NAMES, setOf())
+            // modifying groupNames is not allowed according to docs
+            val newGroupNames = HashSet<String>(groupNames)
+            newGroupNames.add(groupName)
+            sharedPreferences.edit()
+                .putStringSet(GROUP_NAMES, newGroupNames)
+                .apply()
+        }
     }
 }

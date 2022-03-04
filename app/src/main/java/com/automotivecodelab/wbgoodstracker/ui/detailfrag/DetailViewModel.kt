@@ -12,7 +12,7 @@ class DetailViewModel(
     observeSingleItemUseCase: ObserveSingleItemUseCase,
     private val itemId: String
 ) : ViewModel() {
-    val item: LiveData<Item> = observeSingleItemUseCase(itemId)
+    val item: LiveData<Item> = observeSingleItemUseCase(itemId).asLiveData()
 
     private val _confirmDeleteEvent = MutableLiveData<Event<String>>()
     val confirmDeleteEvent: LiveData<Event<String>> = _confirmDeleteEvent

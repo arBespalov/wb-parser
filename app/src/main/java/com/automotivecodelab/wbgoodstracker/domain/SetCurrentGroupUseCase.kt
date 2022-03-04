@@ -5,7 +5,7 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 class SetCurrentGroupUseCase(
     private val itemsRepository: ItemsRepository
 ) {
-    operator fun invoke(groupName: String) {
+    suspend operator fun invoke(groupName: String) {
         itemsRepository.setCurrentGroup(groupName)
     }
 }

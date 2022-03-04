@@ -17,14 +17,12 @@ import com.squareup.picasso.Picasso
 
 class ItemsAdapter(
     private val viewModel: ItemsViewModel,
-    var comparator: Comparator<Item>
+    var comparator: Comparator<Item>?
 ) : RecyclerView.Adapter<ItemsAdapter.ItemsViewHolder>() {
 
     var tracker: SelectionTracker<String>? = null
 
-    val sortedList = SortedList<Item>(
-        Item::class.java,
-        object : SortedList.Callback<Item>() {
+    val sortedList = SortedList(Item::class.java, object : SortedList.Callback<Item>() {
             override fun areItemsTheSame(item1: Item?, item2: Item?): Boolean {
                 return item1?.id == item2?.id
             }
@@ -46,7 +44,7 @@ class ItemsAdapter(
             }
 
             override fun compare(o1: Item?, o2: Item?): Int {
-                return comparator.compare(o1, o2)
+                return comparator?.compare(o1, o2) ?: 0
             }
 
             override fun areContentsTheSame(oldItem: Item?, newItem: Item?): Boolean {
