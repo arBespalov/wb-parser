@@ -31,6 +31,9 @@ interface ItemDao {
     @Query("SELECT * FROM item WHERE groupName IN (:group)")
     suspend fun getByGroup(group: String): List<ItemWithSizesDBModel>
 
+    @Query("SELECT groupName FROM item GROUP BY groupName")
+    fun getGroups(): Flow<List<String?>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg item: ItemDBModel)
 

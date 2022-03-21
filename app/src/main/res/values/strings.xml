@@ -58,6 +58,8 @@
     <string name="theme">Theme</string>
     <string name="warehouses">Warehouses:&#160;</string>
     <string name="orders">Orders</string>
+    <string name="item_deleted">Item deleted</string>
+    <string name="undo">Undo</string>
 
     <string name="shared_element_container_add_item">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment">shared_element_container_detail_fragment</string>

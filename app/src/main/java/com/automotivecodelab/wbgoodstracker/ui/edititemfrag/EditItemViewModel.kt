@@ -18,7 +18,7 @@ class EditItemViewModel(
     private val _viewState = MutableLiveData(
         EditItemViewState(
             item = null,
-            groups = arrayOf()
+            groups = listOf()
         )
     )
     val viewState: LiveData<EditItemViewState> = _viewState
@@ -31,9 +31,11 @@ class EditItemViewModel(
 
     init {
         viewModelScope.launch {
-            _viewState.value = _viewState.value?.copy(
-                groups = getGroupsUseCase()
-            )
+            getGroupsUseCase().collect {
+                _viewState.value = _viewState.value?.copy(
+                    groups = it
+                )
+            }
             observeSingleItemUseCase(itemId).collect {
                 _viewState.value = _viewState.value?.copy(item = it)
             }

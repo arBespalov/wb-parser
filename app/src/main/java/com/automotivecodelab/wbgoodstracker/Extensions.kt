@@ -13,6 +13,7 @@ import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
+import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import kotlin.math.ceil
 
@@ -38,6 +39,10 @@ fun Fragment.getItemsRepository(): ItemsRepository {
 
 fun Fragment.getUserRepository(): UserRepository {
     return (requireActivity().application as MyApplication).appContainer.userRepository
+}
+
+fun Fragment.getSortRepository(): SortRepository {
+    return (requireActivity().application as MyApplication).appContainer.sortRepository
 }
 
 // avoiding duplicate navigation to prevent crashes when click 2 views simultaneously

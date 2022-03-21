@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
     </style>
 
     <style name="Widget.App.CollapsingToolbar" parent="Widget.Design.CollapsingToolbar">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Toolbar" parent="">
+        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
     </style>
 
     <style name="Widget.App.SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
@@ -20,22 +25,14 @@
         <item name="android:popupBackground">?attr/colorSurface</item>
     </style>
 
-    <style name="Widget.App.TextAppearanceSmallPopupMenu" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+    <style name="Widget.App.TextAppearanceSmallPopupMenu"
+        parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/text_color_selector</item>
     </style>
 
-    <style name="ThemeOverlay.App.Toolbar" parent="">
-        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
-        <item name="colorControlNormal">?attr/colorOnPrimary</item>
-    </style>
+    <style name="Accent" parent="TextAppearance.MaterialComponents.Subtitle2"/>
 
-    <style name="Accent" parent="TextAppearance.MaterialComponents.Subtitle2">
-
-    </style>
-
-    <style name="Subtitle" parent="TextAppearance.MaterialComponents.Subtitle2">
-
-    </style>
+    <style name="Subtitle" parent="TextAppearance.MaterialComponents.Subtitle2"/>
 
     <style name="Big" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="fontFamily">@font/roboto_light</item>
@@ -48,8 +45,13 @@
         <item name="android:fontFamily">@font/roboto_light</item>
     </style>
 
-    <style name="Widget.App.ShapeAppearanceMedium" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+    <style name="Widget.App.ShapeAppearanceMedium"
+        parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">15dp</item>
+    </style>
+
+    <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/text_color_selector</item>
     </style>
 </resources>

@@ -1,7 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
 import androidx.lifecycle.*
-import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
@@ -12,41 +11,29 @@ import kotlinx.coroutines.launch
 
 class ItemsViewModel(
     observeItemsByGroupUseCase: ObserveItemsByGroupUseCase,
-    private val getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
+    getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
     private val setSortingModeUseCase: SetSortingModeUseCase,
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
     getGroupsUseCase: GetGroupsUseCase,
-    getCurrentGroupUseCase: GetCurrentGroupUseCase,
     private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val signOutUseCase: SignOutUseCase,
+    private val deleteItemsUseCase: DeleteItemsUseCase
 ) : ViewModel() {
 
-    private val _currentGroup = MutableLiveData<String>()
-    val currentGroup: LiveData<String> = _currentGroup
+    val groups: LiveData<List<String>> = getGroupsUseCase().asLiveData()
 
-    private val _groups = MutableLiveData<Array<String>>()
-    val groups: LiveData<Array<String>> = _groups
+    val itemsComparator: LiveData<Comparator<Item>> = getUserSortingModeComparatorUseCase()
+        .asLiveData()
 
-    private val _itemsComparator = MutableLiveData<Comparator<Item>>()
-    val itemsComparator: LiveData<Comparator<Item>> = _itemsComparator
-
-    init {
-        viewModelScope.launch {
-            _currentGroup.value = getCurrentGroupUseCase()
-            _groups.value = getGroupsUseCase()
-            _itemsComparator.value = getUserSortingModeComparatorUseCase()
-        }
-    }
-
-    val items: LiveData<List<Item>> = Transformations.switchMap(_currentGroup) { groupName ->
-        observeItemsByGroupUseCase(groupName).asLiveData()
-    }
+    // second in pair - current group
+    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> =
+        observeItemsByGroupUseCase().asLiveData()
 
     private val _openItemEvent = MutableLiveData<Event<Int>>()
     val openItemEvent: LiveData<Event<Int>> = _openItemEvent
 
-    private val _addItemEvent = MutableLiveData<Event<Wrapper<String?>>>()
-    val addItemEvent: LiveData<Event<Wrapper<String?>>> = _addItemEvent
+    private val _addItemEvent = MutableLiveData<Event<Unit>>()
+    val addItemEvent: LiveData<Event<Unit>> = _addItemEvent
 
     private val _confirmDeleteEvent = MutableLiveData<Event<List<String>>>()
     val confirmDeleteEvent: LiveData<Event<List<String>>> = _confirmDeleteEvent
@@ -56,9 +43,6 @@ class ItemsViewModel(
 
     private val _updateErrorEvent = MutableLiveData<Event<String>>()
     val updateErrorEvent: LiveData<Event<String>> = _updateErrorEvent
-
-    private val _newGroupEvent = MutableLiveData<Event<Unit>>()
-    val newGroupEvent: LiveData<Event<Unit>> = _newGroupEvent
 
     private val _deleteGroupEvent = MutableLiveData<Event<String>>()
     val deleteGroupEvent: LiveData<Event<String>> = _deleteGroupEvent
@@ -81,38 +65,42 @@ class ItemsViewModel(
     var cachedSearchQuery: String? = null
         private set
 
-    fun openItem(position: Int) {
-        _openItemEvent.value = Event(position)
+    fun openItem(recyclerItemPosition: Int) {
+        _openItemEvent.value = Event(recyclerItemPosition)
     }
 
-    fun addItem(url: String?) {
-        _addItemEvent.value = Event(Wrapper(url))
+    fun addItem() {
+        _addItemEvent.value = Event(Unit)
     }
 
     fun confirmDelete(itemsIdToDelete: List<String>) {
         _confirmDeleteEvent.value = Event(itemsIdToDelete)
     }
 
+    fun deleteItem(itemId: String) {
+        viewModelScope.launch {
+            //todo
+            deleteItemsUseCase(arrayOf(itemId))
+        }
+    }
+
     fun editItem(itemId: String) {
         _editItemEvent.value = Event(itemId)
     }
 
-    fun newGroup() {
-        _newGroupEvent.value = Event(Unit)
-    }
-
     fun deleteGroup() {
-        if (_currentGroup.value != null) {
-            _deleteGroupEvent.value = Event(_currentGroup.value!!)
+        val currentGroup = itemsWithCurrentGroup.value?.second
+        if (currentGroup != null) {
+            _deleteGroupEvent.value = Event(currentGroup)
         }
     }
 
     fun updateItems() {
         viewModelScope.launch {
             _dataLoading.value = true
-            refreshAllItemsUseCase {
+            refreshAllItemsUseCase(onAuthenticationFailureCallback = {
                 _authorizationErrorEvent.value = Event(Unit)
-            }
+            })
                 .onFailure {
                     _updateErrorEvent.value = Event(it.message.toString())
                 }
@@ -120,18 +108,13 @@ class ItemsViewModel(
         }
     }
 
-    fun changeCurrentGroup(position: Int) {
-        val groups = groups.value
-        if (groups != null) {
-            val groupName = groups[position]
-            _currentGroup.value = groupName
-            viewModelScope.launch {
-                setCurrentGroupUseCase(groupName)
-            }
+    fun setCurrentGroup(group: String?) {
+        viewModelScope.launch {
+            setCurrentGroupUseCase(group)
         }
     }
 
-    fun saveSortingMode(sortingMode: SortingMode) {
+    fun setSortingMode(sortingMode: SortingMode) {
         viewModelScope.launch {
             setSortingModeUseCase(sortingMode)
         }
@@ -145,7 +128,7 @@ class ItemsViewModel(
         cachedSearchQuery = query
         val lowerCaseQuery = query?.lowercase(Locale.ROOT) ?: ""
         val filteredList = mutableListOf<Item>()
-        items.value?.forEach { item ->
+        itemsWithCurrentGroup.value?.first?.forEach { item ->
             val text = (item.localName ?: item.name).lowercase(Locale.ROOT)
             if (text.contains(lowerCaseQuery)) {
                 filteredList.add(item)

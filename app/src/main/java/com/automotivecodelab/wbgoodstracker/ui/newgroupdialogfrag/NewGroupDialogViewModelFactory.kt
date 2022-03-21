@@ -2,7 +2,7 @@ package com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.automotivecodelab.wbgoodstracker.domain.CreateNewGroupUseCase
+import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 
 class NewGroupDialogViewModelFactory(
@@ -11,7 +11,7 @@ class NewGroupDialogViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return NewGroupDialogViewModel(
-            CreateNewGroupUseCase(itemsRepository)
+            AddItemsToGroupUseCase(itemsRepository)
         ) as T
     }
 }

@@ -2,7 +2,6 @@ package com.automotivecodelab.wbgoodstracker.data.items
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.automotivecodelab.wbgoodstracker.data.ResourceManager
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.local.toDBModel
@@ -14,34 +13,34 @@ import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.log
 import java.util.*
-import kotlin.Comparator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 
 class ItemsRepositoryImpl(
     private val localDataSource: ItemsLocalDataSource,
     private val remoteDataSource: ItemsRemoteDataSource,
-    private val resourceManager: ResourceManager
 ) : ItemsRepository {
 
-    override fun observeItems(groupName: String): Flow<List<Item>> {
-        return if (groupName == resourceManager.getAllItemsString()) {
-            localDataSource.observeAll().map { list ->
-                list.map { dbModel ->
-                    dbModel.toDomainModel()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun observeItems(): Flow<Pair<List<Item>, String?>> {
+        var _group: String? = null
+        return localDataSource.getCurrentGroup()
+            .flatMapLatest { group ->
+                _group = group
+                if (group == null) {
+                    localDataSource.observeAll()
+                } else {
+                    localDataSource.observeByGroup(group)
                 }
             }
-        } else {
-            localDataSource.observeByGroup(groupName).map { list ->
-                list.map { dbModel ->
-                    dbModel.toDomainModel()
-                }
+            .map {
+                it.map { itemDBModel -> itemDBModel.toDomainModel() } to _group
             }
-        }
     }
+
 
     override fun observeSingleItem(id: String): Flow<Item> {
         return localDataSource.observeItem(id).map { dbModel ->
@@ -67,52 +66,44 @@ class ItemsRepositoryImpl(
     }
 
     override suspend fun updateItem(item: Item) {
-        if (item.localName == resourceManager.getAllItemsString()) {
-            item.copy(localName = null)
-        } else {
-            item
-        }.also {
-            localDataSource.updateItem(it.toDBModel())
-        }
+        localDataSource.updateItem(item.toDBModel())
     }
 
-    override suspend fun addItem(url: String, groupName: String): Result<Unit> {
-        return addItemWithNullableToken(url, groupName, null)
+    override suspend fun addItem(url: String): Result<Unit> {
+        return addItemWithNullableToken(url, null)
     }
 
-    override suspend fun addItem(url: String, groupName: String, token: String): Result<Unit> {
-        return addItemWithNullableToken(url, groupName, token)
+    override suspend fun addItem(url: String, token: String): Result<Unit> {
+        return addItemWithNullableToken(url, token)
     }
 
     private suspend fun addItemWithNullableToken(
         url: String,
-        groupName: String,
         token: String?
     ): Result<Unit> {
         return runCatching {
             withContext(Dispatchers.IO) {
                 val newItemDeferred = async { remoteDataSource.addItem(url, token) }
                 val localItemsDeferred = async { localDataSource.getAll() }
+                val currentGroupDeferred = async { localDataSource.getCurrentGroup().first() }
 
                 val newItem = newItemDeferred.await()
                 val localItems = localItemsDeferred.await()
+                val currentGroup = currentGroupDeferred.await()
 
-                val nullableGroupName = if (groupName == resourceManager.getAllItemsString())
-                    null
-                else groupName
-
-                localItems.find { itemWithSizes -> newItem._id == itemWithSizes.item.id }
-                    ?.also { dbModel ->
-                        localDataSource.updateItem(newItem.toDBModel(
-                            creationTimestamp = dbModel.item.creationTimestamp,
-                            previousOrdersCount = dbModel.item.ordersCount,
-                            previousAveragePrice = dbModel.item.averagePrice,
-                            previousTotalQuantity = dbModel.item.totalQuantity,
-                            localName = dbModel.item.localName,
-                            groupName = nullableGroupName
-                        ))
-                        return@withContext
-                    }
+                localItems.find {
+                        itemWithSizes -> newItem._id == itemWithSizes.item.id
+                }?.let { dbModel ->
+                    localDataSource.updateItem(newItem.toDBModel(
+                        creationTimestamp = dbModel.item.creationTimestamp,
+                        previousOrdersCount = dbModel.item.ordersCount,
+                        previousAveragePrice = dbModel.item.averagePrice,
+                        previousTotalQuantity = dbModel.item.totalQuantity,
+                        localName = dbModel.item.localName,
+                        groupName = dbModel.item.groupName
+                    ))
+                    return@withContext
+                }
 
                 localDataSource.addItem(
                     newItem.toDBModel(
@@ -121,7 +112,7 @@ class ItemsRepositoryImpl(
                         previousAveragePrice = newItem.averagePrice,
                         previousTotalQuantity = newItem.totalQuantity,
                         localName = null,
-                        groupName = nullableGroupName
+                        groupName = currentGroup
                     )
                 )
             }
@@ -255,84 +246,19 @@ class ItemsRepositoryImpl(
         }
     }
 
-    override suspend fun setItemsGroupName(itemIds: List<String>, groupName: String) {
+    override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
         setGroupNameToItemsList(itemIds.map { localDataSource.getItem(it) }, groupName)
     }
 
     private suspend fun setGroupNameToItemsList(
         items: List<ItemWithSizesDBModel>,
-        groupName: String
+        groupName: String?
     ) {
-        if (groupName == resourceManager.getAllItemsString()) {
-            null
-        } else {
-            groupName
-        }.also {
-            localDataSource.updateItem(*items.map { item ->
-                item.copy(
-                    item = item.item.copy(groupName = it)
-                )
-            }.toTypedArray())
-        }
-    }
-
-    override suspend fun deleteGroup(groupName: String) {
-        if (groupName != resourceManager.getAllItemsString()) {
-            val items = localDataSource.getByGroup(groupName)
-            setGroupNameToItemsList(items, resourceManager.getAllItemsString())
-            localDataSource.deleteGroup(groupName)
-        }
-    }
-
-    override suspend fun getGroups(): Array<String> {
-        return localDataSource.getGroups().plus(resourceManager.getAllItemsString())
-    }
-
-    override suspend fun getSortingModeComparator(): Comparator<Item> {
-        return when (localDataSource.getSortingMode()) {
-            SortingMode.BY_NAME_ASC -> Comparator { o1, o2 -> o1.name.compareTo(o2.name) }
-            SortingMode.BY_NAME_DESC -> Comparator { o1, o2 -> o2.name.compareTo(o1.name) }
-            SortingMode.BY_DATE_ASC -> Comparator { o1, o2 ->
-                o2.creationTimestamp.compareTo(o1.creationTimestamp)
-            }
-            SortingMode.BY_DATE_DESC -> Comparator { o1, o2 ->
-                o1.creationTimestamp.compareTo(o2.creationTimestamp)
-            }
-            SortingMode.BY_ORDERS_COUNT -> Comparator { o1, o2 ->
-                o2.ordersCount.compareTo(o1.ordersCount)
-            }
-            SortingMode.BY_ORDERS_COUNT_PER_DAY -> Comparator { o1, o2 ->
-                o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
-            }
-        }
-    }
-
-    override suspend fun setSortingMode(sortingMode: SortingMode) {
-        localDataSource.setSortingMode(sortingMode)
-    }
-
-    override suspend fun getCurrentGroup(): String {
-        return localDataSource.getCurrentGroup() ?: resourceManager.getAllItemsString()
-    }
-
-    override suspend fun setCurrentGroup(groupName: String) {
-        if (groupName == resourceManager.getAllItemsString()) {
-            null
-        } else {
-            groupName
-        }.also {
-            localDataSource.setCurrentGroup(it)
-        }
-    }
-
-    override suspend fun setDefaultGroup() {
-        localDataSource.setCurrentGroup(null)
-    }
-
-    override suspend fun createNewGroup(groupName: String) {
-        if (groupName != resourceManager.getAllItemsString()) {
-            localDataSource.addGroup(groupName)
-        }
+        localDataSource.updateItem(*items.map { item ->
+            item.copy(
+                item = item.item.copy(groupName = groupName)
+            )
+        }.toTypedArray())
     }
 
     override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {
@@ -342,5 +268,18 @@ class ItemsRepositoryImpl(
                 Pair(it.timeOfCreationInMs, it.ordersCount)
             }
         }
+    }
+
+    override suspend fun deleteGroup(groupName: String) {
+        val items = localDataSource.getByGroup(groupName)
+        setGroupNameToItemsList(items, null)
+    }
+
+    override fun getGroups(): Flow<List<String>> {
+        return localDataSource.getGroups()
+    }
+
+    override suspend fun setCurrentGroup(groupName: String?) {
+        localDataSource.setCurrentGroup(groupName)
     }
 }

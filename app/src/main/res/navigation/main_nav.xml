@@ -21,9 +21,6 @@
             android:id="@+id/action_itemsFragment_to_editItemFragment"
             app:destination="@id/editItemFragment" />
         <action
-            android:id="@+id/action_itemsFragment_to_newGroupDialogFragment"
-            app:destination="@id/newGroupDialogFragment" />
-        <action
             android:id="@+id/action_itemsFragment_to_confirmDeleteGroupDialogFrag"
             app:destination="@id/confirmDeleteGroupDialogFrag" />
         <action
@@ -68,9 +65,6 @@
             android:id="@+id/action_addItemFragment_to_errorDialogFragment"
             app:destination="@id/errorDialogFragment" />
         <argument
-            android:name="groupName"
-            app:argType="string" />
-        <argument
             android:name="url"
             app:argType="string"
             app:nullable="true" />
@@ -103,11 +97,9 @@
         android:id="@+id/newGroupDialogFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag.NewGroupDialogFragment"
         android:label="NewGroupDialogFragment" >
-        <action
-            android:id="@+id/action_newGroupDialogFragment_to_itemsFragment"
-            app:destination="@id/itemsFragment"
-            app:popUpTo="@id/itemsFragment"
-            app:popUpToInclusive="true" />
+        <argument
+            android:name="itemIds"
+            app:argType="string[]" />
     </dialog>
     <dialog
         android:id="@+id/confirmDeleteGroupDialogFrag"
@@ -129,6 +121,10 @@
         <argument
             android:name="itemsId"
             app:argType="string[]" />
+        <action
+            android:id="@+id/action_groupPickerDialogFragment_to_newGroupDialogFragment"
+            app:destination="@id/newGroupDialogFragment"
+            app:popUpToInclusive="false" />
     </dialog>
     <fragment
         android:id="@+id/signInFragment"
@@ -153,4 +149,5 @@
             android:id="@+id/action_chartFragment_to_errorDialogFragment"
             app:destination="@id/errorDialogFragment" />
     </fragment>
+    <action android:id="@+id/action_global_addItemFragment" app:destination="@id/addItemFragment" />
 </navigation>

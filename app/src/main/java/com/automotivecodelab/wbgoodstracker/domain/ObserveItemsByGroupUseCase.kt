@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class ObserveItemsByGroupUseCase(
     private val itemsRepository: ItemsRepository
 ) {
-    operator fun invoke(groupName: String): Flow<List<Item>> {
-        return itemsRepository.observeItems(groupName)
+    operator fun invoke(): Flow<Pair<List<Item>, String?>> {
+        return itemsRepository.observeItems()
     }
 }

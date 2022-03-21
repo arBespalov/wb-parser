@@ -4,9 +4,8 @@ import androidx.recyclerview.selection.ItemKeyProvider
 import androidx.recyclerview.widget.SortedList
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
-class MyItemKeyProvider : ItemKeyProvider<String>(SCOPE_CACHED) {
-
-    var sortedListItems: SortedList<Item>? = null
+class MyItemKeyProvider(private val sortedListItems: SortedList<Item>?)
+    : ItemKeyProvider<String>(SCOPE_CACHED) {
 
     override fun getKey(position: Int) = sortedListItems?.get(position)?.id
 

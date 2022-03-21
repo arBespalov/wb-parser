@@ -8,11 +8,14 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.getItemsRepository
 import com.automotivecodelab.wbgoodstracker.navigate
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.KeyboardToggle
+import com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailFragmentArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -22,6 +25,7 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     private val viewModel: NewGroupDialogViewModel by viewModels {
         NewGroupDialogViewModelFactory(getItemsRepository())
     }
+    private val args: NewGroupDialogFragmentArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
@@ -45,7 +49,7 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
                 EditorInfo.IME_ACTION_DONE -> {
                     val newGroupName = editText.text.toString()
                     if (newGroupName.isNotEmpty()) {
-                        viewModel.addGroup(newGroupName)
+                        viewModel.addGroup(args.itemIds.toList(), newGroupName)
                     }
                     true
                 }
@@ -63,13 +67,8 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // won't be initialized
-        viewModel.taskCompletedEvent.observe(
-            this,
-            EventObserver {
-                val action = NewGroupDialogFragmentDirections
-                    .actionNewGroupDialogFragmentToItemsFragment()
-                navigate(action)
-            }
-        )
+        viewModel.taskCompletedEvent.observe(this, EventObserver {
+            findNavController().navigateUp()
+        })
     }
 }

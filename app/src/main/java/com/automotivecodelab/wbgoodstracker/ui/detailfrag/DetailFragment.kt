@@ -52,7 +52,7 @@ class DetailFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             viewmodel = viewModel
         }
-
+        postponeEnterTransition()
         return view
     }
 
@@ -146,8 +146,8 @@ class DetailFragment : Fragment() {
             }
         }
 
-//        postponeEnterTransition()
-//        view.doOnPreDraw { startPostponedEnterTransition() }
+
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     private fun setupOptionsMenu() {

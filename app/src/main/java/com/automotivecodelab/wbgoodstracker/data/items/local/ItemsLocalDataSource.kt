@@ -14,11 +14,7 @@ interface ItemsLocalDataSource {
     fun observeItem(id: String): Flow<ItemWithSizesDBModel>
     suspend fun deleteItems(itemsId: Array<String>)
     suspend fun updateItem(vararg item: ItemWithSizesDBModel)
-    suspend fun getCurrentGroup(): String?
+    fun getCurrentGroup(): Flow<String?>
     suspend fun setCurrentGroup(groupName: String?)
-    suspend fun getSortingMode(): SortingMode
-    suspend fun setSortingMode(sortingMode: SortingMode)
-    suspend fun getGroups(): Array<String>
-    suspend fun deleteGroup(groupName: String)
-    suspend fun addGroup(groupName: String)
+    fun getGroups(): Flow<List<String>>
 }

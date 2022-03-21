@@ -2,11 +2,13 @@ package com.automotivecodelab.wbgoodstracker.domain
 
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
+import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
+import kotlinx.coroutines.flow.Flow
 
 class GetUserSortingModeComparatorUseCase(
-    private val itemsRepository: ItemsRepository
+    private val sortRepository: SortRepository
 ) {
-    suspend operator fun invoke(): Comparator<Item> {
-        return itemsRepository.getSortingModeComparator()
+    operator fun invoke(): Flow<Comparator<Item>> {
+        return sortRepository.getSortingModeComparator()
     }
 }

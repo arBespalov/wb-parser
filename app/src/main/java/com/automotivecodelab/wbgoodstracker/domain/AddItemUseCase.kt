@@ -12,7 +12,6 @@ class AddItemUseCase(
 
     suspend operator fun invoke(
         url: String,
-        groupName: String,
         onAuthenticationFailureCallback: () -> Unit = {}
     ): Result<Unit> {
         if (!url.contains("https://wildberries.") &&
@@ -26,17 +25,16 @@ class AddItemUseCase(
         val result = userRepository.getUser()
         return if (result.isFailure) {
             onAuthenticationFailureCallback.invoke()
-            itemsRepository.addItem(pureUrl, groupName)
+            itemsRepository.addItem(pureUrl)
         } else {
             val user = result.getOrNull()
             if (user != null) {
                 itemsRepository.addItem(
                     pureUrl,
-                    groupName,
                     user.idToken
                 )
             } else {
-                itemsRepository.addItem(pureUrl, groupName)
+                itemsRepository.addItem(pureUrl)
             }
         }
     }

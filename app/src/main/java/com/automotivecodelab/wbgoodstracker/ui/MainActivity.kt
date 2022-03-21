@@ -7,24 +7,31 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.R
 
 class MainActivity : AppCompatActivity(), KeyboardToggle {
 
-    var intentValue: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        handleIntentAndNavigateToAddItemFragment(intent)
+    }
 
-        when (intent?.action) {
-            Intent.ACTION_SEND -> {
-                if (intent.type == "text/plain") {
-                    intentValue = intent.getStringExtra(Intent.EXTRA_TEXT)
-                    if (intentValue != null && !intentValue!!.contains("wildberries")) {
-                        finish()
-                    }
-                }
+    override fun onNewIntent(intent: Intent?) {
+        handleIntentAndNavigateToAddItemFragment(intent)
+        super.onNewIntent(intent)
+    }
+
+    private fun handleIntentAndNavigateToAddItemFragment(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            val intentValue = intent.getStringExtra(Intent.EXTRA_TEXT)
+            // mark intent as handled for the case of activity recreation:
+            intent.removeExtra(Intent.EXTRA_TEXT)
+            if (intentValue != null && intentValue.contains("wildberries")) {
+                val action = MainNavDirections.actionGlobalAddItemFragment(intentValue)
+                findNavController(R.id.fragment).navigate(action)
             }
         }
     }

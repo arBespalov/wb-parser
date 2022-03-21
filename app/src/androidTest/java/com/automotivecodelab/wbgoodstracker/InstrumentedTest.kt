@@ -2,7 +2,6 @@ package com.automotivecodelab.wbgoodstracker
 
 import android.widget.AutoCompleteTextView
 import androidx.core.view.isVisible
-import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -17,7 +16,6 @@ import com.automotivecodelab.wbgoodstracker.ui.MainActivity
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapter
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.textfield.TextInputLayout
-import org.hamcrest.CoreMatchers.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -134,7 +132,7 @@ class InstrumentedTest {
         // goto detail screen
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -179,7 +177,7 @@ class InstrumentedTest {
         onView(withId(R.id.recycler_view_items))
             .perform(
                 RecyclerViewActions
-                    .actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(0, click())
+                    .actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(0, click())
             )
         // goto delete confirmation dialog
         onView(withId(R.id.menu_delete))
@@ -205,7 +203,7 @@ class InstrumentedTest {
         Thread.sleep(1500)
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -266,7 +264,7 @@ class InstrumentedTest {
         Thread.sleep(1500)
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -344,7 +342,7 @@ class InstrumentedTest {
             .perform(click())
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -355,7 +353,7 @@ class InstrumentedTest {
             .perform(androidx.test.espresso.action.ViewActions.pressBack())
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -373,7 +371,7 @@ class InstrumentedTest {
         // goto detail for change the name of the item
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     10,
                     click()
                 )
@@ -405,7 +403,7 @@ class InstrumentedTest {
         Thread.sleep(1500)
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     0,
                     click()
                 )
@@ -437,7 +435,7 @@ class InstrumentedTest {
         // goto detail for change the name of the item
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     0,
                     swipeRight()
                 )
@@ -449,7 +447,7 @@ class InstrumentedTest {
         toggleOrientation()
         onView(withId(R.id.recycler_view_items))
             .perform(
-                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemsViewHolder>(
+                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
                     0,
                     swipeRight()
                 )

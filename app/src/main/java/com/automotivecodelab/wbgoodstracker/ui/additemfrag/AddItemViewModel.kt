@@ -30,12 +30,11 @@ class AddItemViewModel(
 
     private var url: String = ""
 
-    fun saveItem(groupName: String) {
+    fun saveItem() {
         viewModelScope.launch {
             _dataLoading.value = true
             addItemUseCase(
                 url = url,
-                groupName = groupName,
                 onAuthenticationFailureCallback =  {
                     _authorizationErrorEvent.value = Event(Unit)
                 }

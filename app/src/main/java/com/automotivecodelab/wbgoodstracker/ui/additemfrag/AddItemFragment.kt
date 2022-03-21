@@ -40,7 +40,7 @@ class AddItemFragment : Fragment() {
         viewDataBinding = AddItemFragmentBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
+        postponeEnterTransition()
         return view
     }
 
@@ -64,7 +64,7 @@ class AddItemFragment : Fragment() {
             toolbar.setupWithNavController(navController, appBarConfiguration)
             toolbar.navigationIcon = cancelButton
             swipeRefresh.isEnabled = false
-            fabSave.setOnClickListener { viewModel.saveItem(args.groupName) }
+            fabSave.setOnClickListener { viewModel.saveItem() }
 
             viewModel.invalidUrl.observe(
                 viewLifecycleOwner,
@@ -125,8 +125,6 @@ class AddItemFragment : Fragment() {
         )
 
         setupNavigation()
-
-        postponeEnterTransition()
         view?.doOnPreDraw { startPostponedEnterTransition() }
     }
 

@@ -76,7 +76,8 @@ class EditItemFragment : Fragment() {
 
             viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
                 adapter.clear()
-                adapter.addAll(viewState.groups.toList())
+                adapter.addAll(viewState.groups
+                    .plus(requireContext().getString(R.string.all_items)))
                 if (viewState.item != null) {
                     val sName =
                         viewModel.newName ?: viewState.item.localName ?: viewState.item.name
@@ -94,7 +95,11 @@ class EditItemFragment : Fragment() {
                 viewModel.newName = it.toString()
             }
             autoCompleteTextView.addTextChangedListener {
-                viewModel.newGroup = it.toString()
+                if (it.toString() == requireContext().getString(R.string.all_items)) {
+                    viewModel.newGroup = null
+                } else {
+                    viewModel.newGroup = it.toString()
+                }
             }
         }
 
