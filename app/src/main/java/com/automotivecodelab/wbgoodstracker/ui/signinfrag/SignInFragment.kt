@@ -1,16 +1,18 @@
 package com.automotivecodelab.wbgoodstracker.ui.signinfrag
 
-import android.content.Intent
+import android.app.Activity
 import android.content.IntentSender
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -22,15 +24,27 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 
 class SignInFragment : Fragment() {
 
+    private val getUserCredentials = registerForActivityResult(ActivityResultContracts
+        .StartIntentSenderForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            try {
+                val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
+                val user = User(credential.googleIdToken!!, email = null)
+                viewModel.signIn(user)
+            } catch (e: ApiException) {
+                log(e.message.toString())
+            }
+        }
+    }
     private val viewModel: SignInViewModel by viewModels {
         SignInViewModelFactory(getItemsRepository(), getUserRepository())
     }
     private var viewDataBinding: SignInFragmentBinding? = null
-    private val REQ_ONE_TAP = 77
     private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
 
     override fun onCreateView(
@@ -43,7 +57,9 @@ class SignInFragment : Fragment() {
         viewDataBinding = SignInFragmentBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
+        postponeEnterTransition()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
         return view
     }
 
@@ -52,9 +68,7 @@ class SignInFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         val cancelButton = ResourcesCompat.getDrawable(
@@ -68,27 +82,19 @@ class SignInFragment : Fragment() {
             swipeRefresh.isEnabled = false
         }
 
-        viewModel.start()
         setupNavigation()
-        viewModel.viewState.observe(
-            viewLifecycleOwner,
-            Observer {
-                when (it) {
-                    is SignInViewState.SignedOutState -> setSignedOutState()
-                    is SignInViewState.SignedInState -> setSignedInState(it.email)
-                    is SignInViewState.LoadingState -> setLoadingState()
-                }
+        viewModel.viewState.observe(viewLifecycleOwner) {
+            when (it) {
+                is SignInViewState.SignedOutState -> setSignedOutState()
+                is SignInViewState.SignedInState -> setSignedInState(it.email)
+                is SignInViewState.LoadingState -> setLoadingState()
             }
-        )
-
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+        }
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     private fun setupNavigation() {
-        viewModel.networkErrorEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = SignInFragmentDirections.actionSignInFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
@@ -109,7 +115,7 @@ class SignInFragment : Fragment() {
             hint.text = getString(R.string.sign_in_hint)
             signInButton.apply {
                 visibility = View.VISIBLE
-                setOnClickListener { beginSignIn() }
+                setOnClickListener { beginAuthenticationFlow(signUp = false) }
             }
             signOutButton.visibility = View.INVISIBLE
             swipeRefresh.isRefreshing = false
@@ -128,11 +134,8 @@ class SignInFragment : Fragment() {
                 setOnClickListener {
                     oneTapClient.signOut()
                     viewModel.signOut()
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.sign_out_message,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    // todo test snackbar
+                    Snackbar.make(rootView, R.string.sign_out_message, Snackbar.LENGTH_LONG).show()
                 }
             }
             signInButton.visibility = View.INVISIBLE
@@ -140,14 +143,13 @@ class SignInFragment : Fragment() {
         }
     }
 
-    private fun beginSignIn() {
-
+    private fun beginAuthenticationFlow(signUp: Boolean) {
         val signInRequest: BeginSignInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setServerClientId(BuildConfig.SERVER_CLIENT_ID)
-                    .setFilterByAuthorizedAccounts(true)
+                    .setFilterByAuthorizedAccounts(!signUp)
                     .build()
             )
             // .setAutoSelectEnabled(true)
@@ -156,61 +158,15 @@ class SignInFragment : Fragment() {
         oneTapClient.beginSignIn(signInRequest)
             .addOnSuccessListener { result ->
                 try {
-                    startIntentSenderForResult(
-                        result.pendingIntent.intentSender, REQ_ONE_TAP,
-                        null, 0, 0, 0, null
-                    )
+                    getUserCredentials.launch(IntentSenderRequest.Builder(
+                        result.pendingIntent.intentSender).build())
                 } catch (e: IntentSender.SendIntentException) {
                     log("Couldn't start One Tap UI: ${e.message}")
                 }
             }
             .addOnFailureListener { e ->
                 log(e.message.toString())
-                beginSignUp()
+                if (!signUp) beginAuthenticationFlow(signUp = true)
             }
-    }
-
-    private fun beginSignUp() {
-        val signUpRequest: BeginSignInRequest = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setServerClientId(BuildConfig.SERVER_CLIENT_ID)
-                    .setFilterByAuthorizedAccounts(false)
-                    .build()
-            ).build()
-
-        oneTapClient.beginSignIn(signUpRequest)
-            .addOnSuccessListener { result ->
-                try {
-                    startIntentSenderForResult(
-                        result.pendingIntent.intentSender, REQ_ONE_TAP,
-                        null, 0, 0, 0, null
-                    )
-                } catch (e: IntentSender.SendIntentException) {
-                    log("Couldn't start One Tap UI: ${e.message}")
-                }
-            }
-            .addOnFailureListener { e ->
-                log(e.message.toString())
-            }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            REQ_ONE_TAP -> {
-                try {
-                    val credential = oneTapClient.getSignInCredentialFromIntent(data)
-
-                    val user = User(credential.googleIdToken!!, email = null)
-
-                    viewModel.handleSignInResult(user)
-                } catch (e: ApiException) {
-                    log(e.message.toString())
-                }
-            }
-        }
     }
 }

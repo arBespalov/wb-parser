@@ -22,20 +22,16 @@ class AddItemUseCase(
             return Result.failure(InvalidUrlException())
         }
         val pureUrl = url.replaceBefore("http", "")
-        val result = userRepository.getUser()
-        return if (result.isFailure) {
-            onAuthenticationFailureCallback.invoke()
-            itemsRepository.addItem(pureUrl)
-        } else {
-            val user = result.getOrNull()
-            if (user != null) {
-                itemsRepository.addItem(
-                    pureUrl,
-                    user.idToken
-                )
-            } else {
+        return if (userRepository.isUserAuthenticated()) {
+            val user = userRepository.getUser()
+            if (user.isFailure) {
+                onAuthenticationFailureCallback.invoke()
                 itemsRepository.addItem(pureUrl)
+            } else {
+                itemsRepository.addItem(pureUrl, user.getOrThrow().idToken)
             }
+        } else {
+            itemsRepository.addItem(pureUrl)
         }
     }
 }

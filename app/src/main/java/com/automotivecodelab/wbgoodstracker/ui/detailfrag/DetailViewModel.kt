@@ -6,13 +6,17 @@ import com.automotivecodelab.wbgoodstracker.domain.RefreshSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onErrorResume
 
 class DetailViewModel(
     private val refreshSingleItemUseCase: RefreshSingleItemUseCase,
     observeSingleItemUseCase: ObserveSingleItemUseCase,
     private val itemId: String
 ) : ViewModel() {
-    val item: LiveData<Item> = observeSingleItemUseCase(itemId).asLiveData()
+    val item: LiveData<Item> = observeSingleItemUseCase(itemId)
+        .catch { _closeScreenEvent.value = Event(Unit) }
+        .asLiveData()
 
     private val _confirmDeleteEvent = MutableLiveData<Event<String>>()
     val confirmDeleteEvent: LiveData<Event<String>> = _confirmDeleteEvent
@@ -28,6 +32,9 @@ class DetailViewModel(
 
     private val _showOrdersChartEvent = MutableLiveData<Event<String>>()
     val showOrdersChartEvent: LiveData<Event<String>> = _showOrdersChartEvent
+
+    private val _closeScreenEvent = MutableLiveData<Event<Unit>>()
+    val closeScreenEvent: LiveData<Event<Unit>> = _closeScreenEvent
 
     fun confirmDelete() {
         _confirmDeleteEvent.value = Event(itemId)

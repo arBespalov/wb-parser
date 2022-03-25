@@ -77,9 +77,8 @@ class ItemsViewModel(
         _confirmDeleteEvent.value = Event(itemsIdToDelete)
     }
 
-    fun deleteItem(itemId: String) {
+    fun deleteSingleItem(itemId: String) {
         viewModelScope.launch {
-            //todo
             deleteItemsUseCase(arrayOf(itemId))
         }
     }

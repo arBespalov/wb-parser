@@ -5,7 +5,6 @@ import com.automotivecodelab.wbgoodstracker.domain.EditItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class EditItemViewModel(
@@ -14,33 +13,17 @@ class EditItemViewModel(
     itemId: String,
     private val editItemUseCase: EditItemUseCase,
 ) : ViewModel() {
-
-    private val _viewState = MutableLiveData(
-        EditItemViewState(
-            item = null,
-            groups = listOf()
-        )
-    )
-    val viewState: LiveData<EditItemViewState> = _viewState
+    val item = observeSingleItemUseCase(itemId).asLiveData()
+    val groups = getGroupsUseCase().asLiveData()
 
     var newName: String? = null
     var newGroup: String? = null
 
-    private val _saveItemEvent = MutableLiveData<Event<Unit>>()
-    val saveItemEvent: LiveData<Event<Unit>> = _saveItemEvent
+    private val _closeScreenEvent = MutableLiveData<Event<Unit>>()
+    val closeScreenEvent: LiveData<Event<Unit>> = _closeScreenEvent
 
-    init {
-        viewModelScope.launch {
-            getGroupsUseCase().collect {
-                _viewState.value = _viewState.value?.copy(
-                    groups = it
-                )
-            }
-            observeSingleItemUseCase(itemId).collect {
-                _viewState.value = _viewState.value?.copy(item = it)
-            }
-        }
-    }
+    private val _createNewGroupEvent = MutableLiveData<Event<String>>()
+    val createNewGroupEvent: LiveData<Event<String>> = _createNewGroupEvent
 
     fun saveItem() {
         viewModelScope.launch {
@@ -49,14 +32,20 @@ class EditItemViewModel(
             } else {
                 newName
             }
-            val item = viewState.value?.item
+            val item = item.value
             if (item != null) {
                 editItemUseCase(item.copy(
                     localName = sName,
                     groupName = newGroup
                 ))
-                _saveItemEvent.value = Event(Unit)
+                _closeScreenEvent.value = Event(Unit)
             }
+        }
+    }
+
+    fun createNewGroup() {
+        item.value?.id?.let {
+            _createNewGroupEvent.value = Event(it)
         }
     }
 }

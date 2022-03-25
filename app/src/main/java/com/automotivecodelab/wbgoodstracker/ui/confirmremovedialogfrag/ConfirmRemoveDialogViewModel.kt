@@ -15,12 +15,9 @@ class ConfirmRemoveDialogViewModel(
     private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()
     val taskCompletedEvent: LiveData<Event<Unit>> = _taskCompletedEvent
 
-    private val _authorizationErrorEvent = MutableLiveData<Event<Unit>>()
-    val authorizationErrorEvent: LiveData<Event<Unit>> = _authorizationErrorEvent
-
     fun deleteItems(itemsIdToDelete: Array<String>) {
         viewModelScope.launch {
-            deleteItemsUseCase(itemsIdToDelete) // bad design
+            deleteItemsUseCase(itemsIdToDelete)
             _taskCompletedEvent.value = Event(Unit)
         }
     }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -37,11 +38,12 @@ class ChartFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.chart_fragment, container, false)
-
         viewDataBinding = ChartFragmentBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
+        postponeEnterTransition()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
         return view
     }
 
@@ -50,64 +52,48 @@ class ChartFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
-
         viewDataBinding?.apply {
             toolbar.setupWithNavController(navController, appBarConfiguration)
             swipeRefresh.isEnabled = false
-            viewModel.dataLoading.observe(
-                viewLifecycleOwner,
-                Observer {
-                    swipeRefresh.isRefreshing = it
-                }
-            )
+            viewModel.dataLoading.observe(viewLifecycleOwner) {
+                swipeRefresh.isRefreshing = it
+            }
             chart.setNoDataText(getString(R.string.please_wait))
-            viewModel.chartData.observe(
-                viewLifecycleOwner,
-                Observer { list ->
-                    val entries = list.map {
-                        Entry(it.first.toFloat(), it.second.toFloat())
-                    }
-                    val dataSet = LineDataSet(entries, "exampleLabel")
-                    dataSet.color = requireContext().themeColor(R.attr.colorPrimary)
-                    dataSet.setDrawCircles(false)
-                    dataSet.setDrawValues(false)
-                    val lineData = LineData(dataSet)
-                    chart.apply {
-                        data = lineData
-                        description = null
-                        isKeepPositionOnRotation = true
-                        setDrawBorders(false)
-                        axisLeft.setDrawAxisLine(false)
-                        axisLeft.textColor = requireContext().themeColor(R.attr.colorOnBackground)
-                        axisRight.isEnabled = false
-                        xAxis.setDrawAxisLine(false)
-                        xAxis.position = XAxis.XAxisPosition.BOTTOM
-                        xAxis.valueFormatter = MyValueFormatter()
-                        xAxis.textColor = requireContext().themeColor(R.attr.colorOnBackground)
-                        legend.isEnabled = false
-                        invalidate()
-                    }
+            viewModel.chartData.observe(viewLifecycleOwner) { list ->
+                val entries = list.map {
+                    Entry(it.first.toFloat(), it.second.toFloat())
                 }
-            )
+                val dataSet = LineDataSet(entries, "exampleLabel")
+                dataSet.color = requireContext().themeColor(R.attr.colorPrimary)
+                dataSet.setDrawCircles(false)
+                dataSet.setDrawValues(false)
+                val lineData = LineData(dataSet)
+                chart.apply {
+                    data = lineData
+                    description = null
+                    isKeepPositionOnRotation = true
+                    setDrawBorders(false)
+                    axisLeft.setDrawAxisLine(false)
+                    axisLeft.textColor = requireContext().themeColor(R.attr.colorOnBackground)
+                    axisRight.isEnabled = false
+                    xAxis.setDrawAxisLine(false)
+                    xAxis.position = XAxis.XAxisPosition.BOTTOM
+                    xAxis.valueFormatter = MyValueFormatter()
+                    xAxis.textColor = requireContext().themeColor(R.attr.colorOnBackground)
+                    legend.isEnabled = false
+                    invalidate()
+                }
+            }
         }
-
-        viewModel.start()
-
         setupNavigation()
-
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     private fun setupNavigation() {
-        viewModel.networkErrorEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = ChartFragmentDirections.actionChartFragmentToErrorDialogFragment(it)
                 navigate(action)
             }

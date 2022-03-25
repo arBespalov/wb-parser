@@ -12,10 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.getItemsRepository
-import com.automotivecodelab.wbgoodstracker.navigate
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.KeyboardToggle
-import com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailFragmentArgs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -67,7 +65,7 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // won't be initialized
-        viewModel.taskCompletedEvent.observe(this, EventObserver {
+        viewModel.closeDialogEvent.observe(this, EventObserver {
             findNavController().navigateUp()
         })
     }

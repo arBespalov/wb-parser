@@ -23,7 +23,7 @@ class SignInViewModel(
     private val _networkErrorEvent = MutableLiveData<Event<String>>()
     val networkErrorEvent: LiveData<Event<String>> = _networkErrorEvent
 
-    fun start() {
+    init {
         viewModelScope.launch {
             getUserUseCase()
                 .onFailure {
@@ -46,7 +46,7 @@ class SignInViewModel(
         }
     }
 
-    fun handleSignInResult(user: User) {
+    fun signIn(user: User) {
         viewModelScope.launch {
             _viewState.value = SignInViewState.LoadingState
             signInUseCase(user)

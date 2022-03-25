@@ -12,20 +12,17 @@ class DeleteItemsUseCase(
         itemsIdToDelete: Array<String>,
         onAuthenticationFailureCallback: () -> Unit = {}
     ) {
-        userRepository.getUser()
-            .onFailure {
-                onAuthenticationFailureCallback()
-                itemsRepository.deleteItems(itemsIdToDelete)
-            }
-            .onSuccess { user ->
-                if (user != null) {
-                    itemsRepository.deleteItems(
-                        itemsIdToDelete,
-                        user.idToken
-                    )
-                } else {
+        if (userRepository.isUserAuthenticated()) {
+            userRepository.getUser()
+                .onFailure {
+                    onAuthenticationFailureCallback()
                     itemsRepository.deleteItems(itemsIdToDelete)
                 }
-            }
+                .onSuccess { user ->
+                    itemsRepository.deleteItems(itemsIdToDelete, user.idToken)
+                }
+        } else {
+            itemsRepository.deleteItems(itemsIdToDelete)
+        }
     }
 }

@@ -9,12 +9,19 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
+import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.R
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), KeyboardToggle {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val appThemeSource = (application as MyApplication).appContainer.appThemeSource
+        runBlocking {
+            appThemeSource.saveAndSetupAppTheme(appThemeSource.getAppTheme())
+        }
         setContentView(R.layout.activity_main)
         handleIntentAndNavigateToAddItemFragment(intent)
     }
@@ -37,9 +44,8 @@ class MainActivity : AppCompatActivity(), KeyboardToggle {
     }
 
     override fun hideKeyboard(view: View) {
-        val inputMethodManager =
-            getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun showKeyboard(view: View) {

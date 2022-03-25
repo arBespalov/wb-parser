@@ -1,8 +1,12 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview
 
+import android.animation.ValueAnimator
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.postDelayed
+import android.widget.ImageView
+import androidx.core.animation.addPauseListener
+import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
@@ -13,7 +17,9 @@ import com.automotivecodelab.wbgoodstracker.databinding.RecyclerviewItemBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.httpToHttps
 import com.google.android.material.color.MaterialColors
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import java.lang.Exception
 
 class ItemsAdapter(
     private var comparator: Comparator<Item>?,
@@ -62,7 +68,7 @@ class ItemsAdapter(
     }
 
     private val sortedList = SortedList(Item::class.java, object : SortedList.Callback<Item>() {
-        override fun getChangePayload(item1: Item?, item2: Item?): Any? {
+        override fun getChangePayload(item1: Item?, item2: Item?): Any {
             return ITEM_CONTENT_CHANGED_PAYLOAD
         }
         override fun areItemsTheSame(item1: Item?, item2: Item?): Boolean {
@@ -121,7 +127,7 @@ class ItemsAdapter(
         RecyclerView.ViewHolder(recyclerViewItemBinding.root), ViewHolderWithDetails<String> {
 
         init {
-            this.recyclerViewItemBinding.card.setOnClickListener {
+            recyclerViewItemBinding.card.setOnClickListener {
                 onOpenItemDetails(bindingAdapterPosition)
             }
         }
@@ -152,13 +158,56 @@ class ItemsAdapter(
         val item = sortedList[position]
         for (payload in payloads) {
             when (payload) {
-                ITEM_CONTENT_CHANGED_PAYLOAD ->
-                    holder.recyclerViewItemBinding.item = item
+                ITEM_CONTENT_CHANGED_PAYLOAD -> {
+                    val oldCount = holder.recyclerViewItemBinding.totalQuantity.text.toString()
+                        .toInt()
+                    val newCount = item.totalQuantity
+                    if (oldCount != newCount) {
+                        holder.recyclerViewItemBinding.item = item.copy(totalQuantity = oldCount)
+                        ValueAnimator.ofInt(oldCount, newCount).apply {
+                            duration = 200
+                            addUpdateListener {
+                                holder.recyclerViewItemBinding.totalQuantity.text =
+                                    it.animatedValue.toString()
+                            }
+                            start()
+                        }
+
+                    } else {
+                        holder.recyclerViewItemBinding.item = item
+                    }
+                }
+                else -> super.onBindViewHolder(holder, position, payloads)
             }
         }
-        // selection mode results in payload
+
+    }
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        val item = sortedList[position]
+        holder.recyclerViewItemBinding.item = item
+
+        val loadImage = {
+            Picasso.get()
+                .load(item.img.httpToHttps())
+                .fit()
+                .centerCrop()
+                .error(R.drawable.ic_baseline_error_outline_24)
+                .into(holder.recyclerViewItemBinding.imageView)
+        }
+        loadImage()
+        //Picasso.get().cancelRequest(holder.recyclerViewItemBinding.imageView)
+        holder.recyclerViewItemBinding.imageView.addOnLayoutChangeListener {
+                view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            val height = bottom - top
+            val oldHeight = oldBottom - oldTop
+            if (oldHeight != 0 && height != oldHeight && position < sortedList.size()) {
+                //Picasso.get().cancelRequest(view as ImageView)
+                loadImage()
+            }
+        }
         tracker?.let {
-            if (it.isSelected(sortedList[position].id)) {
+            if (it.isSelected(item.id)) {
                 holder.recyclerViewItemBinding.card.setCardBackgroundColor(
                     MaterialColors.getColor(
                         holder.recyclerViewItemBinding.root,
@@ -176,21 +225,5 @@ class ItemsAdapter(
                 // holder.recyclerViewItemBinding.root.isActivated = false
             }
         }
-    }
-
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.recyclerViewItemBinding.apply {
-            item = sortedList[position]
-        }
-        val imgUrl = httpToHttps(sortedList[position].img)
-        holder.recyclerViewItemBinding.card.postDelayed(50) {
-            Picasso.get()
-                .load(imgUrl)
-                .fit()
-                .centerCrop()
-                .error(R.drawable.ic_baseline_error_outline_24)
-                .into(holder.recyclerViewItemBinding.imageView)
-        }
-
     }
 }

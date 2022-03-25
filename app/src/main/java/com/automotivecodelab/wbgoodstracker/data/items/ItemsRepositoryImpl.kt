@@ -12,12 +12,9 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.log
+import kotlinx.coroutines.*
 import java.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 
 class ItemsRepositoryImpl(
     private val localDataSource: ItemsLocalDataSource,
@@ -41,11 +38,11 @@ class ItemsRepositoryImpl(
             }
     }
 
-
     override fun observeSingleItem(id: String): Flow<Item> {
-        return localDataSource.observeItem(id).map { dbModel ->
-            dbModel.toDomainModel()
-        }
+        return localDataSource.observeItem(id)
+            .map { dbModel ->
+                dbModel.toDomainModel()
+            }
     }
 
     override suspend fun deleteItems(itemsId: Array<String>) {
@@ -56,11 +53,18 @@ class ItemsRepositoryImpl(
         deleteItemsWithNullableToken(itemsId, token)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: Array<String>, token: String?) {
-        localDataSource.deleteItems(itemsId)
         runCatching {
+            val currentGroup = localDataSource.getCurrentGroup().first()
+            if (currentGroup != null && localDataSource.getByGroup(currentGroup).size == 1) {
+                setCurrentGroup(null)
+            }
+            localDataSource.deleteItems(itemsId)
             if (token != null) {
-                remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
+                GlobalScope.launch {
+                    remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
+                }
             }
         }
     }
@@ -248,6 +252,10 @@ class ItemsRepositoryImpl(
 
     override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
         setGroupNameToItemsList(itemIds.map { localDataSource.getItem(it) }, groupName)
+        val currentGroup = localDataSource.getCurrentGroup().first()
+        if (currentGroup != null && localDataSource.getByGroup(currentGroup).isEmpty()) {
+            setCurrentGroup(null)
+        }
     }
 
     private suspend fun setGroupNameToItemsList(
@@ -265,7 +273,7 @@ class ItemsRepositoryImpl(
         return runCatching {
             val item = remoteDataSource.getItemWithFullData(itemId)
             item.info.map {
-                Pair(it.timeOfCreationInMs, it.ordersCount)
+                it.timeOfCreationInMs to it.ordersCount
             }
         }
     }
@@ -273,6 +281,7 @@ class ItemsRepositoryImpl(
     override suspend fun deleteGroup(groupName: String) {
         val items = localDataSource.getByGroup(groupName)
         setGroupNameToItemsList(items, null)
+        setCurrentGroup(null)
     }
 
     override fun getGroups(): Flow<List<String>> {

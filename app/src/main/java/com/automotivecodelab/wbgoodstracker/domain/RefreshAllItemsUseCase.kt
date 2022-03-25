@@ -8,17 +8,16 @@ class RefreshAllItemsUseCase(
     private val itemsRepository: ItemsRepository
 ) {
     suspend operator fun invoke(onAuthenticationFailureCallback: () -> Unit = {}): Result<Unit> {
-        val authenticationResult = userRepository.getUser()
-        return if (authenticationResult.isFailure) {
-            onAuthenticationFailureCallback.invoke()
-            itemsRepository.refreshAllItems()
-        } else {
-            val user = authenticationResult.getOrNull()
-            if (user == null) {
+        return if (userRepository.isUserAuthenticated()) {
+            val user = userRepository.getUser()
+            if (user.isFailure) {
+                onAuthenticationFailureCallback.invoke()
                 itemsRepository.refreshAllItems()
             } else {
-                itemsRepository.syncItems(user.idToken)
+                itemsRepository.syncItems(user.getOrThrow().idToken)
             }
+        } else {
+            itemsRepository.refreshAllItems()
         }
     }
 }

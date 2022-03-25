@@ -44,11 +44,8 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
 
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog won't be initialized
-        viewModel.taskCompletedEvent.observe(
-            this,
-            EventObserver {
-                findNavController().navigateUp()
-                findNavController().navigateUp()
+        viewModel.taskCompletedEvent.observe(this, EventObserver {
+                dismiss()
             }
         )
     }

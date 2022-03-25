@@ -6,7 +6,6 @@ import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.ListView
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.getItemsRepository
@@ -62,7 +61,7 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // 't be initialized
-        viewModel.taskCompletedEvent.observe(this, EventObserver {
+        viewModel.closeDialogEvent.observe(this, EventObserver {
             dismiss()
         })
 

@@ -12,13 +12,13 @@ class NewGroupDialogViewModel(
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase
 ) : ViewModel() {
 
-    private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()
-    val taskCompletedEvent: LiveData<Event<Unit>> = _taskCompletedEvent
+    private val _closeDialogEvent = MutableLiveData<Event<Unit>>()
+    val closeDialogEvent: LiveData<Event<Unit>> = _closeDialogEvent
 
     fun addGroup(itemIds: List<String>, groupName: String) {
         viewModelScope.launch {
             addItemsToGroupUseCase(itemIds, groupName)
-            _taskCompletedEvent.value = Event(Unit)
+            _closeDialogEvent.value = Event(Unit)
         }
     }
 }

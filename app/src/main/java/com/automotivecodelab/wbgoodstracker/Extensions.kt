@@ -17,11 +17,11 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import kotlin.math.ceil
 
-fun httpToHttps(url: String): String {
-    return if (!url.contains("https")) {
-        "https" + url.drop(4)
+fun String.httpToHttps(): String {
+    return if (!contains("https")) {
+        "https" + drop(4)
     } else {
-        url
+        this
     }
 }
 
@@ -29,8 +29,8 @@ fun log(text: String) {
     Log.d("happy", text)
 }
 
-fun millisToDays(millis: Long): Int {
-    return ceil((millis.toDouble() / (24 * 60 * 60 * 1000))).toInt()
+fun Long.millisToDays(): Int {
+    return ceil((toDouble() / (24 * 60 * 60 * 1000))).toInt()
 }
 
 fun Fragment.getItemsRepository(): ItemsRepository {
@@ -48,38 +48,38 @@ fun Fragment.getSortRepository(): SortRepository {
 // avoiding duplicate navigation to prevent crashes when click 2 views simultaneously
 fun Fragment.navigate(directions: NavDirections) {
     val controller = findNavController()
-    when (val currentDestination = controller.currentDestination) {
+    val className = when (val currentDestination = controller.currentDestination) {
         is DialogFragmentNavigator.Destination -> {
-            if (currentDestination.className == this.javaClass.name) {
-                controller.navigate(directions)
-            }
+            currentDestination.className
         }
         is FragmentNavigator.Destination -> {
-            if (currentDestination.className == this.javaClass.name) {
-                controller.navigate(directions)
-            }
+            currentDestination.className
         }
+        else -> return
+    }
+    if (className == this.javaClass.name) {
+        controller.navigate(directions)
     }
 }
 
-fun Fragment.navigate(directions: NavDirections, extras: FragmentNavigator.Extras) {
+fun Fragment.navigate(directions: NavDirections, extras: FragmentNavigator.Extras? = null) {
     val controller = findNavController()
-    when (val currentDestination = controller.currentDestination) {
+    val className = when (val currentDestination = controller.currentDestination) {
         is DialogFragmentNavigator.Destination -> {
-            if (currentDestination.className == this.javaClass.name) {
-                controller.navigate(directions, extras)
-            }
+            currentDestination.className
         }
         is FragmentNavigator.Destination -> {
-            if (currentDestination.className == this.javaClass.name) {
-                controller.navigate(directions, extras)
-            }
+            currentDestination.className
         }
+        else -> return
+    }
+    if (className == this.javaClass.name) {
+        if (extras != null) controller.navigate(directions, extras)
+        else controller.navigate(directions)
     }
 }
 
 @ColorInt
-@SuppressLint("Recycle")
 fun Context.themeColor(
     @AttrRes themeAttrId: Int
 ): Int {

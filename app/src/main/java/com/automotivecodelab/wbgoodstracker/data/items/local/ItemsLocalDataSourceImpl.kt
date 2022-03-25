@@ -53,12 +53,12 @@ class ItemsLocalDataSourceImpl(
 
     override suspend fun deleteItems(itemsId: Array<String>) {
         withContext(Dispatchers.IO) {
-            itemsId.forEach {
+            itemsId.map {
                 async {
                     val item = getItem(it)
                     itemDao.delete(item.item)
                 }
-            }
+            }.awaitAll()
         }
 
     }
@@ -67,7 +67,7 @@ class ItemsLocalDataSourceImpl(
         return withContext(Dispatchers.IO) {
             itemDao.update(*item.map { it.item }.toTypedArray())
             withContext(Dispatchers.IO) {
-                item.forEach { updatedItem ->
+                item.map { updatedItem ->
                     async {
                         val localItemSizes = itemDao.getById(updatedItem.item.id).sizes
                         val localItemSizeNames = localItemSizes.map { it.sizeName }
@@ -100,7 +100,7 @@ class ItemsLocalDataSourceImpl(
                             sizeDao.update(*list.toTypedArray())
                         }
                     }
-                }
+                }.awaitAll()
             }
         }
     }
@@ -110,7 +110,7 @@ class ItemsLocalDataSourceImpl(
             .map { prefs ->
                 prefs[CURRENT_GROUP]
             }
-            .distinctUntilChanged()
+            //.distinctUntilChanged()
     }
 
     override suspend fun setCurrentGroup(groupName: String?) {
@@ -126,8 +126,8 @@ class ItemsLocalDataSourceImpl(
     override fun getGroups(): Flow<List<String>> {
         return itemDao.getGroups()
             .map {
-            it.filterNotNull()
+                it.filterNotNull()
             }
-            .distinctUntilChanged()
+            //.distinctUntilChanged()
     }
 }

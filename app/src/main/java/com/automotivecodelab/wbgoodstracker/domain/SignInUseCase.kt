@@ -9,7 +9,7 @@ class SignInUseCase(
     private val itemsRepository: ItemsRepository
 ) {
     suspend operator fun invoke(user: User): Result<Unit> {
-        userRepository.handleSignInResult(user)
+        userRepository.setUserAuthenticated(true)
         return itemsRepository.mergeItems(user.idToken)
     }
 }

@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GroupPickerDialogViewModel(
@@ -12,8 +11,8 @@ class GroupPickerDialogViewModel(
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase
 ) : ViewModel() {
 
-    private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()
-    val taskCompletedEvent: LiveData<Event<Unit>> = _taskCompletedEvent
+    private val _closeDialogEvent = MutableLiveData<Event<Unit>>()
+    val closeDialogEvent: LiveData<Event<Unit>> = _closeDialogEvent
 
     private val _newGroupEvent = MutableLiveData<Event<Unit>>()
     val newGroupEvent: LiveData<Event<Unit>> = _newGroupEvent
@@ -23,7 +22,7 @@ class GroupPickerDialogViewModel(
     fun setGroupToItems(itemsId: List<String>, group: String?) {
         viewModelScope.launch {
             addItemsToGroupUseCase(itemsId, group)
-            _taskCompletedEvent.value = Event(Unit)
+            _closeDialogEvent.value = Event(Unit)
         }
     }
 

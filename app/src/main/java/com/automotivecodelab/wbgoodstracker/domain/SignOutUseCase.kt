@@ -6,6 +6,6 @@ class SignOutUseCase(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke() {
-        userRepository.signOut()
+        userRepository.setUserAuthenticated(false)
     }
 }

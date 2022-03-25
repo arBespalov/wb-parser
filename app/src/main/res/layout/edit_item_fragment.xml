@@ -51,6 +51,14 @@
                     android:inputType="none"
                     android:id="@+id/auto_complete_text_view"/>
             </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/new_group"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:text="@string/new_group"
+                app:icon="@drawable/ic_baseline_add_24"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
 

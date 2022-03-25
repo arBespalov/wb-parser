@@ -9,8 +9,8 @@ import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class ChartViewModel(
-    private val getOrdersChartDataUseCase: GetOrdersChartDataUseCase,
-    private val itemId: String
+    getOrdersChartDataUseCase: GetOrdersChartDataUseCase,
+    itemId: String
 ) : ViewModel() {
 
     private val _chartData = MutableLiveData<List<Pair<Long, Int>>>()
@@ -22,7 +22,7 @@ class ChartViewModel(
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    fun start() {
+    init {
         viewModelScope.launch {
             _dataLoading.value = true
             getOrdersChartDataUseCase(itemId)

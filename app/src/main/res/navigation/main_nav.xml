@@ -30,15 +30,13 @@
             android:id="@+id/action_itemsFragment_to_signInFragment"
             app:destination="@id/signInFragment" />
         <action
-            android:id="@+id/action_itemsFragment_to_addItemFragment"
-            app:destination="@id/addItemFragment" />
-        <action
             android:id="@+id/action_itemsFragment_to_themeSelectorFragment"
             app:destination="@id/themeSelectorFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailFragment">
+        android:name="com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailFragment"
+        tools:layout="@layout/detail_fragment">
         <argument
             android:name="itemid"
             app:argType="string" />
@@ -60,7 +58,8 @@
     <fragment
         android:id="@+id/addItemFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.additemfrag.AddItemFragment"
-        android:label="@string/add">
+        android:label="@string/add"
+        tools:layout="@layout/add_item_fragment">
         <action
             android:id="@+id/action_addItemFragment_to_errorDialogFragment"
             app:destination="@id/errorDialogFragment" />
@@ -72,7 +71,8 @@
     <dialog
         android:id="@+id/confirmRemoveDialogFragment2"
         android:name="com.automotivecodelab.wbgoodstracker.ui.confirmremovedialogfrag.ConfirmRemoveDialogFragment"
-        android:label="ConfirmRemoveDialogFragment" >
+        android:label="ConfirmRemoveDialogFragment"
+        tools:layout="@layout/confirm_remove_bottom_sheet">
         <argument
             android:name="itemsIdToDelete"
             app:argType="string[]" />
@@ -80,7 +80,8 @@
     <dialog
         android:id="@+id/errorDialogFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.errordialogfrag.ErrorDialogFragment"
-        android:label="ErrorDialogFragment" >
+        android:label="ErrorDialogFragment"
+        tools:layout="@layout/error_bottom_sheet">
         <argument
             android:name="errorCode"
             app:argType="string" />
@@ -88,15 +89,20 @@
     <fragment
         android:id="@+id/editItemFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.edititemfrag.EditItemFragment"
-        android:label="@string/edit">
+        android:label="@string/edit"
+        tools:layout="@layout/edit_item_fragment">
         <argument
             android:name="itemId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_editItemFragment_to_newGroupDialogFragment"
+            app:destination="@id/newGroupDialogFragment" />
     </fragment>
     <dialog
         android:id="@+id/newGroupDialogFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag.NewGroupDialogFragment"
-        android:label="NewGroupDialogFragment" >
+        android:label="NewGroupDialogFragment"
+        tools:layout="@layout/fragment_new_group_dialog">
         <argument
             android:name="itemIds"
             app:argType="string[]" />
@@ -104,32 +110,31 @@
     <dialog
         android:id="@+id/confirmDeleteGroupDialogFrag"
         android:name="com.automotivecodelab.wbgoodstracker.ui.confirmdeletegroupdialogfrag.ConfirmDeleteGroupDialogFragment"
-        android:label="ConfirmDeleteGroupDialogFrag" >
+        android:label="ConfirmDeleteGroupDialogFrag"
+        tools:layout="@layout/confirm_remove_bottom_sheet">
         <argument
             android:name="groupName"
             app:argType="string" />
-        <action
-            android:id="@+id/action_confirmDeleteGroupDialogFrag_to_itemsFragment"
-            app:destination="@id/itemsFragment"
-            app:popUpTo="@id/itemsFragment"
-            app:popUpToInclusive="true" />
     </dialog>
     <dialog
         android:id="@+id/groupPickerDialogFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.grouppickerfrag.GroupPickerDialogFragment"
-        android:label="GroupPickerDialogFragment" >
+        android:label="GroupPickerDialogFragment"
+        tools:layout="@layout/group_picker_dialog_fragment">
         <argument
             android:name="itemsId"
             app:argType="string[]" />
         <action
             android:id="@+id/action_groupPickerDialogFragment_to_newGroupDialogFragment"
             app:destination="@id/newGroupDialogFragment"
-            app:popUpToInclusive="false" />
+            app:popUpTo="@id/groupPickerDialogFragment"
+            app:popUpToInclusive="true" />
     </dialog>
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.signinfrag.SignInFragment"
-        android:label="@string/backup_and_sync" >
+        android:label="@string/backup_and_sync"
+        tools:layout="@layout/sign_in_fragment">
         <action
             android:id="@+id/action_signInFragment_to_errorDialogFragment"
             app:destination="@id/errorDialogFragment" />
@@ -137,11 +142,13 @@
     <fragment
         android:id="@+id/themeSelectorFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.themeselectorfragment.ThemeSelectorFragment"
-        android:label="@string/theme" />
+        android:label="@string/theme"
+        tools:layout="@layout/theme_selector_fragment"/>
     <fragment
         android:id="@+id/chartFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.chartfragment.ChartFragment"
-        android:label="@string/orders">
+        android:label="@string/orders"
+        tools:layout="@layout/chart_fragment">
         <argument
             android:name="itemId"
             app:argType="string" />

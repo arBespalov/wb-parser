@@ -33,26 +33,20 @@ class DetailFragment : Fragment() {
     }
     private var viewDataBinding: DetailFragmentBinding? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = MaterialContainerTransform().apply {
-            scrimColor = Color.TRANSPARENT
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view = inflater.inflate(R.layout.detail_fragment, container, false)
-
         viewDataBinding = DetailFragmentBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
             viewmodel = viewModel
         }
         postponeEnterTransition()
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            scrimColor = Color.TRANSPARENT
+        }
         return view
     }
 
@@ -83,69 +77,55 @@ class DetailFragment : Fragment() {
         setupNavigation()
         setupOptionsMenu()
 
-        viewModel.item.observe(
-            viewLifecycleOwner,
-            Observer { item: Item? ->
-                if (item != null) {
-                    val imgUrl = httpToHttps(item.img)
-                    Picasso.get()
-                        .load(imgUrl)
-                        .fit()
-                        .centerCrop(Gravity.TOP)
-                        .error(R.drawable.ic_baseline_error_outline_24)
-                        .into(viewDataBinding?.imageView)
+        viewModel.item.observe(viewLifecycleOwner) { item ->
+            Picasso.get()
+                .load(item.img.httpToHttps())
+                .fit()
+                .centerCrop(Gravity.TOP)
+                .error(R.drawable.ic_baseline_error_outline_24)
+                .into(viewDataBinding?.imageView)
 
-                    viewDataBinding?.collapsingToolbar?.title = item.localName ?: item.name
+            viewDataBinding?.collapsingToolbar?.title = item.localName ?: item.name
 
-                    viewDataBinding?.daysObserving?.count?.text =
-                        millisToDays(item.observingTimeInMs).toString()
-                    viewDataBinding?.updatingTime?.count?.text =
-                        SimpleDateFormat(
-                            "dd.MM HH:mm",
-                            Locale("en")
-                        ).format(item.lastUpdateTimestamp)
+            viewDataBinding?.daysObserving?.count?.text =
+                item.observingTimeInMs.millisToDays().toString()
+            viewDataBinding?.updatingTime?.count?.text =
+                SimpleDateFormat(
+                    "dd.MM HH:mm",
+                    Locale("en")
+                ).format(item.lastUpdateTimestamp)
 
-                    viewDataBinding?.sizesLayout?.removeAllViews()
-                    item.sizes.forEach {
-                        val cardSizeLayoutBinding = DataBindingUtil.inflate<CardSizeLayoutBinding>(
-                            layoutInflater,
-                            R.layout.card_size_layout,
-                            viewDataBinding?.sizesLayout,
-                            true
-                        )
-
-                        cardSizeLayoutBinding.size = it
-                        val storeIds = it.storesWithQuantity
-                        if (storeIds == null) {
-                            cardSizeLayoutBinding.warehousesInfo.visibility = View.GONE
-                        } else {
-                            cardSizeLayoutBinding.warehousesInfo.visibility = View.VISIBLE
-                            cardSizeLayoutBinding.count5.text =
-                                storeIds
-                        }
-                    }
+            viewDataBinding?.sizesLayout?.removeAllViews()
+            item.sizes.forEach { size ->
+                val cardSizeLayoutBinding = DataBindingUtil.inflate<CardSizeLayoutBinding>(
+                    layoutInflater,
+                    R.layout.card_size_layout,
+                    viewDataBinding?.sizesLayout,
+                    true
+                )
+                cardSizeLayoutBinding.size = size
+                val storeIds = size.storesWithQuantity
+                if (storeIds == null) {
+                    cardSizeLayoutBinding.warehousesInfo.visibility = View.GONE
+                } else {
+                    cardSizeLayoutBinding.warehousesInfo.visibility = View.VISIBLE
+                    cardSizeLayoutBinding.count5.text = storeIds
                 }
             }
-        )
+        }
 
         viewDataBinding?.swipeRefresh?.setOnRefreshListener {
             viewModel.refreshItem()
         }
 
-        viewModel.dataLoading.observe(
-            viewLifecycleOwner,
-            Observer {
-                viewDataBinding?.swipeRefresh?.isRefreshing = it
-            }
-        )
+        viewModel.dataLoading.observe(viewLifecycleOwner) {
+            viewDataBinding?.swipeRefresh?.isRefreshing = it
+        }
 
         viewDataBinding?.ordersCount?.apply {
             icon.setImageResource(R.drawable.ic_baseline_bar_chart_24)
-            root.setOnClickListener {
-                viewModel.showOrdersChart()
-            }
+            root.setOnClickListener { viewModel.showOrdersChart() }
         }
-
 
         view.doOnPreDraw { startPostponedEnterTransition() }
     }
@@ -171,19 +151,14 @@ class DetailFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-
-        viewModel.confirmDeleteEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.confirmDeleteEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = DetailFragmentDirections
                     .actionDetailFragmentToConfirmRemoveDialogFragment2(arrayOf(it))
                 navigate(action)
             }
         )
 
-        viewModel.editItemEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.editItemEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = DetailFragmentDirections.actionDetailFragmentToEditItemFragment(it)
@@ -191,21 +166,22 @@ class DetailFragment : Fragment() {
             }
         )
 
-        viewModel.updateErrorEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.updateErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = DetailFragmentDirections.actionDetailFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
         )
 
-        viewModel.showOrdersChartEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.showOrdersChartEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = DetailFragmentDirections.actionDetailFragmentToChartFragment(it)
                 navigate(action)
+            }
+        )
+
+        viewModel.closeScreenEvent.observe(viewLifecycleOwner, EventObserver {
+                findNavController().navigateUp()
             }
         )
     }

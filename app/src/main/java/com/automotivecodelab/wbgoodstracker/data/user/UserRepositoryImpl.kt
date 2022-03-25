@@ -1,37 +1,38 @@
 package com.automotivecodelab.wbgoodstracker.data.user
 
-import com.automotivecodelab.wbgoodstracker.data.user.local.UserLocalDataSource
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
 
 class UserRepositoryImpl(
-    private val localDataSource: UserLocalDataSource,
+    private val dataStore: DataStore<Preferences>,
     private val authenticationService: AuthenticationService
 ) : UserRepository {
+    private val IS_USER_AUTHENTICATED = booleanPreferencesKey("isUserAuthenticated")
 
-    override suspend fun getUser(): Result<User?> {
-        if (localDataSource.isUserSignedIn()) {
-            val localUser = localDataSource.user
-            return runCatching {
-                if (localUser == null) {
-                    authenticationService.signIn()
-                } else {
-                    authenticationService.updateToken(localUser)
-                }.also {
-                    localDataSource.setUser(it)
-                    return Result.success(it)
-                }
+    override suspend fun isUserAuthenticated(): Boolean {
+        return dataStore.data
+            .map { prefs ->
+                prefs[IS_USER_AUTHENTICATED] ?: false
             }
-        } else {
-            return Result.success(null)
+            .first()
+    }
+
+    override suspend fun setUserAuthenticated(isAuthenticated: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[IS_USER_AUTHENTICATED] = isAuthenticated
         }
     }
 
-    override suspend fun handleSignInResult(user: User) {
-        localDataSource.setUser(user)
-    }
-
-    override suspend fun signOut() {
-        localDataSource.setUser(null)
+    override suspend fun getUser(): Result<User> {
+        return runCatching {
+            authenticationService.signIn()
+        }
     }
 }

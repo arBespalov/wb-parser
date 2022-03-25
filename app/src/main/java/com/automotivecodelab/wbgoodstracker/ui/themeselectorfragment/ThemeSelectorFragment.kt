@@ -7,15 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.PREFS_NAME
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.SAVED_UI_MODE
 import com.automotivecodelab.wbgoodstracker.databinding.ThemeSelectorFragmentBinding
+import com.automotivecodelab.wbgoodstracker.ui.AppTheme
 import com.google.android.material.transition.MaterialSharedAxis
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ThemeSelectorFragment : Fragment() {
 
@@ -31,7 +38,9 @@ class ThemeSelectorFragment : Fragment() {
         viewDataBinding = ThemeSelectorFragmentBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
         }
-
+        postponeEnterTransition()
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
         return view
     }
 
@@ -40,39 +49,28 @@ class ThemeSelectorFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         val cancelButton = ResourcesCompat
             .getDrawable(resources, R.drawable.ic_baseline_close_24, requireActivity().theme)
+        val appThemeSource = (requireActivity().application as MyApplication).appContainer.appThemeSource
+        val currentTheme = runBlocking { appThemeSource.getAppTheme() }
         viewDataBinding?.apply {
             toolbar.setupWithNavController(navController, appBarConfiguration)
             toolbar.navigationIcon = cancelButton
-
-            when (AppCompatDelegate.getDefaultNightMode()) {
-                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> systemDefault.isChecked = true
-                AppCompatDelegate.MODE_NIGHT_NO -> day.isChecked = true
-                AppCompatDelegate.MODE_NIGHT_YES -> night.isChecked = true
-                AppCompatDelegate.MODE_NIGHT_UNSPECIFIED -> systemDefault.isChecked = true
+            val currentThemeToRadioButton = mapOf(
+                AppTheme.AUTO to systemDefault,
+                AppTheme.LIGHT to day,
+                AppTheme.DARK to night
+            )
+            currentThemeToRadioButton[currentTheme]?.isChecked = true
+            currentThemeToRadioButton.forEach { (appTheme, button) ->
+                button.setOnClickListener {
+                    lifecycleScope.launch { appThemeSource.saveAndSetupAppTheme(appTheme) }
+                }
             }
-
-            systemDefault.setOnClickListener {
-                setUIMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-            day.setOnClickListener { setUIMode(AppCompatDelegate.MODE_NIGHT_NO) }
-            night.setOnClickListener { setUIMode(AppCompatDelegate.MODE_NIGHT_YES) }
         }
-
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-    }
-
-    private fun setUIMode(mode: Int) {
-        AppCompatDelegate.setDefaultNightMode(mode)
-        requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
-            .putInt(SAVED_UI_MODE, mode)
-            .apply()
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 }

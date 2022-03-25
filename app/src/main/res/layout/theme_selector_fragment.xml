@@ -17,6 +17,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
             <RadioGroup
+                android:id="@+id/app_theme_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

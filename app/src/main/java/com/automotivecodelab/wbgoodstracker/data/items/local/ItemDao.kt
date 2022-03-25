@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemDao {
-    //todo make suspend
     @Transaction
     @Query("SELECT * FROM item")
     fun observeAll(): Flow<List<ItemWithSizesDBModel>>

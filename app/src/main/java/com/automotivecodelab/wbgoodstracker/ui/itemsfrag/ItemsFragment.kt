@@ -1,7 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -13,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat.getDrawable
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -98,13 +98,11 @@ class ItemsFragment : Fragment() {
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
             SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
         })
-        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { itemsWithCurrentGroup ->
-            if (itemsWithCurrentGroup?.first != null) {
-                adapter?.replaceAll(itemsWithCurrentGroup.first)
-                if (scrollToStartOnUpdate) {
-                    viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                    scrollToStartOnUpdate = false
-                }
+        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (items, _) ->
+            adapter?.replaceAll(items)
+            if (scrollToStartOnUpdate) {
+                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
+                scrollToStartOnUpdate = false
             }
 
             // items must be set before performing search
@@ -151,9 +149,9 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupOptionsMenu() {
-        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { itemsWithGroup ->
+        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
             viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)?.run {
-                isEnabled = itemsWithGroup.second != null
+                isEnabled = group != null
             }
         }
         viewDataBinding?.toolbar?.setOnMenuItemClickListener(
@@ -229,9 +227,23 @@ class ItemsFragment : Fragment() {
         )
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         viewDataBinding?.spinner?.adapter = spinnerAdapter
+
+        viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
+            val groupsToAdd = savedGroups.minus(groups)
+            val groupsToRemove = groups.minus(savedGroups.plus(defaultGroup))
+            groups.addAll(groupsToAdd)
+            groups.removeAll(groupsToRemove)
+        }
+        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
+            val index = if (group == null) groups.indexOf(defaultGroup) else groups.indexOf(group)
+            view?.doOnNextLayout { viewDataBinding?.spinner?.setSelection(index, true) }
+        }
+
         viewDataBinding?.spinner?.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) { }
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    log("ds")
+                }
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
                     view: View?,
@@ -240,29 +252,16 @@ class ItemsFragment : Fragment() {
                 ) {
                     val textView = view as? TextView
                     if (textView != null) {
-                        if (textView.text == requireContext().getString(R.string.all_items)) {
-                            viewModel.setCurrentGroup(null)
-                        } else {
-                            viewModel.setCurrentGroup(textView.text.toString())
+                        val group = if (textView.text ==
+                            requireContext().getString(R.string.all_items)) null
+                        else textView.text.toString()
+                        if (group != viewModel.itemsWithCurrentGroup.value?.second) {
+                            viewModel.setCurrentGroup(group)
+                            scrollToStartOnUpdate = true
                         }
-                        scrollToStartOnUpdate = true
                     }
                 }
             }
-
-        viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
-            val groupsToAdd = savedGroups.minus(groups)
-            val groupsToRemove = groups.minus(savedGroups.plus(defaultGroup))
-            groups.addAll(groupsToAdd)
-            groups.removeAll(groupsToRemove)
-
-            viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { itemsWithGroup ->
-                viewDataBinding?.spinner?.setSelection(
-                    groups.indexOf(itemsWithGroup.second),
-                    true
-                )
-            }
-        }
     }
 
     private fun setupRecycler() {
@@ -318,7 +317,7 @@ class ItemsFragment : Fragment() {
                     snackbar.addCallback(object : Snackbar.Callback() {
                         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                             if (event != DISMISS_EVENT_ACTION) {
-                                viewModel.deleteItem(item.id)
+                                viewModel.deleteSingleItem(item.id)
                             }
                             viewDataBinding?.fabAdditem?.show()
                             super.onDismissed(transientBottomBar, event)
@@ -391,9 +390,7 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.openItemEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { recyclerItemPosition ->
+        viewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver { recyclerItemPosition ->
                 exitTransition = MaterialElevationScale(false)
                 reenterTransition = MaterialElevationScale(true)
                 val viewHolder = viewDataBinding!!.recyclerViewItems
@@ -409,12 +406,10 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.addItemEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.addItemEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialElevationScale(false)
                 reenterTransition = MaterialElevationScale(true)
-                val action = ItemsFragmentDirections.actionItemsFragmentToAddItemFragment(null)
+                val action = MainNavDirections.actionGlobalAddItemFragment(null)
                 navigate(
                     action,
                     FragmentNavigatorExtras(
@@ -425,18 +420,14 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.confirmDeleteEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.confirmDeleteEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToConfirmRemoveDialogFragment2(it.toTypedArray())
                 navigate(action)
             }
         )
 
-        viewModel.editItemEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.editItemEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToEditItemFragment(it)
@@ -445,26 +436,20 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.updateErrorEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.updateErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = ItemsFragmentDirections.actionItemsFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
         )
 
-        viewModel.deleteGroupEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.deleteGroupEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToConfirmDeleteGroupDialogFrag(it)
                 navigate(action)
             }
         )
 
-        viewModel.addToGroupEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.addToGroupEvent.observe(viewLifecycleOwner, EventObserver {
                 closeActionModeLater = true
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToGroupPickerDialogFragment(it.toTypedArray())
@@ -472,9 +457,7 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.signInEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.signInEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToSignInFragment()
@@ -482,9 +465,7 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.changeThemeEvent.observe(
-            viewLifecycleOwner,
-            EventObserver {
+        viewModel.changeThemeEvent.observe(viewLifecycleOwner, EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToThemeSelectorFragment()
@@ -562,11 +543,13 @@ class ItemsFragment : Fragment() {
                     menuItems.forEach { menu?.findItem(it)?.isVisible = false }
                     viewDataBinding?.spinner?.isVisible = false
                     viewDataBinding?.swipeRefresh?.isEnabled = false
+                    viewDataBinding?.fabAdditem?.hide()
                 }
                 setOnCloseListener {
                     menuItems.forEach { menu?.findItem(it)?.isVisible = true }
                     viewDataBinding?.spinner?.isVisible = true
                     viewDataBinding?.swipeRefresh?.isEnabled = true
+                    viewDataBinding?.fabAdditem?.show()
                     false
                 }
             }
