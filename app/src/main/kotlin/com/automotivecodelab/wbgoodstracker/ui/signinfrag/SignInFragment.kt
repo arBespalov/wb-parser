@@ -134,7 +134,6 @@ class SignInFragment : Fragment() {
                 setOnClickListener {
                     oneTapClient.signOut()
                     viewModel.signOut()
-                    // todo test snackbar
                     Snackbar.make(rootView, R.string.sign_out_message, Snackbar.LENGTH_LONG).show()
                 }
             }

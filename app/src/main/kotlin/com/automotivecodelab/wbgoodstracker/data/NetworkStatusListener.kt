@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.os.Build
+import java.io.IOException
 
 class NetworkStatusListener(context: Context) {
 
@@ -44,7 +45,9 @@ class NetworkStatusListener(context: Context) {
                 isNetworkAvailable = activeNetwork?.isConnectedOrConnecting == true
             }
         } catch (t: Throwable) {
-            isNetworkAvailable = false
+            isNetworkAvailable = true
         }
     }
 }
+
+class NoInternetConnectionException : IOException("No internet connection")

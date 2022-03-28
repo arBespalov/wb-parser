@@ -19,8 +19,8 @@ class AddItemViewModel(
     private val _invalidUrl = MutableLiveData<Boolean>()
     val invalidUrl: LiveData<Boolean> = _invalidUrl
 
-    private val _networkErrorEvent = MutableLiveData<Event<String>>()
-    val networkErrorEvent: LiveData<Event<String>> = _networkErrorEvent
+    private val _networkErrorEvent = MutableLiveData<Event<Throwable>>()
+    val networkErrorEvent: LiveData<Event<Throwable>> = _networkErrorEvent
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -42,7 +42,7 @@ class AddItemViewModel(
                 .onFailure {
                 when (it) {
                     is InvalidUrlException -> _invalidUrl.value = true
-                    else -> _networkErrorEvent.value = Event(it.message.toString())
+                    else -> _networkErrorEvent.value = Event(it)
                 }
             }
                 .onSuccess {

@@ -1,17 +1,31 @@
 package com.automotivecodelab.wbgoodstracker.data.items.remote
 
 import com.automotivecodelab.wbgoodstracker.BuildConfig
-import com.automotivecodelab.wbgoodstracker.data.util.Wrapper
+import com.automotivecodelab.wbgoodstracker.data.NetworkStatusListener
+import com.automotivecodelab.wbgoodstracker.data.NoInternetConnectionException
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
+import okhttp3.OkHttpClient
+import okhttp3.internal.http2.Header
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 interface ServerApi {
     companion object {
-        operator fun invoke(): ServerApi {
+        operator fun invoke(networkStatusListener: NetworkStatusListener): ServerApi {
+            val okHttpClient = OkHttpClient.Builder()
+                .addInterceptor { chain ->
+                    if (!networkStatusListener.isNetworkAvailable)
+                        throw NoInternetConnectionException()
+                    chain.proceed(chain.request())
+                }
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .build()
             return Retrofit.Builder()
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BuildConfig.SERVER_URL)
                 .build()
@@ -19,37 +33,33 @@ interface ServerApi {
         }
     }
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/add_item")
     suspend fun addItem(
         @Query("url") url: String,
         @Query("id_token") idToken: String?
-    ): Response<ItemRemoteModel>
+    ): ItemRemoteModel
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
+    //todo test
     @POST("wbparserapi/delete_items")
     suspend fun deleteItems(
-        @Body itemIds: Wrapper<List<Int>>,
+        @Body itemIds: List<Int>,
         @Query("id_token") idToken: String
     ): Response<Unit>
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/update_items")
-    suspend fun updateItems(@Body itemIds: Wrapper<List<Int>>): Response<List<ItemRemoteModel>>
+    suspend fun updateItems(@Body itemIds: List<Int>): List<ItemRemoteModel>
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
     @GET("wbparserapi/update_items")
     suspend fun getItemsForUserId(@Query("id_token") idToken: String)
-    : Response<List<ItemRemoteModel>>
+    : List<ItemRemoteModel>
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
+    //todo test
     @POST("wbparserapi/merge_items")
     suspend fun mergeItems(
-        @Body itemIds: Wrapper<List<Int>>,
+        @Body itemIds: List<Int>,
         @Query("id_token") idToken: String
-    ): Response<List<ItemRemoteModel>>
+    ): List<ItemRemoteModel>
 
-    @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("wbparserapi/get_full_data_item")
-    suspend fun getItemWithFullData(@Query("id") itemId: String): Response<ItemRemoteModel>
+    suspend fun getItemWithFullData(@Query("id") itemId: String): ItemRemoteModel
 }

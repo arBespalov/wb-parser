@@ -20,8 +20,8 @@ class SignInViewModel(
     private val _viewState = MutableLiveData<SignInViewState>()
     val viewState: LiveData<SignInViewState> = _viewState
 
-    private val _networkErrorEvent = MutableLiveData<Event<String>>()
-    val networkErrorEvent: LiveData<Event<String>> = _networkErrorEvent
+    private val _networkErrorEvent = MutableLiveData<Event<Throwable>>()
+    val networkErrorEvent: LiveData<Event<Throwable>> = _networkErrorEvent
 
     init {
         viewModelScope.launch {
@@ -52,7 +52,7 @@ class SignInViewModel(
             signInUseCase(user)
                 .onFailure {
                     _viewState.value = SignInViewState.SignedOutState
-                    _networkErrorEvent.value = Event(it.message.toString())
+                    _networkErrorEvent.value = Event(it)
                 }
                 .onSuccess {
                     _viewState.value = SignInViewState.SignedInState(user.email)

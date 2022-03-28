@@ -129,8 +129,8 @@ class ItemsFragment : Fragment() {
                     startActionMode()
                 }
             }
+            view.doOnPreDraw { startPostponedEnterTransition() }
         }
-        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     // if set listener in onViewCreated, onQueryTextChange triggers immediately and causes

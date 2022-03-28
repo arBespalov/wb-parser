@@ -16,8 +16,8 @@ class ChartViewModel(
     private val _chartData = MutableLiveData<List<Pair<Long, Int>>>()
     val chartData: LiveData<List<Pair<Long, Int>>> = _chartData
 
-    private val _networkErrorEvent = MutableLiveData<Event<String>>()
-    val networkErrorEvent: LiveData<Event<String>> = _networkErrorEvent
+    private val _networkErrorEvent = MutableLiveData<Event<Throwable>>()
+    val networkErrorEvent: LiveData<Event<Throwable>> = _networkErrorEvent
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -27,7 +27,7 @@ class ChartViewModel(
             _dataLoading.value = true
             getOrdersChartDataUseCase(itemId)
                 .onFailure {
-                    _networkErrorEvent.value = Event(it.message.toString())
+                    _networkErrorEvent.value = Event(it)
                 }
                 .onSuccess {
                     _chartData.value = it

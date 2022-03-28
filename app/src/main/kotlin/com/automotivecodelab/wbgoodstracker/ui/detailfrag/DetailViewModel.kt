@@ -24,8 +24,8 @@ class DetailViewModel(
     private val _editItemEvent = MutableLiveData<Event<String>>()
     val editItemEvent: LiveData<Event<String>> = _editItemEvent
 
-    private val _updateErrorEvent = MutableLiveData<Event<String>>()
-    val updateErrorEvent: LiveData<Event<String>> = _updateErrorEvent
+    private val _updateErrorEvent = MutableLiveData<Event<Throwable>>()
+    val updateErrorEvent: LiveData<Event<Throwable>> = _updateErrorEvent
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -50,8 +50,7 @@ class DetailViewModel(
             if (item.value != null) {
                 refreshSingleItemUseCase(item.value!!)
                     .onFailure {
-                        _updateErrorEvent.value =
-                            Event(it.message.toString())
+                        _updateErrorEvent.value = Event(it)
                     }
             }
             _dataLoading.value = false

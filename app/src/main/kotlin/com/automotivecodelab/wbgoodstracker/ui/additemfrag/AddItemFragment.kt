@@ -82,9 +82,7 @@ class AddItemFragment : Fragment() {
                     textInputLayout.error = null
                 }
             }
-            viewModel.dataLoading.observe(
-                viewLifecycleOwner
-            ) {
+            viewModel.dataLoading.observe(viewLifecycleOwner) {
                 if (it) {
                     swipeRefresh.isRefreshing = true
                     fabSave.hide()
@@ -95,7 +93,7 @@ class AddItemFragment : Fragment() {
             }
             fabSave.isEnabled = false
             URL.addTextChangedListener {
-                fabSave.isEnabled = !this.URL.text.isNullOrEmpty()
+                fabSave.isEnabled = !it.isNullOrEmpty()
                 viewModel.handleTextInput(it.toString())
             }
             if (!isArgsUrlHandled) {

@@ -83,8 +83,8 @@
         android:label="ErrorDialogFragment"
         tools:layout="@layout/error_bottom_sheet">
         <argument
-            android:name="errorCode"
-            app:argType="string" />
+            android:name="throwable"
+            app:argType="java.lang.Throwable" />
     </dialog>
     <fragment
         android:id="@+id/editItemFragment"

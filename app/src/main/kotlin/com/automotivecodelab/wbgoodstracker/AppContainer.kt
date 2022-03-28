@@ -9,6 +9,7 @@ import com.automotivecodelab.wbgoodstracker.data.items.ItemsRepositoryImpl
 import com.automotivecodelab.wbgoodstracker.data.items.local.AppDatabase
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSourceImpl
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ServerApi
 import com.automotivecodelab.wbgoodstracker.data.sort.SortLocalDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.sort.SortRepositoryImpl
 import com.automotivecodelab.wbgoodstracker.data.user.AuthenticationServiceImpl
@@ -42,7 +43,8 @@ class AppContainer(context: Context) {
             dataStore
         )
         val networkStatusListener = NetworkStatusListener(context)
-        val itemsRemoteDataSource = ItemsRemoteDataSourceImpl(networkStatusListener)
+        val serverApi = ServerApi(networkStatusListener)
+        val itemsRemoteDataSource = ItemsRemoteDataSourceImpl(serverApi)
         itemsRepository = ItemsRepositoryImpl(
             itemsLocalDataSource,
             itemsRemoteDataSource

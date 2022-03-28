@@ -27,7 +27,7 @@
     <string name="by_orders_count_per_day">Orders count per day &#9660;</string>
     <string name="price">Price:&#160;</string>
     <string name="error">Error</string>
-    <string name="error_body">Error: %1$s. Please try again later</string>
+    <string name="error_body">Error. Please try again later</string>
     <string name="ok">OK</string>
     <string name="invalid_url">Invalid URL</string>
     <string name="cancel">Cancel</string>
@@ -60,7 +60,8 @@
     <string name="orders">Orders</string>
     <string name="item_deleted">Item deleted</string>
     <string name="undo">Undo</string>
+    <string name="no_connection">No Internet Connection</string>
 
-    <string name="shared_element_container_add_item">shared_element_container_add_item</string>
-    <string name="shared_element_container_detail_fragment">shared_element_container_detail_fragment</string>
+    <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
+    <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>
 </resources>

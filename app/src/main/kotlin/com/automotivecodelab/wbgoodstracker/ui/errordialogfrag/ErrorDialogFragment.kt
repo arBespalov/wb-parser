@@ -6,7 +6,9 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.navigation.fragment.navArgs
+import com.automotivecodelab.wbgoodstracker.BuildConfig
 import com.automotivecodelab.wbgoodstracker.R
+import com.automotivecodelab.wbgoodstracker.data.NoInternetConnectionException
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,8 +21,13 @@ class ErrorDialogFragment : BottomSheetDialogFragment() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(R.layout.error_bottom_sheet)
 
-        bottomSheetDialog.findViewById<TextView>(R.id.text)?.text =
-            getString(R.string.error_body, args.errorCode)
+        val errorMessage = when {
+            BuildConfig.DEBUG -> args.throwable.message.toString()
+            args.throwable is NoInternetConnectionException -> getString(R.string.no_connection)
+            else -> getString(R.string.error_body)
+        }
+
+        bottomSheetDialog.findViewById<TextView>(R.id.text)?.text = errorMessage
         bottomSheetDialog.findViewById<Button>(R.id.ok)?.setOnClickListener { dismiss() }
 
         bottomSheetDialog.findViewById<FrameLayout>(

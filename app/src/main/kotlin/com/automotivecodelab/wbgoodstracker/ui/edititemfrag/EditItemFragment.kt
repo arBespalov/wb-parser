@@ -102,7 +102,7 @@ class EditItemFragment : Fragment() {
                 }
             }
             newGroup.setOnClickListener {
-
+                viewModel.createNewGroup()
             }
         }
         view.doOnPreDraw { startPostponedEnterTransition() }
