@@ -20,8 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.automotivecodelab.wbgoodstracker.domain.models.Item {*;}
--keep class com.automotivecodelab.wbgoodstracker.domain.models.User {*;}
 -keep class com.automotivecodelab.wbgoodstracker.data.util.Wrapper {*;}
--keep class com.automotivecodelab.wbgoodstracker.domain.models.Info {*;}
--keep class com.automotivecodelab.wbgoodstracker.domain.models.Size {*;}
+-keep class com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel {*;}
+-keep class com.automotivecodelab.wbgoodstracker.data.items.remote.ItemInfoRemoteModel {*;}
+-keep class com.automotivecodelab.wbgoodstracker.data.items.remote.SizeRemoteModel {*;}

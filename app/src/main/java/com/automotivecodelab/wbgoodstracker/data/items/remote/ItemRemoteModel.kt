@@ -18,10 +18,10 @@ data class ItemRemoteModel(
 data class ItemInfoRemoteModel(
     val timeOfCreationInMs: Long,
     val ordersCount: Int,
-    val sizes: List<SizesRemoteModel>
+    val sizes: List<SizeRemoteModel>
 )
 
-data class SizesRemoteModel(
+data class SizeRemoteModel(
     val sizeName: String,
     val quantity: Int,
     val price: Int,
