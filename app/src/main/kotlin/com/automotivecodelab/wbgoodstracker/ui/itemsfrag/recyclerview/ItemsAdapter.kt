@@ -1,6 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.databinding.RecyclerviewItemBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.httpToHttps
+import com.automotivecodelab.wbgoodstracker.themeColor
 import com.google.android.material.color.MaterialColors
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -183,6 +185,7 @@ class ItemsAdapter(
 
     }
 
+    @SuppressLint("PrivateResource")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = sortedList[position]
         holder.recyclerViewItemBinding.item = item
@@ -207,23 +210,13 @@ class ItemsAdapter(
             }
         }
         tracker?.let {
-            if (it.isSelected(item.id)) {
-                holder.recyclerViewItemBinding.card.setCardBackgroundColor(
-                    MaterialColors.getColor(
-                        holder.recyclerViewItemBinding.root,
-                        R.attr.colorSecondary
-                    )
-                )
-                // holder.recyclerViewItemBinding.root.isActivated = true
+            val backgroundColor = if (it.isSelected(item.id)) {
+                holder.itemView.context.themeColor(R.attr.colorSecondary)
             } else {
-                holder.recyclerViewItemBinding.card.setCardBackgroundColor(
-                    MaterialColors.getColor(
-                        holder.recyclerViewItemBinding.root,
-                        R.attr.colorSurface
-                    )
-                )
-                // holder.recyclerViewItemBinding.root.isActivated = false
+                // colorSurfaceVariant - default material3 card background
+                holder.itemView.context.themeColor(R.attr.colorSurfaceVariant)
             }
+            holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
         }
     }
 }

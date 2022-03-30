@@ -41,16 +41,10 @@ class AddItemFragment : Fragment() {
         }
         postponeEnterTransition()
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            scrimColor = Color.TRANSPARENT
-            containerColor = requireContext().themeColor(R.attr.colorSurface)
-            startContainerColor = requireContext().themeColor(R.attr.colorSecondary)
             endContainerColor = requireContext().themeColor(R.attr.colorSurface)
         }
         sharedElementReturnTransition = MaterialContainerTransform().apply {
-            scrimColor = Color.TRANSPARENT
-            containerColor = requireContext().themeColor(R.attr.colorSurface)
             startContainerColor = requireContext().themeColor(R.attr.colorSurface)
-            endContainerColor = requireContext().themeColor(R.attr.colorSecondary)
         }
         return view
     }

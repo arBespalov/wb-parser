@@ -15,26 +15,27 @@
     </data>
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        style="?attr/materialCardViewFilledStyle">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/default_margin"
                 android:text="@{text}"
+                android:textAppearance="@style/Body"
                 app:layout_constraintBottom_toTopOf="@+id/count"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0"
-                tools:text="@string/orders_count"
-                android:textAppearance="@style/Body"/>
+                app:layout_constraintVertical_bias="0"
+                tools:text="Orders count:" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,7 +48,7 @@
                 android:gravity="center"
                 android:textAppearance="@style/Big"/>
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/delta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -66,7 +67,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@drawable/ic_baseline_bar_chart_24"
-                android:id="@+id/icon"/>
+                android:id="@+id/icon"
+                app:tint="?attr/colorOnSurface"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

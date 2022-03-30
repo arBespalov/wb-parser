@@ -13,7 +13,8 @@
             <com.google.android.material.appbar.MaterialToolbar
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:id="@+id/toolbar" />
+                android:id="@+id/toolbar"
+                app:titleCentered="true"/>
         </com.google.android.material.appbar.AppBarLayout>
 
             <RadioGroup
@@ -23,19 +24,19 @@
                 android:orientation="vertical"
                 android:layout_margin="@dimen/default_margin"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
-                <RadioButton
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/system_default"
                     android:id="@+id/system_default"
                     android:textAppearance="@style/Body"/>
-                <RadioButton
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/day"
                     android:id="@+id/day"
                     android:textAppearance="@style/Body"/>
-                <RadioButton
+                <com.google.android.material.radiobutton.MaterialRadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/night"

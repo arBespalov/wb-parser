@@ -12,7 +12,7 @@
     <string name="search">Поиск</string>
     <string name="selected">Выбрано:&#160;</string>
     <string name="details">Детали</string>
-    <string name="add">Добавить</string>
+    <string name="add">Добавить товар</string>
     <string name="sort">Сортировка</string>
     <string name="by_name_asc">По названию &#9650;</string>
     <string name="by_name_desc">По названию &#9660;</string>
@@ -28,7 +28,7 @@
     <string name="error">Ошибка</string>
     <string name="error_body">Ошибка. Попробуйте позже</string>
     <string name="invalid_url">Неверный URL</string>
-    <string name="cancel">Отменить</string>
+    <string name="cancel">Отмена</string>
     <string name="orders_count_since_observing_started">Количество заказов с начала отслеживания:&#160;</string>
     <string name="estimated_income">Приблизительная выручка:&#160;</string>
     <string name="updated">Обновлено:&#160;</string>
@@ -55,6 +55,6 @@
     <string name="warehouses">Склады:&#160;</string>
     <string name="orders">Выкупы</string>
     <string name="item_deleted">Товар удален</string>
-    <string name="undo">Отменить</string>
+    <string name="undo">Отмена</string>
     <string name="no_connection">Отсутствует интернет-соединение</string>
 </resources>

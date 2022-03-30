@@ -4,19 +4,19 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     >
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:layout_margin="40dp"
         android:textSize="16sp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/ok"
         android:text="@string/ok"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_margin="@dimen/default_margin"/>
 
 

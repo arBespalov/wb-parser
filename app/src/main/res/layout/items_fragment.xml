@@ -22,12 +22,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:id="@+id/toolbar"
-                app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:menu="@menu/items_fragment_menu">
-                <androidx.appcompat.widget.AppCompatSpinner
+                <com.google.android.material.button.MaterialButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/spinner" />
+                    android:id="@+id/spinner"
+                    tools:text="@string/all_items"
+                    app:icon="@drawable/ic_baseline_arrow_drop_down_24"
+                    app:iconGravity="end"
+                    style="@style/SpinnerButton"/>
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

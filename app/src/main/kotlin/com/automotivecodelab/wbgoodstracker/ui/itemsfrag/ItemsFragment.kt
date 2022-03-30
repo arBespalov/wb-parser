@@ -7,14 +7,15 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
+import androidx.core.widget.PopupMenuCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -125,27 +126,11 @@ class ItemsFragment : Fragment() {
             if (savedInstanceState != null && !actionModeRestored) {
                 actionModeRestored = true
                 adapter?.tracker?.onRestoreInstanceState(savedInstanceState)
-                if (adapter?.tracker?.hasSelection() == true && actionMode == null) {
+                if (adapter?.tracker?.hasSelection() == true && actionMode == null)
                     startActionMode()
-                }
             }
             view.doOnPreDraw { startPostponedEnterTransition() }
         }
-    }
-
-    // if set listener in onViewCreated, onQueryTextChange triggers immediately and causes
-    // list to scroll up even after pressing back on details screen
-    override fun onResume() {
-        (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as SearchView)
-            .setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?) = false
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    findItems(newText)
-                    viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                    return false
-                }
-            })
-        super.onResume()
     }
 
     private fun setupOptionsMenu() {
@@ -165,7 +150,6 @@ class ItemsFragment : Fragment() {
                                 requireActivity().findViewById(item.itemId)
                             )
                             popup.menuInflater.inflate(R.menu.popup_sort_menu, popup.menu)
-                            popup.show()
                             popup.setOnMenuItemClickListener {
                                 when (it.itemId) {
                                     R.id.by_name_asc -> {
@@ -191,6 +175,7 @@ class ItemsFragment : Fragment() {
                                 scrollToStartOnUpdate = true
                                 return@setOnMenuItemClickListener true
                             }
+                            popup.show()
                             true
                         }
                         R.id.menu_refresh -> {
@@ -220,13 +205,26 @@ class ItemsFragment : Fragment() {
         viewDataBinding?.toolbar?.title = null
         val defaultGroup = requireContext().getString(R.string.all_items)
         val groups = mutableListOf(defaultGroup)
-        val spinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            groups
-        )
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        viewDataBinding?.spinner?.adapter = spinnerAdapter
+
+        viewDataBinding?.spinner?.setOnClickListener { view ->
+            val popup = PopupMenu(requireContext(), view)
+            groups.forEach { group ->
+                popup.menu.add(group)
+            }
+            popup.setOnMenuItemClickListener { menuItem ->
+                val selectedText = menuItem.title
+                if (selectedText != null) {
+                    val group = if (selectedText == defaultGroup) null
+                    else selectedText.toString()
+                    if (group != viewModel.itemsWithCurrentGroup.value?.second) {
+                        viewModel.setCurrentGroup(group)
+                        scrollToStartOnUpdate = true
+                    }
+                }
+                true
+            }
+            popup.show()
+        }
 
         viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
             val groupsToAdd = savedGroups.minus(groups)
@@ -235,33 +233,8 @@ class ItemsFragment : Fragment() {
             groups.removeAll(groupsToRemove)
         }
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
-            val index = if (group == null) groups.indexOf(defaultGroup) else groups.indexOf(group)
-            view?.doOnNextLayout { viewDataBinding?.spinner?.setSelection(index, true) }
+            viewDataBinding?.spinner?.text = group ?: defaultGroup
         }
-
-        viewDataBinding?.spinner?.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    log("ds")
-                }
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val textView = view as? TextView
-                    if (textView != null) {
-                        val group = if (textView.text ==
-                            requireContext().getString(R.string.all_items)) null
-                        else textView.text.toString()
-                        if (group != viewModel.itemsWithCurrentGroup.value?.second) {
-                            viewModel.setCurrentGroup(group)
-                            scrollToStartOnUpdate = true
-                        }
-                    }
-                }
-            }
     }
 
     private fun setupRecycler() {
@@ -552,6 +525,18 @@ class ItemsFragment : Fragment() {
                     viewDataBinding?.fabAdditem?.show()
                     false
                 }
+                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?) = false
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        // without check onQueryTextChange triggers immediately and causes
+                        // list to scroll up even after pressing back on details screen
+                        if (adapter?.itemCount != 0) {
+                            findItems(newText)
+                            viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
+                        }
+                        return true
+                    }
+                })
             }
     }
 

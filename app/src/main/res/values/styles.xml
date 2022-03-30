@@ -1,57 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
+    <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
     </style>
 
-    <style name="Widget.App.CollapsingToolbar" parent="Widget.Design.CollapsingToolbar">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
-    </style>
+    <style name="Accent" parent="TextAppearance.Material3.TitleSmall"/>
 
-    <style name="ThemeOverlay.App.Toolbar" parent="">
-        <item name="android:textColorPrimary">?attr/colorOnPrimary</item>
-        <item name="colorControlNormal">?attr/colorOnPrimary</item>
-    </style>
+    <style name="Subtitle" parent="TextAppearance.Material3.TitleSmall"/>
 
-    <style name="Widget.App.SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
+    <style name="Big" parent="TextAppearance.Material3.DisplaySmall"/>
 
-    <style name="Widget.App.DropDownSpinner" parent="Widget.AppCompat.Spinner.DropDown">
-        <item name="android:popupBackground">?attr/colorSurface</item>
-    </style>
-
-    <style name="Widget.App.PopupMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:popupBackground">?attr/colorSurface</item>
-    </style>
-
-    <style name="Widget.App.TextAppearanceSmallPopupMenu"
-        parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:textColor">@color/text_color_selector</item>
-    </style>
-
-    <style name="Accent" parent="TextAppearance.MaterialComponents.Subtitle2"/>
-
-    <style name="Subtitle" parent="TextAppearance.MaterialComponents.Subtitle2"/>
-
-    <style name="Big" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-        <item name="android:textSize">40sp</item>
-    </style>
-
-    <style name="Body" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="fontFamily">@font/roboto_light</item>
-        <item name="android:fontFamily">@font/roboto_light</item>
-    </style>
+    <style name="Body" parent="TextAppearance.Material3.BodySmall"/>
 
     <style name="Widget.App.ShapeAppearanceMedium"
-        parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">15dp</item>
     </style>
 
-    <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+    <style name="ActionModeStyle" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="colorControlNormal">@color/text_color_selector</item>
+    </style>
+
+    <style name="SpinnerButton" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="materialThemeOverlay">@style/SpinnerButtonThemeOverlay</item>
+    </style>
+
+    <style name="SpinnerButtonThemeOverlay" parent="ThemeOverlay.Material3.Button.TextButton">
+        <item name="colorOnContainer">?attr/colorControlNormal</item>
     </style>
 </resources>

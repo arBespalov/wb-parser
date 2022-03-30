@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/default_margin"
         android:id="@+id/card"
-        android:transitionName="@{item.id}">
+        android:transitionName="@{item.id}"
+        style="?attr/materialCardViewFilledStyle">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,7 +59,6 @@
                         android:id="@+id/price"
                         android:text="@{`` + item.averagePrice}"
                         tools:text="1990"
-
                         android:textAppearance="@style/Accent"
                         />
 
@@ -74,7 +74,7 @@
                     android:layout_margin="@dimen/default_margin"
                     android:layout_toRightOf="@id/price_container"
                     android:layout_below="@id/name"
-                    android:textAppearance="@style/Body"
+                    android:textAppearance="@style/Accent"
                     />
 
                 <LinearLayout
@@ -99,7 +99,6 @@
                         android:id="@+id/orders_count"
                         android:text="@{`` + item.ordersCount}"
                         tools:text="20"
-
                         android:textAppearance="@style/Accent"
                         />
                 </LinearLayout>
@@ -115,7 +114,7 @@
                     android:layout_below="@id/price_container"
                     android:layout_margin="@dimen/default_margin"
                     android:layout_toRightOf="@id/orders_container"
-                    android:textAppearance="@style/Body"
+                    android:textAppearance="@style/Accent"
                     />
 
                 <LinearLayout
@@ -141,7 +140,6 @@
                         android:id="@+id/average_orders_count_per_day"
                         android:text="@{`` + item.averageOrdersCountPerDay}"
                         tools:text="1"
-
                         android:textAppearance="@style/Accent"
                         />
                 </LinearLayout>
@@ -185,7 +183,7 @@
                     android:layout_marginLeft="@dimen/default_margin"
                     android:layout_marginTop="@dimen/default_margin"
                     android:layout_toRightOf="@id/total_quantity_container"
-                    android:textAppearance="@style/Body"
+                    android:textAppearance="@style/Accent"
                     />
 
             </RelativeLayout>

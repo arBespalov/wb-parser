@@ -67,7 +67,7 @@ class EditItemFragment : Fragment() {
             fabSave.setOnClickListener { viewModel.saveItem() }
 
             // setupAutoCompleteTextView
-            val defaultGroup = requireContext().getString(R.string.all_items)
+            val defaultGroup = getString(R.string.all_items)
             val groups = mutableListOf(defaultGroup)
             val adapter = ArrayAdapter(
                 requireContext(),
@@ -81,7 +81,7 @@ class EditItemFragment : Fragment() {
                 val sName = viewModel.newName ?: item.localName ?: item.name
                 name.setText(sName)
                 val currentGroup =
-                    viewModel.newGroup ?: item.groupName ?: getString(R.string.all_items)
+                    viewModel.newGroup ?: item.groupName ?: defaultGroup
                 autoCompleteTextView.setText(currentGroup, false)
             }
 
