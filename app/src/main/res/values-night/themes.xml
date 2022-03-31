@@ -1,9 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-
     <style name="Theme.WBParser" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorSecondary">@color/green</item>
-        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlNormal">@color/text_color_selector</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorSurface</item>
         <item name="colorPrimaryContainer">@color/green</item>
         <item name="colorOnPrimaryContainer">@android:color/black</item>

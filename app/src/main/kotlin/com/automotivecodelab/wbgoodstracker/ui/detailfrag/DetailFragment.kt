@@ -112,7 +112,6 @@ class DetailFragment : Fragment() {
                     cardSizeLayoutBinding.count5.text = storeIds
                 }
             }
-            view.doOnPreDraw { startPostponedEnterTransition() }
         }
 
         viewDataBinding?.swipeRefresh?.setOnRefreshListener {
@@ -127,6 +126,8 @@ class DetailFragment : Fragment() {
             icon.setImageResource(R.drawable.ic_baseline_bar_chart_24)
             root.setOnClickListener { viewModel.showOrdersChart() }
         }
+
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
     private fun setupOptionsMenu() {

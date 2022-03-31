@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.MyApplication

@@ -3,6 +3,12 @@
     <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="materialThemeOverlay">@style/ToolBarThemeOverlay</item>
+    </style>
+
+    <!--search view text color-->
+    <style name="ToolBarThemeOverlay">
+        <item name="android:editTextColor">?attr/colorOnPrimary</item>
     </style>
 
     <style name="Accent" parent="TextAppearance.Material3.TitleSmall"/>

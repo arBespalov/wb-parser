@@ -12,9 +12,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat.getDrawable
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.doOnPreDraw
-import androidx.core.view.isVisible
+import androidx.core.view.*
 import androidx.core.widget.PopupMenuCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -106,16 +104,6 @@ class ItemsFragment : Fragment() {
                 scrollToStartOnUpdate = false
             }
 
-            // items must be set before performing search
-            if (!viewModel.cachedSearchQuery.isNullOrEmpty()) {
-                (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as
-                        SearchView).apply {
-                    isIconified = false
-                    setQuery(viewModel.cachedSearchQuery, false)
-                }
-                findItems(viewModel.cachedSearchQuery)
-            }
-
             // called when user choose group in group picker
             if (closeActionModeLater) {
                 closeActionModeLater = false
@@ -143,7 +131,7 @@ class ItemsFragment : Fragment() {
             object : Toolbar.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem?): Boolean {
                     return when (item?.itemId) {
-                        R.id.menu_search -> true
+                        R.id.menu_search -> false
                         R.id.menu_sort -> {
                             val popup = PopupMenu(
                                 requireContext(),
@@ -482,10 +470,13 @@ class ItemsFragment : Fragment() {
 
             override fun onDestroyActionMode(mode: ActionMode?) {
                 adapter?.tracker?.clearSelection()
-                viewDataBinding?.fabAdditem?.show()
                 actionMode = null
-                viewDataBinding?.swipeRefresh?.isEnabled = true
                 setItemTouchHelperEnabled(true)
+                if (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)
+                        ?.isActionViewExpanded == false) {
+                    viewDataBinding?.fabAdditem?.show()
+                    viewDataBinding?.swipeRefresh?.isEnabled = true
+                }
             }
         })
         viewDataBinding?.fabAdditem?.hide()
@@ -500,48 +491,48 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupSearchView() {
-        (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.actionView as SearchView)
-            .apply {
+        viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)?.apply {
+            (actionView as? SearchView)?.let { searchView ->
                 // make editText not expanded in landscape mode
-                imeOptions = imeOptions or EditorInfo.IME_FLAG_NO_EXTRACT_UI
-                val menu = viewDataBinding?.toolbar?.menu
-                val menuItems = setOf(
-                    R.id.menu_sort,
-                    R.id.menu_refresh,
-                    R.id.menu_delete_group,
-                    R.id.menu_backup,
-                    R.id.menu_theme
-                )
-                setOnSearchClickListener {
-                    menuItems.forEach { menu?.findItem(it)?.isVisible = false }
-                    viewDataBinding?.spinner?.isVisible = false
-                    viewDataBinding?.swipeRefresh?.isEnabled = false
-                    viewDataBinding?.fabAdditem?.hide()
-                }
-                setOnCloseListener {
-                    menuItems.forEach { menu?.findItem(it)?.isVisible = true }
-                    viewDataBinding?.spinner?.isVisible = true
-                    viewDataBinding?.swipeRefresh?.isEnabled = true
-                    viewDataBinding?.fabAdditem?.show()
-                    false
-                }
-                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_FLAG_NO_EXTRACT_UI
+
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?) = false
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        // without check onQueryTextChange triggers immediately and causes
-                        // list to scroll up even after pressing back on details screen
-                        if (adapter?.itemCount != 0) {
-                            findItems(newText)
-                            viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                        }
+                        viewModel.filterItems(newText ?: "")
+                        if (adapter?.itemCount != 0) scrollToStartOnUpdate = true
                         return true
                     }
                 })
+                viewDataBinding?.toolbar?.doOnLayout { toolbar ->
+                    searchView.maxWidth = toolbar.width
+                }
             }
-    }
+            setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                    viewDataBinding?.toolbar?.menu?.forEach { menuItem ->
+                        if (menuItem.itemId != R.id.menu_search) {
+                            menuItem.isVisible = false
+                        }
+                    }
+                    viewDataBinding?.spinner?.isVisible = false
+                    viewDataBinding?.swipeRefresh?.isEnabled = false
+                    viewDataBinding?.fabAdditem?.hide()
+                    return true
+                }
 
-    private fun findItems(query: String?) {
-        val filteredList = viewModel.filterItems(query)
-        adapter?.replaceAll(filteredList)
+                override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                    viewDataBinding?.toolbar?.menu?.forEach { menuItem ->
+                        if (menuItem.itemId != R.id.menu_search) {
+                            menuItem.isVisible = true
+                        }
+                    }
+                    viewDataBinding?.spinner?.isVisible = true
+                    viewDataBinding?.swipeRefresh?.isEnabled = true
+                    viewDataBinding?.fabAdditem?.show()
+                    return true
+                }
+            })
+        }
     }
 }

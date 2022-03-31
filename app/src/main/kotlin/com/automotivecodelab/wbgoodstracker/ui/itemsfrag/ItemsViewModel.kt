@@ -4,7 +4,10 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
+import com.automotivecodelab.wbgoodstracker.log
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.Comparator
 import kotlinx.coroutines.launch
@@ -25,9 +28,21 @@ class ItemsViewModel(
     val itemsComparator: LiveData<Comparator<Item>> = getUserSortingModeComparatorUseCase()
         .asLiveData()
 
+    private val searchQuery = MutableStateFlow("")
+
     // second in pair - current group
-    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> =
-        observeItemsByGroupUseCase().asLiveData()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> = searchQuery
+        .flatMapLatest { query ->
+            observeItemsByGroupUseCase().mapLatest { (items, group) ->
+                items.filter { item ->
+                    (item.localName ?: item.name)
+                        .lowercase(Locale.ROOT)
+                        .contains(query.lowercase(Locale.ROOT))
+                } to group
+            }
+        }
+        .asLiveData()
 
     private val _openItemEvent = MutableLiveData<Event<Int>>()
     val openItemEvent: LiveData<Event<Int>> = _openItemEvent
@@ -62,8 +77,8 @@ class ItemsViewModel(
     private val _authorizationErrorEvent = MutableLiveData<Event<Unit>>()
     val authorizationErrorEvent: LiveData<Event<Unit>> = _authorizationErrorEvent
 
-    var cachedSearchQuery: String? = null
-        private set
+//    var cachedSearchQuery: String? = null
+//        private set
 
     fun openItem(recyclerItemPosition: Int) {
         _openItemEvent.value = Event(recyclerItemPosition)
@@ -123,17 +138,8 @@ class ItemsViewModel(
         _addToGroupEvent.value = Event(itemsId)
     }
 
-    fun filterItems(query: String?): List<Item> {
-        cachedSearchQuery = query
-        val lowerCaseQuery = query?.lowercase(Locale.ROOT) ?: ""
-        val filteredList = mutableListOf<Item>()
-        itemsWithCurrentGroup.value?.first?.forEach { item ->
-            val text = (item.localName ?: item.name).lowercase(Locale.ROOT)
-            if (text.contains(lowerCaseQuery)) {
-                filteredList.add(item)
-            }
-        }
-        return filteredList
+    fun filterItems(query: String) {
+        searchQuery.value = query
     }
 
     fun signIn() {
