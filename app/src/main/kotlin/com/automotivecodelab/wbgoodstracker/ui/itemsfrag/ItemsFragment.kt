@@ -5,15 +5,11 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.core.view.*
-import androidx.core.widget.PopupMenuCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -112,8 +108,11 @@ class ItemsFragment : Fragment() {
 
     private fun setupOptionsMenu() {
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
-            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)?.isEnabled =
-                group != null
+            viewDataBinding?.toolbar?.menu?.apply {
+                val isEnabled = group!= null
+                findItem(R.id.menu_delete_group)?.isEnabled = isEnabled
+                findItem(R.id.menu_rename_group)?.isEnabled = isEnabled
+            }
         }
         viewDataBinding?.toolbar?.setOnMenuItemClickListener(
             object : Toolbar.OnMenuItemClickListener {
@@ -159,6 +158,10 @@ class ItemsFragment : Fragment() {
                         }
                         R.id.menu_theme -> {
                             viewModel.changeTheme()
+                            true
+                        }
+                        R.id.menu_rename_group -> {
+                            viewModel.renameGroup()
                             true
                         }
                         else -> false
@@ -469,6 +472,12 @@ class ItemsFragment : Fragment() {
                 navigate(action)
             }
         )
+
+        viewModel.renameCurrentGroupEvent.observe(viewLifecycleOwner, EventObserver {
+            val action = ItemsFragmentDirections
+                .actionItemsFragmentToNewGroupDialogFragment(null, true)
+            navigate(action)
+        })
     }
 
     private fun setupSearchView() {

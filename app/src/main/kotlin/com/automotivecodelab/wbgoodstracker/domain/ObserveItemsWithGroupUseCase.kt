@@ -5,7 +5,7 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import kotlinx.coroutines.flow.Flow
 
-class ObserveItemsByGroupUseCase(
+class ObserveItemsWithGroupUseCase(
     private val itemsRepository: ItemsRepository
 ) {
     operator fun invoke(): Flow<Pair<List<Item>, String?>> {

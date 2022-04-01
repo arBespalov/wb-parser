@@ -15,7 +15,7 @@ class ItemsViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return ItemsViewModel(
-            ObserveItemsByGroupUseCase(itemsRepository),
+            ObserveItemsWithGroupUseCase(itemsRepository),
             GetUserSortingModeComparatorUseCase(sortRepository),
             SetSortingModeUseCase(sortRepository),
             RefreshAllItemsUseCase(userRepository, itemsRepository),

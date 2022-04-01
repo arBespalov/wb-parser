@@ -57,4 +57,5 @@
     <string name="item_deleted">Товар удален</string>
     <string name="undo">Отмена</string>
     <string name="no_connection">Отсутствует интернет-соединение</string>
+    <string name="rename_group">Переименовать группу</string>
 </resources>

@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
-import com.automotivecodelab.wbgoodstracker.log
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -13,7 +12,7 @@ import kotlin.Comparator
 import kotlinx.coroutines.launch
 
 class ItemsViewModel(
-    observeItemsByGroupUseCase: ObserveItemsByGroupUseCase,
+    observeItemsByGroupUseCase: ObserveItemsWithGroupUseCase,
     getUserSortingModeComparatorUseCase: GetUserSortingModeComparatorUseCase,
     private val setSortingModeUseCase: SetSortingModeUseCase,
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
@@ -79,6 +78,9 @@ class ItemsViewModel(
     private val _authorizationErrorEvent = MutableLiveData<Event<Unit>>()
     val authorizationErrorEvent: LiveData<Event<Unit>> = _authorizationErrorEvent
 
+    private val _renameCurrentGroupEvent = MutableLiveData<Event<Unit>>()
+    val renameCurrentGroupEvent: LiveData<Event<Unit>> = _renameCurrentGroupEvent
+
     fun openItem(recyclerItemPosition: Int) {
         _openItemEvent.value = Event(recyclerItemPosition)
     }
@@ -143,7 +145,6 @@ class ItemsViewModel(
         selectedItemIds.value?.let {
             _addToGroupEvent.value = Event(it.toList())
         }
-
     }
 
     fun filterItems(query: String) {
@@ -174,5 +175,9 @@ class ItemsViewModel(
 
     fun clearSelection() {
         _selectedItemIds.value = emptySet()
+    }
+
+    fun renameGroup() {
+        _renameCurrentGroupEvent.value = Event(Unit)
     }
 }

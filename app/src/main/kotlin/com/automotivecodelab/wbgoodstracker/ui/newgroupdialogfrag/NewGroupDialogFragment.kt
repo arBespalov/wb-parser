@@ -41,13 +41,26 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
         }
 
         val editText = bottomSheetDialog.findViewById<EditText>(R.id.group_name)!!
+        if (args.renameGroup) {
+            viewModel.getCurrentGroup()
+            viewModel.currentGroup.observe(this) { group: String? ->
+                if (group != null) {
+                    editText.setText(group)
+                    editText.setSelection(group.length)
+                }
+            }
+        }
 
         editText.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     val newGroupName = editText.text.toString()
                     if (newGroupName.isNotEmpty()) {
-                        viewModel.addGroup(args.itemIds.toList(), newGroupName)
+                        if (args.renameGroup)
+                            viewModel.renameGroup(newGroupName)
+                        else if (args.itemIds != null)
+                            viewModel.addGroup(args.itemIds!!.toList(), newGroupName)
+
                     }
                     true
                 }

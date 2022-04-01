@@ -116,7 +116,7 @@ class EditItemFragment : Fragment() {
 
         viewModel.createNewGroupEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = EditItemFragmentDirections
-                    .actionEditItemFragmentToNewGroupDialogFragment(arrayOf(it))
+                    .actionEditItemFragmentToNewGroupDialogFragment(arrayOf(it), false)
                 navigate(action)
             }
         )

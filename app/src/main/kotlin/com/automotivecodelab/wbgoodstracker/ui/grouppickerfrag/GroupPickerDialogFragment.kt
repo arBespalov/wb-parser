@@ -67,7 +67,7 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
 
         viewModel.newGroupEvent.observe(this, EventObserver{
             val action = GroupPickerDialogFragmentDirections
-                .actionGroupPickerDialogFragmentToNewGroupDialogFragment(args.itemsId)
+                .actionGroupPickerDialogFragmentToNewGroupDialogFragment(args.itemsId, false)
             navigate(action)
         })
     }

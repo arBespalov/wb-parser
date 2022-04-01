@@ -22,4 +22,6 @@ interface ItemsRepository {
     suspend fun deleteGroup(groupName: String)
     fun getGroups(): Flow<List<String>>
     suspend fun setCurrentGroup(groupName: String?)
+    suspend fun renameCurrentGroup(newGroupName: String)
+    fun observeCurrentGroup(): Flow<String?>
 }

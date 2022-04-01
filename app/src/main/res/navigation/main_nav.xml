@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_itemsFragment_to_themeSelectorFragment"
             app:destination="@id/themeSelectorFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_newGroupDialogFragment"
+            app:destination="@id/newGroupDialogFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -105,7 +108,11 @@
         tools:layout="@layout/fragment_new_group_dialog">
         <argument
             android:name="itemIds"
-            app:argType="string[]" />
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="renameGroup"
+            app:argType="boolean" />
     </dialog>
     <dialog
         android:id="@+id/confirmDeleteGroupDialogFrag"
