@@ -2,11 +2,12 @@ package com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.os.Build
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.animation.addPauseListener
+import android.widget.Toast
 import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.selection.SelectionTracker
@@ -17,11 +18,10 @@ import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.databinding.RecyclerviewItemBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.httpToHttps
+import com.automotivecodelab.wbgoodstracker.log
 import com.automotivecodelab.wbgoodstracker.themeColor
-import com.google.android.material.color.MaterialColors
-import com.squareup.picasso.Callback
+import com.google.android.material.textview.MaterialTextView
 import com.squareup.picasso.Picasso
-import java.lang.Exception
 
 class ItemsAdapter(
     private var comparator: Comparator<Item>?,
@@ -29,6 +29,7 @@ class ItemsAdapter(
 ) : RecyclerView.Adapter<ItemsAdapter.ItemViewHolder>() {
 
     private val ITEM_CONTENT_CHANGED_PAYLOAD = "itemContentChangedPayload"
+    private val defaultTextViewColors = mutableMapOf<String, ColorStateList>()
 
     var tracker: SelectionTracker<String>? = null
         private set
@@ -199,24 +200,50 @@ class ItemsAdapter(
                 .into(holder.recyclerViewItemBinding.imageView)
         }
         loadImage()
-        //Picasso.get().cancelRequest(holder.recyclerViewItemBinding.imageView)
         holder.recyclerViewItemBinding.imageView.addOnLayoutChangeListener {
                 view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             val height = bottom - top
             val oldHeight = oldBottom - oldTop
             if (oldHeight != 0 && height != oldHeight && position < sortedList.size()) {
-                //Picasso.get().cancelRequest(view as ImageView)
                 loadImage()
             }
         }
-        tracker?.let {
-            val backgroundColor = if (it.isSelected(item.id)) {
-                holder.itemView.context.themeColor(R.attr.colorSecondary)
+        tracker?.let { selectionTracker ->
+            val context = holder.itemView.context
+            val backgroundColor = if (selectionTracker.isSelected(item.id)) {
+                context.themeColor(R.attr.colorSecondary)
             } else {
                 // colorSurfaceVariant - default material3 card background
-                holder.itemView.context.themeColor(R.attr.colorSurfaceVariant)
+                context.themeColor(R.attr.colorSurfaceVariant)
             }
             holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
+
+            // change text view colors in dark mode
+            val isDarkTheme = context.resources.configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            if (isDarkTheme) {
+                if (defaultTextViewColors.isEmpty()) {
+                    holder.itemView.allViews.forEach { view ->
+                        if (view is MaterialTextView) {
+                            defaultTextViewColors[context.resources.getResourceEntryName(view.id)] =
+                                view.textColors
+                        }
+                    }
+                }
+                holder.itemView.allViews.forEach { view ->
+                    if (view is MaterialTextView) {
+                        if (selectionTracker.isSelected(item.id)) {
+                            view.setTextColor(context.themeColor(R.attr.colorOnSecondary))
+                        } else {
+                            val colorStateList = defaultTextViewColors[
+                                    context.resources.getResourceEntryName(view.id)]
+                            if (colorStateList != null) {
+                                view.setTextColor(colorStateList)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

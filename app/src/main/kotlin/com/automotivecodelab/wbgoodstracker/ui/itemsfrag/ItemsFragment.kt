@@ -44,11 +44,8 @@ class ItemsFragment : Fragment() {
     private var viewDataBinding: ItemsFragmentBinding? = null
     private var adapter: ItemsAdapter? = null
     private var itemTouchHelper: ItemTouchHelper? = null
-    private var actionMode: ActionMode? = null
 
-    private var actionModeRestored = false
     private var closeActionModeLater = false
-    // to scroll on group change
     private var scrollToStartOnUpdate = false
 
     override fun onCreateView(
@@ -69,7 +66,6 @@ class ItemsFragment : Fragment() {
         viewDataBinding = null
         adapter = null
         itemTouchHelper = null
-        actionMode = null
         super.onDestroyView()
     }
 
@@ -107,25 +103,17 @@ class ItemsFragment : Fragment() {
             // called when user choose group in group picker
             if (closeActionModeLater) {
                 closeActionModeLater = false
-                actionMode?.finish()
+                viewModel.clearSelection()
             }
 
-            // handle rotation
-            if (savedInstanceState != null && !actionModeRestored) {
-                actionModeRestored = true
-                adapter?.tracker?.onRestoreInstanceState(savedInstanceState)
-                if (adapter?.tracker?.hasSelection() == true && actionMode == null)
-                    startActionMode()
-            }
             view.doOnPreDraw { startPostponedEnterTransition() }
         }
     }
 
     private fun setupOptionsMenu() {
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
-            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)?.run {
-                isEnabled = group != null
-            }
+            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_delete_group)?.isEnabled =
+                group != null
         }
         viewDataBinding?.toolbar?.setOnMenuItemClickListener(
             object : Toolbar.OnMenuItemClickListener {
@@ -135,30 +123,21 @@ class ItemsFragment : Fragment() {
                         R.id.menu_sort -> {
                             val popup = PopupMenu(
                                 requireContext(),
-                                requireActivity().findViewById(item.itemId)
+                                requireView().findViewById(item.itemId)
                             )
                             popup.menuInflater.inflate(R.menu.popup_sort_menu, popup.menu)
-                            popup.setOnMenuItemClickListener {
-                                when (it.itemId) {
-                                    R.id.by_name_asc -> {
-                                        viewModel.setSortingMode(SortingMode.BY_NAME_ASC)
-                                    }
-                                    R.id.by_name_desc -> {
-                                        viewModel.setSortingMode(SortingMode.BY_NAME_DESC)
-                                    }
-                                    R.id.by_date_asc -> {
-                                        viewModel.setSortingMode(SortingMode.BY_DATE_ASC)
-                                    }
-                                    R.id.by_date_desc -> {
-                                        viewModel.setSortingMode(SortingMode.BY_DATE_DESC)
-                                    }
-                                    R.id.by_orders_count_desc -> {
-                                        viewModel.setSortingMode(SortingMode.BY_ORDERS_COUNT)
-                                    }
-                                    R.id.by_orders_count_per_day_desc -> {
-                                        viewModel.setSortingMode(
-                                            SortingMode.BY_ORDERS_COUNT_PER_DAY)
-                                    }
+                            val sortingModeToMenuItemMap = mapOf(
+                                R.id.by_name_asc to SortingMode.BY_NAME_ASC,
+                                R.id.by_name_desc to SortingMode.BY_NAME_DESC,
+                                R.id.by_date_asc to SortingMode.BY_DATE_ASC,
+                                R.id.by_date_desc to SortingMode.BY_DATE_DESC,
+                                R.id.by_orders_count_desc to SortingMode.BY_ORDERS_COUNT,
+                                R.id.by_orders_count_per_day_desc to
+                                        SortingMode.BY_ORDERS_COUNT_PER_DAY
+                            )
+                            popup.setOnMenuItemClickListener { menuItem ->
+                                sortingModeToMenuItemMap[menuItem.itemId]?.let { sortingMode ->
+                                    viewModel.setSortingMode(sortingMode)
                                 }
                                 scrollToStartOnUpdate = true
                                 return@setOnMenuItemClickListener true
@@ -189,6 +168,72 @@ class ItemsFragment : Fragment() {
         )
     }
 
+    private fun setupActionMode() {
+        var actionMode: ActionMode? = null
+        val callback = object : ActionMode.Callback {
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                return when (item?.itemId) {
+                    R.id.menu_delete -> {
+                        viewModel.confirmDelete()
+                        true
+                    }
+                    R.id.menu_add_to_group -> {
+                        viewModel.addToGroup()
+                        true
+                    }
+                    R.id.menu_edit -> {
+                        viewModel.editItem()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                mode?.menuInflater?.inflate(R.menu.selection_menu, menu)
+                return true
+            }
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
+            override fun onDestroyActionMode(mode: ActionMode?) {
+                viewModel.clearSelection()
+            }
+        }
+
+        adapter?.tracker?.run {
+            addObserver(object : SelectionTracker.SelectionObserver<String>() {
+                override fun onItemStateChanged(key: String, selected: Boolean) {
+                    super.onItemStateChanged(key, selected)
+                    if (selected) viewModel.selectItem(key)
+                    else viewModel.unselectItem(key)
+                }
+            })
+        }
+
+        viewModel.selectedItemIds.observe(viewLifecycleOwner) { selectedItemsSet ->
+            if (selectedItemsSet.isEmpty()) {
+                actionMode?.finish()
+                actionMode = null
+                setItemTouchHelperEnabled(true)
+                if (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)
+                        ?.isActionViewExpanded == false) {
+                            viewDataBinding?.fabAdditem?.show()
+                            viewDataBinding?.swipeRefresh?.isEnabled = true
+                }
+                adapter?.tracker?.clearSelection()
+            } else {
+                if (actionMode == null) {
+                    actionMode = viewDataBinding?.toolbar?.startActionMode(callback)
+                    viewDataBinding?.fabAdditem?.hide()
+                    viewDataBinding?.swipeRefresh?.isEnabled = false
+                    setItemTouchHelperEnabled(false)
+                    adapter?.tracker?.setItemsSelected(selectedItemsSet, true)
+                }
+                actionMode?.title = getString(R.string.selected) + selectedItemsSet.size
+                actionMode?.menu?.findItem(R.id.menu_edit)?.isEnabled =
+                    selectedItemsSet.size == 1
+            }
+        }
+    }
+
     private fun setupSpinner() {
         viewDataBinding?.toolbar?.title = null
         val defaultGroup = requireContext().getString(R.string.all_items)
@@ -203,7 +248,7 @@ class ItemsFragment : Fragment() {
                 val selectedText = menuItem.title
                 if (selectedText != null) {
                     val group = if (selectedText == defaultGroup) null
-                    else selectedText.toString()
+                        else selectedText.toString()
                     if (group != viewModel.itemsWithCurrentGroup.value?.second) {
                         viewModel.setCurrentGroup(group)
                         scrollToStartOnUpdate = true
@@ -216,7 +261,7 @@ class ItemsFragment : Fragment() {
 
         viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
             val groupsToAdd = savedGroups.minus(groups)
-            val groupsToRemove = groups.minus(savedGroups.plus(defaultGroup))
+            val groupsToRemove = groups.minus(savedGroups).minus(defaultGroup)
             groups.addAll(groupsToAdd)
             groups.removeAll(groupsToRemove)
         }
@@ -237,20 +282,21 @@ class ItemsFragment : Fragment() {
             setHasFixedSize(true)
             adapter = this@ItemsFragment.adapter
         }
-        adapter?.tracker?.run {
-            addObserver(object : SelectionTracker.SelectionObserver<String>() {
-                override fun onSelectionChanged() {
-                    super.onSelectionChanged()
-                    if (hasSelection() && actionMode == null) {
-                        startActionMode()
-                    } else if (!hasSelection()) {
-                        actionMode?.finish()
-                    } else {
-                        setSelectedTitle(selection.size())
-                    }
-                }
-            })
+
+        setupItemTouchHelper()
+        setupActionMode()
+        setItemTouchHelperEnabled(true)
+
+        viewModel.itemsComparator.observe(viewLifecycleOwner) { comparator ->
+            adapter?.setItemsComparator(comparator)
+            if (scrollToStartOnUpdate) {
+                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
+                scrollToStartOnUpdate = false
+            }
         }
+    }
+
+    private fun setupItemTouchHelper() {
         itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.LEFT
@@ -263,30 +309,30 @@ class ItemsFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
-                ?.let { item ->
-                    val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
-                    adapter?.remove(item)
-                    val snackbar = Snackbar.make(
-                        viewDataBinding?.fabAdditem ?: requireView(),
-                        R.string.item_deleted,
-                        Snackbar.LENGTH_LONG)
-                    snackbar.setAction(R.string.undo) {
-                        adapter?.add(item)
-                        if (isItemInFirstPosition)
-                            viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                    }
-                    snackbar.addCallback(object : Snackbar.Callback() {
-                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                            if (event != DISMISS_EVENT_ACTION) {
-                                viewModel.deleteSingleItem(item.id)
-                            }
-                            viewDataBinding?.fabAdditem?.show()
-                            super.onDismissed(transientBottomBar, event)
+                    ?.let { item ->
+                        val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
+                        adapter?.remove(item)
+                        val snackbar = Snackbar.make(
+                            viewDataBinding?.fabAdditem ?: requireView(),
+                            R.string.item_deleted,
+                            Snackbar.LENGTH_LONG)
+                        snackbar.setAction(R.string.undo) {
+                            adapter?.add(item)
+                            if (isItemInFirstPosition)
+                                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
                         }
-                    })
-                    viewDataBinding?.fabAdditem?.hide()
-                    snackbar.show()
-                }
+                        snackbar.addCallback(object : Snackbar.Callback() {
+                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                if (event != DISMISS_EVENT_ACTION) {
+                                    viewModel.deleteSingleItem(item.id)
+                                }
+                                viewDataBinding?.fabAdditem?.show()
+                                super.onDismissed(transientBottomBar, event)
+                            }
+                        })
+                        viewDataBinding?.fabAdditem?.hide()
+                        snackbar.show()
+                    }
             }
 
             override fun onChildDraw(
@@ -330,16 +376,6 @@ class ItemsFragment : Fragment() {
                 )
             }
         })
-
-        setItemTouchHelperEnabled(true)
-
-        viewModel.itemsComparator.observe(viewLifecycleOwner) { comparator ->
-            adapter?.setItemsComparator(comparator)
-            if (scrollToStartOnUpdate) {
-                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                scrollToStartOnUpdate = false
-            }
-        }
     }
 
     private fun setItemTouchHelperEnabled(isEnabled: Boolean) {
@@ -392,7 +428,7 @@ class ItemsFragment : Fragment() {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToEditItemFragment(it)
-                actionMode?.finish()
+                viewModel.clearSelection()
                 navigate(action)
             }
         )
@@ -433,61 +469,6 @@ class ItemsFragment : Fragment() {
                 navigate(action)
             }
         )
-    }
-
-    private fun setSelectedTitle(selected: Int) {
-        actionMode?.title = getString(R.string.selected) + selected
-        actionMode?.menu?.findItem(R.id.menu_edit)?.isEnabled = selected == 1
-    }
-
-    private fun startActionMode() {
-        actionMode = viewDataBinding?.toolbar?.startActionMode(object : ActionMode.Callback {
-            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-                val itemsId = adapter?.tracker?.selection?.toList() ?: emptyList()
-                return when (item?.itemId) {
-                    R.id.menu_delete -> {
-                        viewModel.confirmDelete(itemsId)
-                        true
-                    }
-                    R.id.menu_add_to_group -> {
-                        viewModel.addToGroup(itemsId)
-                        true
-                    }
-                    R.id.menu_edit -> {
-                        viewModel.editItem(itemsId[0])
-                        true
-                    }
-                    else -> false
-                }
-            }
-
-            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                mode?.menuInflater?.inflate(R.menu.selection_menu, menu)
-                return true
-            }
-
-            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
-
-            override fun onDestroyActionMode(mode: ActionMode?) {
-                adapter?.tracker?.clearSelection()
-                actionMode = null
-                setItemTouchHelperEnabled(true)
-                if (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)
-                        ?.isActionViewExpanded == false) {
-                    viewDataBinding?.fabAdditem?.show()
-                    viewDataBinding?.swipeRefresh?.isEnabled = true
-                }
-            }
-        })
-        viewDataBinding?.fabAdditem?.hide()
-        setSelectedTitle(adapter?.tracker?.selection?.size() ?: 0)
-        viewDataBinding?.swipeRefresh?.isEnabled = false
-        setItemTouchHelperEnabled(false)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        adapter?.tracker?.onSaveInstanceState(outState)
     }
 
     private fun setupSearchView() {

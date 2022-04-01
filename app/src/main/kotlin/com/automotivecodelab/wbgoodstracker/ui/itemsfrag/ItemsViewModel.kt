@@ -30,11 +30,10 @@ class ItemsViewModel(
 
     private val searchQuery = MutableStateFlow("")
 
-    // second in pair - current group
     @OptIn(ExperimentalCoroutinesApi::class)
-    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> = searchQuery
-        .flatMapLatest { query ->
-            observeItemsByGroupUseCase().mapLatest { (items, group) ->
+    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> = observeItemsByGroupUseCase()
+        .flatMapLatest { (items, group) ->
+            searchQuery.mapLatest { query ->
                 items.filter { item ->
                     (item.localName ?: item.name)
                         .lowercase(Locale.ROOT)
@@ -43,6 +42,9 @@ class ItemsViewModel(
             }
         }
         .asLiveData()
+
+    private val _selectedItemIds = MutableLiveData<Set<String>>(emptySet())
+    val selectedItemIds: LiveData<Set<String>> = _selectedItemIds
 
     private val _openItemEvent = MutableLiveData<Event<Int>>()
     val openItemEvent: LiveData<Event<Int>> = _openItemEvent
@@ -77,9 +79,6 @@ class ItemsViewModel(
     private val _authorizationErrorEvent = MutableLiveData<Event<Unit>>()
     val authorizationErrorEvent: LiveData<Event<Unit>> = _authorizationErrorEvent
 
-//    var cachedSearchQuery: String? = null
-//        private set
-
     fun openItem(recyclerItemPosition: Int) {
         _openItemEvent.value = Event(recyclerItemPosition)
     }
@@ -88,8 +87,10 @@ class ItemsViewModel(
         _addItemEvent.value = Event(Unit)
     }
 
-    fun confirmDelete(itemsIdToDelete: List<String>) {
-        _confirmDeleteEvent.value = Event(itemsIdToDelete)
+    fun confirmDelete() {
+        selectedItemIds.value?.let {
+            _confirmDeleteEvent.value = Event(it.toList())
+        }
     }
 
     fun deleteSingleItem(itemId: String) {
@@ -98,8 +99,12 @@ class ItemsViewModel(
         }
     }
 
-    fun editItem(itemId: String) {
-        _editItemEvent.value = Event(itemId)
+    fun editItem() {
+        if (selectedItemIds.value?.size == 1) {
+            val itemId = selectedItemIds.value?.elementAt(0)
+            if (itemId != null) _editItemEvent.value = Event(itemId)
+        }
+
     }
 
     fun deleteGroup() {
@@ -134,8 +139,11 @@ class ItemsViewModel(
         }
     }
 
-    fun addToGroup(itemsId: List<String>) {
-        _addToGroupEvent.value = Event(itemsId)
+    fun addToGroup() {
+        selectedItemIds.value?.let {
+            _addToGroupEvent.value = Event(it.toList())
+        }
+
     }
 
     fun filterItems(query: String) {
@@ -154,5 +162,17 @@ class ItemsViewModel(
 
     fun changeTheme() {
         _changeThemeEvent.value = Event(Unit)
+    }
+
+    fun selectItem(id: String) {
+        _selectedItemIds.value = _selectedItemIds.value?.plus(id)
+    }
+
+    fun unselectItem(id: String) {
+        _selectedItemIds.value = _selectedItemIds.value?.minus(id)
+    }
+
+    fun clearSelection() {
+        _selectedItemIds.value = emptySet()
     }
 }

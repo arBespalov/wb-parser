@@ -22,7 +22,7 @@ interface ServerApi {
                         throw NoInternetConnectionException()
                     chain.proceed(chain.request())
                 }
-                .connectTimeout(15, TimeUnit.SECONDS)
+                .callTimeout(15, TimeUnit.SECONDS)
                 .build()
             return Retrofit.Builder()
                 .client(okHttpClient)

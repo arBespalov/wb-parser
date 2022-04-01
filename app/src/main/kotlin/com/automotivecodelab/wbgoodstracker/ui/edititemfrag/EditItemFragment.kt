@@ -87,7 +87,7 @@ class EditItemFragment : Fragment() {
 
             viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
                 val groupsToAdd = savedGroups.minus(groups)
-                val groupsToRemove = groups.minus(savedGroups.plus(defaultGroup))
+                val groupsToRemove = groups.minus(savedGroups).minus(defaultGroup)
                 groups.addAll(groupsToAdd)
                 groups.removeAll(groupsToRemove)
             }
