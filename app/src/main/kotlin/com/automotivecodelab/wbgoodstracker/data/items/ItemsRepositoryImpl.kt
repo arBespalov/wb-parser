@@ -258,6 +258,19 @@ class ItemsRepositoryImpl(
         }
     }
 
+    override suspend fun renameCurrentGroup(newGroupName: String) {
+        val currentGroup = localDataSource.getCurrentGroup().first()
+        if (currentGroup != null) {
+            val items = localDataSource.getByGroup(currentGroup)
+            setGroupNameToItemsList(items, newGroupName)
+            setCurrentGroup(newGroupName)
+        }
+    }
+
+    override fun observeCurrentGroup(): Flow<String?> {
+        return localDataSource.getCurrentGroup()
+    }
+
     private suspend fun setGroupNameToItemsList(
         items: List<ItemWithSizesDBModel>,
         groupName: String?

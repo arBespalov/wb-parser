@@ -2,19 +2,19 @@ package com.automotivecodelab.wbgoodstracker.ui.edititemfrag
 
 import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.EditItemUseCase
-import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
+import com.automotivecodelab.wbgoodstracker.domain.ObserveGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class EditItemViewModel(
     observeSingleItemUseCase: ObserveSingleItemUseCase,
-    getGroupsUseCase: GetGroupsUseCase,
+    observeGroupsUseCase: ObserveGroupsUseCase,
     itemId: String,
     private val editItemUseCase: EditItemUseCase,
 ) : ViewModel() {
     val item = observeSingleItemUseCase(itemId).asLiveData()
-    val groups = getGroupsUseCase().asLiveData()
+    val groups = observeGroupsUseCase().asLiveData()
 
     var newName: String? = null
     var newGroup: String? = null

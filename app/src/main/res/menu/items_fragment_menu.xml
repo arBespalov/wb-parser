@@ -21,6 +21,10 @@
         android:title="@string/delete_group"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/menu_rename_group"
+        android:title="@string/rename_group"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_backup"
         android:title="@string/backup_and_sync"
         app:showAsAction="never"/>

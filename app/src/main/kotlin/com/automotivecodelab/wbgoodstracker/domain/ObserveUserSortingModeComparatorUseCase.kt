@@ -5,7 +5,7 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetUserSortingModeComparatorUseCase(
+class ObserveUserSortingModeComparatorUseCase(
     private val sortRepository: SortRepository
 ) {
     operator fun invoke(): Flow<Comparator<Item>> {

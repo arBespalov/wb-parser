@@ -218,28 +218,24 @@ class ItemsAdapter(
             }
             holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
 
-            // change text view colors in dark mode
-            val isDarkTheme = context.resources.configuration.uiMode and
-                    Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-            if (isDarkTheme) {
-                if (defaultTextViewColors.isEmpty()) {
-                    holder.itemView.allViews.forEach { view ->
-                        if (view is MaterialTextView) {
-                            defaultTextViewColors[context.resources.getResourceEntryName(view.id)] =
-                                view.textColors
-                        }
-                    }
-                }
+            if (defaultTextViewColors.isEmpty()) {
                 holder.itemView.allViews.forEach { view ->
                     if (view is MaterialTextView) {
-                        if (selectionTracker.isSelected(item.id)) {
-                            view.setTextColor(context.themeColor(R.attr.colorOnSecondary))
-                        } else {
-                            val colorStateList = defaultTextViewColors[
-                                    context.resources.getResourceEntryName(view.id)]
-                            if (colorStateList != null) {
-                                view.setTextColor(colorStateList)
-                            }
+                        defaultTextViewColors[context.resources.getResourceEntryName(view.id)] =
+                            view.textColors
+                    }
+                }
+            }
+
+            holder.itemView.allViews.forEach { view ->
+                if (view is MaterialTextView) {
+                    if (selectionTracker.isSelected(item.id)) {
+                        view.setTextColor(context.themeColor(R.attr.colorOnSecondary))
+                    } else {
+                        val colorStateList = defaultTextViewColors[
+                                context.resources.getResourceEntryName(view.id)]
+                        if (colorStateList != null) {
+                            view.setTextColor(colorStateList)
                         }
                     }
                 }

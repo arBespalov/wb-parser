@@ -21,8 +21,8 @@ android {
         applicationId = "com.automotivecodelab.wbgoodstracker"
         minSdk = 21
         targetSdk = 31
-        versionCode = 2
-        versionName = "1.01"
+        versionCode = 3
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField(
             "String", "SERVER_URL",

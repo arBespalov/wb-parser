@@ -2,12 +2,12 @@ package com.automotivecodelab.wbgoodstracker.ui.grouppickerfrag
 
 import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
-import com.automotivecodelab.wbgoodstracker.domain.GetGroupsUseCase
+import com.automotivecodelab.wbgoodstracker.domain.ObserveGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
 
 class GroupPickerDialogViewModel(
-    getGroupsUseCase: GetGroupsUseCase,
+    observeGroupsUseCase: ObserveGroupsUseCase,
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase
 ) : ViewModel() {
 
@@ -17,7 +17,7 @@ class GroupPickerDialogViewModel(
     private val _newGroupEvent = MutableLiveData<Event<Unit>>()
     val newGroupEvent: LiveData<Event<Unit>> = _newGroupEvent
 
-    val groups: LiveData<List<String>> = getGroupsUseCase().asLiveData()
+    val groups: LiveData<List<String>> = observeGroupsUseCase().asLiveData()
 
     fun setGroupToItems(itemsId: List<String>, group: String?) {
         viewModelScope.launch {
