@@ -18,7 +18,6 @@ import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.databinding.RecyclerviewItemBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.httpToHttps
-import com.automotivecodelab.wbgoodstracker.log
 import com.automotivecodelab.wbgoodstracker.themeColor
 import com.google.android.material.textview.MaterialTextView
 import com.squareup.picasso.Picasso

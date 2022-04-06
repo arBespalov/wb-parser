@@ -20,12 +20,14 @@ import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.SignInFragmentBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
+import timber.log.Timber
 
 class SignInFragment : Fragment() {
 
@@ -37,12 +39,12 @@ class SignInFragment : Fragment() {
                 val user = User(credential.googleIdToken!!, email = null)
                 viewModel.signIn(user)
             } catch (e: ApiException) {
-                log(e.message.toString())
+                Timber.d(e.message.toString())
             }
         }
     }
     private val viewModel: SignInViewModel by viewModels {
-        SignInViewModelFactory(getItemsRepository(), getUserRepository())
+        ViewModelFactory(requireContext().appComponent.signInViewModel())
     }
     private var viewDataBinding: SignInFragmentBinding? = null
     private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
@@ -160,11 +162,11 @@ class SignInFragment : Fragment() {
                     getUserCredentials.launch(IntentSenderRequest.Builder(
                         result.pendingIntent.intentSender).build())
                 } catch (e: IntentSender.SendIntentException) {
-                    log("Couldn't start One Tap UI: ${e.message}")
+                    Timber.d("Couldn't start One Tap UI: ${e.message}")
                 }
             }
             .addOnFailureListener { e ->
-                log(e.message.toString())
+                Timber.d(e.message.toString())
                 if (!signUp) beginAuthenticationFlow(signUp = true)
             }
     }

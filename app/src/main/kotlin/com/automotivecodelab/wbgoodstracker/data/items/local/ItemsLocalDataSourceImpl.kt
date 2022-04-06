@@ -1,19 +1,17 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
-import android.content.SharedPreferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.lifecycle.LiveData
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ItemsLocalDataSourceImpl(
+class ItemsLocalDataSourceImpl @Inject constructor(
     private val itemDao: ItemDao,
     private val sizeDao: SizeDao,
     private val dataStore: DataStore<Preferences>

@@ -7,8 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddItemViewModel(
+class AddItemViewModel @Inject constructor(
     private val addItemUseCase: AddItemUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {

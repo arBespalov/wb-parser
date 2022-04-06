@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.ChartFragmentBinding
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -28,7 +28,9 @@ import java.util.*
 class ChartFragment : Fragment() {
     private val args: ChartFragmentArgs by navArgs()
     private val viewModel: ChartViewModel by viewModels {
-        ChartViewModelFactory(getItemsRepository(), args.itemId)
+        ViewModelFactory(
+            requireContext().appComponent.chartViewModelFactory().create(args.itemId)
+        )
     }
     private var viewDataBinding: ChartFragmentBinding? = null
 

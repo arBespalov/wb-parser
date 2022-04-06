@@ -5,12 +5,14 @@ import com.automotivecodelab.wbgoodstracker.domain.EditItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
-class EditItemViewModel(
+class EditItemViewModel @AssistedInject constructor(
     observeSingleItemUseCase: ObserveSingleItemUseCase,
     observeGroupsUseCase: ObserveGroupsUseCase,
-    itemId: String,
+    @Assisted itemId: String,
     private val editItemUseCase: EditItemUseCase,
 ) : ViewModel() {
     val item = observeSingleItemUseCase(itemId).asLiveData()

@@ -11,12 +11,13 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import com.automotivecodelab.wbgoodstracker.log
 import kotlinx.coroutines.*
 import java.util.*
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
+import javax.inject.Inject
 
-class ItemsRepositoryImpl(
+class ItemsRepositoryImpl @Inject constructor(
     private val localDataSource: ItemsLocalDataSource,
     private val remoteDataSource: ItemsRemoteDataSource,
 ) : ItemsRepository {
@@ -150,8 +151,8 @@ class ItemsRepositoryImpl(
                 val itemIdsToAdd = serverItemIds.minus(localItemIds)
                 val itemIdsToUpdate = serverItemIds.minus(itemIdsToAdd).minus(itemIdsToDelete)
 
-                log("items to delete: ${itemIdsToDelete.size}")
-                log("items to add: ${itemIdsToAdd.size}")
+                Timber.d("items to delete: ${itemIdsToDelete.size}")
+                Timber.d("items to add: ${itemIdsToAdd.size}")
 
                 localDataSource.deleteItems(itemIdsToDelete.toTypedArray())
 
@@ -220,7 +221,7 @@ class ItemsRepositoryImpl(
             val mergedItemIds = mergedItems.map { remoteItem -> remoteItem._id }
             val itemIdsToAdd = mergedItemIds.minus(localItemIds)
             val itemIdsToUpdate = mergedItemIds.minus(itemIdsToAdd)
-            log("items to add: ${itemIdsToAdd.size}")
+            Timber.d("items to add: ${itemIdsToAdd.size}")
             itemIdsToAdd.forEach { id ->
                 val item = mergedItems.find { remoteItem -> remoteItem._id == id }!!
                 localDataSource.addItem(

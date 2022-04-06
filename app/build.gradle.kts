@@ -95,7 +95,7 @@ dependencies {
     // ===dagger===
     val daggerVersion = "2.41"
     implementation("com.google.dagger:dagger:$daggerVersion")
-    annotationProcessor("com.google.dagger:dagger-compiler:$daggerVersion")
+    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
 
     // ===testing===
     testImplementation("junit:junit:4.13.2")

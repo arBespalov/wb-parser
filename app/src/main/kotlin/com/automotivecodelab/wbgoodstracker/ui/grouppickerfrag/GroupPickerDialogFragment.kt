@@ -8,9 +8,10 @@ import android.widget.ListView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.getItemsRepository
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.navigate
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,7 +20,7 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
 
     private val args: GroupPickerDialogFragmentArgs by navArgs()
     private val viewModel: GroupPickerDialogViewModel by viewModels {
-        GroupPickerDialogViewModelFactory(getItemsRepository())
+        ViewModelFactory(requireContext().appComponent.groupPickerDialogViewModel())
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

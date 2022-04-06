@@ -4,8 +4,9 @@ import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import java.lang.Exception
+import javax.inject.Inject
 
-class AddItemUseCase(
+class AddItemUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository,
     private val userRepository: UserRepository
 ) {

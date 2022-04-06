@@ -7,19 +7,17 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
-import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.R
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), KeyboardToggle {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appThemeSource = (application as MyApplication).appContainer.appThemeSource
+        val appThemeSource = application.appComponent.appThemeSource()
         runBlocking {
             appThemeSource.saveAndSetupAppTheme(appThemeSource.getAppTheme())
         }

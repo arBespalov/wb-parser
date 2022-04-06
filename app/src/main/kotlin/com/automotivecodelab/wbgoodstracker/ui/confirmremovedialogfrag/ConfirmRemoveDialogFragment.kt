@@ -8,9 +8,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.getItemsRepository
-import com.automotivecodelab.wbgoodstracker.getUserRepository
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,7 +19,7 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
 
     private val args: ConfirmRemoveDialogFragmentArgs by navArgs()
     private val viewModel: ConfirmRemoveDialogViewModel by viewModels {
-        ConfirmRemoveDialogViewModelFactory(getItemsRepository(), getUserRepository())
+        ViewModelFactory(requireContext().appComponent.confirmRemoveDialogViewModel())
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

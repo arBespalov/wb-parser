@@ -8,8 +8,11 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class SortRepositoryImpl(private val localDataSource: SortLocalDataSource): SortRepository {
+class SortRepositoryImpl @Inject constructor(
+    private val localDataSource: SortLocalDataSource
+): SortRepository {
     override fun getSortingModeComparator(): Flow<Comparator<Item>> {
         return localDataSource.getSortingMode()
             .map { sortingMode ->

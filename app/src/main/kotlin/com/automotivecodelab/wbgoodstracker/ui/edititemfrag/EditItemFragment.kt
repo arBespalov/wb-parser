@@ -16,16 +16,19 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.R
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.databinding.EditItemFragmentBinding
-import com.automotivecodelab.wbgoodstracker.getItemsRepository
 import com.automotivecodelab.wbgoodstracker.navigate
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.transition.MaterialSharedAxis
 
 class EditItemFragment : Fragment() {
 
     private val viewModel: EditItemViewModel by viewModels {
-        EditItemViewModelFactory(args.itemId, getItemsRepository())
+        ViewModelFactory(
+            requireContext().appComponent.editItemViewModelFactory().create(args.itemId)
+        )
     }
     private val args: EditItemFragmentArgs by navArgs()
     private var viewDataBinding: EditItemFragmentBinding? = null

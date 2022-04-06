@@ -15,9 +15,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.MyApplication
-import com.automotivecodelab.wbgoodstracker.PREFS_NAME
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.SAVED_UI_MODE
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.databinding.ThemeSelectorFragmentBinding
 import com.automotivecodelab.wbgoodstracker.ui.AppTheme
 import com.google.android.material.transition.MaterialSharedAxis
@@ -54,7 +53,7 @@ class ThemeSelectorFragment : Fragment() {
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         val cancelButton = ResourcesCompat
             .getDrawable(resources, R.drawable.ic_baseline_close_24, requireActivity().theme)
-        val appThemeSource = (requireActivity().application as MyApplication).appContainer.appThemeSource
+        val appThemeSource = requireContext().appComponent.appThemeSource()
         val currentTheme = runBlocking { appThemeSource.getAppTheme() }
         viewDataBinding?.apply {
             toolbar.setupWithNavController(navController, appBarConfiguration)

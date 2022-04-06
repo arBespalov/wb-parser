@@ -8,13 +8,16 @@ import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface SortLocalDataSource {
     fun getSortingMode(): Flow<SortingMode>
     suspend fun setSortingMode(sortingMode: SortingMode)
 }
 
-class SortLocalDataSourceImpl(private val dataStore: DataStore<Preferences>) : SortLocalDataSource {
+class SortLocalDataSourceImpl @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) : SortLocalDataSource {
     private val SAVED_SORTING_MODE = intPreferencesKey("savedSortingMode")
 
     override fun getSortingMode(): Flow<SortingMode> {

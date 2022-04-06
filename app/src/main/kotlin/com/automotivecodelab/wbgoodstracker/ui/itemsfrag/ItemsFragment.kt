@@ -24,7 +24,7 @@ import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.ItemsFragmentBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
-import com.automotivecodelab.wbgoodstracker.ui.SignOutSnackbar
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
@@ -33,7 +33,7 @@ import com.google.android.material.transition.MaterialSharedAxis
 class ItemsFragment : Fragment() {
 
     private val viewModel: ItemsViewModel by viewModels {
-        ItemsViewModelFactory(getItemsRepository(), getUserRepository(), getSortRepository())
+        ViewModelFactory(requireContext().appComponent.itemsViewModel())
     }
 
     // references to views
@@ -87,7 +87,7 @@ class ItemsFragment : Fragment() {
             viewDataBinding?.swipeRefresh?.isRefreshing = it
         }
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
+            requireView().signOutSnackbar { viewModel.signOut() }
         })
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (items, _) ->
             adapter?.replaceAll(items)

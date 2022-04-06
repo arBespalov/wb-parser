@@ -11,9 +11,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.getItemsRepository
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.KeyboardToggle
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -21,7 +22,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class NewGroupDialogFragment : BottomSheetDialogFragment() {
 
     private val viewModel: NewGroupDialogViewModel by viewModels {
-        NewGroupDialogViewModelFactory(getItemsRepository())
+        ViewModelFactory(requireContext().appComponent.newGroupDialogViewModel())
     }
     private val args: NewGroupDialogFragmentArgs by navArgs()
 

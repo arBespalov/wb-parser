@@ -5,14 +5,16 @@ import com.automotivecodelab.wbgoodstracker.domain.ObserveSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.RefreshSingleItemUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onErrorResume
 
-class DetailViewModel(
+class DetailViewModel @AssistedInject constructor(
     private val refreshSingleItemUseCase: RefreshSingleItemUseCase,
     observeSingleItemUseCase: ObserveSingleItemUseCase,
-    private val itemId: String
+    @Assisted private val itemId: String
 ) : ViewModel() {
     val item: LiveData<Item> = observeSingleItemUseCase(itemId)
         .catch { _closeScreenEvent.value = Event(Unit) }

@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import java.util.*
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -14,8 +15,9 @@ interface AuthenticationService {
     suspend fun signIn(): User
 }
 
-class AuthenticationServiceImpl(val context: Context) : AuthenticationService {
-
+class AuthenticationServiceImpl @Inject constructor(
+    val context: Context
+) : AuthenticationService {
     override suspend fun signIn(): User {
         val gso = GoogleSignInOptions.Builder()
             .requestIdToken(BuildConfig.SERVER_CLIENT_ID)

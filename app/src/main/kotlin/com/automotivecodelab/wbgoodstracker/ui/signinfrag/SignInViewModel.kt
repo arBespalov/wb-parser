@@ -10,10 +10,11 @@ import com.automotivecodelab.wbgoodstracker.domain.SignOutUseCase
 import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SignInViewModel(
+class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
-    private val getUserUseCase: GetUserUseCase,
+    getUserUseCase: GetUserUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
@@ -30,11 +31,7 @@ class SignInViewModel(
                     _viewState.value = SignInViewState.SignedOutState
                 }
                 .onSuccess { user ->
-                    if (user != null) {
-                        _viewState.value = SignInViewState.SignedInState(user.email)
-                    } else {
-                        _viewState.value = SignInViewState.SignedOutState
-                    }
+                    _viewState.value = SignInViewState.SignedInState(user.email)
                 }
         }
     }

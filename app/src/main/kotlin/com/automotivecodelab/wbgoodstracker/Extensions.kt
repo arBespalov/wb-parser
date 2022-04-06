@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.util.Log
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.res.use
@@ -15,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
+import com.google.android.material.snackbar.Snackbar
 import kotlin.math.ceil
 
 fun String.httpToHttps(): String {
@@ -25,24 +27,8 @@ fun String.httpToHttps(): String {
     }
 }
 
-fun log(text: String) {
-    Log.d("happy", text)
-}
-
 fun Long.millisToDays(): Int {
     return ceil((toDouble() / (24 * 60 * 60 * 1000))).toInt()
-}
-
-fun Fragment.getItemsRepository(): ItemsRepository {
-    return (requireActivity().application as MyApplication).appContainer.itemsRepository
-}
-
-fun Fragment.getUserRepository(): UserRepository {
-    return (requireActivity().application as MyApplication).appContainer.userRepository
-}
-
-fun Fragment.getSortRepository(): SortRepository {
-    return (requireActivity().application as MyApplication).appContainer.sortRepository
 }
 
 // avoiding duplicate navigation to prevent crashes when click 2 views simultaneously
@@ -88,4 +74,10 @@ fun Context.themeColor(
     ).use {
         it.getColor(0, Color.MAGENTA)
     }
+}
+
+fun View.signOutSnackbar(onSignOutButtonClick: () -> Unit) {
+    val snackbar = Snackbar.make(this, R.string.snackbar_sign_out_text, Snackbar.LENGTH_LONG)
+    snackbar.setAction(R.string.sign_out) { onSignOutButtonClick() }
+    snackbar.show()
 }

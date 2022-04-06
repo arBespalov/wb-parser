@@ -5,8 +5,9 @@ import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GroupPickerDialogViewModel(
+class GroupPickerDialogViewModel @Inject constructor(
     observeGroupsUseCase: ObserveGroupsUseCase,
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase
 ) : ViewModel() {

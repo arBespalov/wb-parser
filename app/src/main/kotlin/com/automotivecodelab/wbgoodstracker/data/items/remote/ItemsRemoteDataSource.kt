@@ -1,6 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.data.items.remote
 
 import java.io.IOException
+import javax.inject.Inject
 
 interface ItemsRemoteDataSource {
     suspend fun addItem(url: String, idToken: String?): ItemRemoteModel
@@ -11,7 +12,9 @@ interface ItemsRemoteDataSource {
     suspend fun getItemWithFullData(itemId: String): ItemRemoteModel
 }
 
-class ItemsRemoteDataSourceImpl(private val api: ServerApi): ItemsRemoteDataSource {
+class ItemsRemoteDataSourceImpl @Inject constructor(
+    private val api: ServerApi
+): ItemsRemoteDataSource {
     override suspend fun addItem(url: String, idToken: String?): ItemRemoteModel {
         return api.addItem(url, idToken)
     }

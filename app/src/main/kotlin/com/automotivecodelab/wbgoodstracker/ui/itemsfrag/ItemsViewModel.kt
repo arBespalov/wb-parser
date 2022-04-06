@@ -10,8 +10,9 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.Comparator
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ItemsViewModel(
+class ItemsViewModel @Inject constructor(
     observeItemsByGroupUseCase: ObserveItemsWithGroupUseCase,
     observeUserSortingModeComparatorUseCase: ObserveUserSortingModeComparatorUseCase,
     private val setSortingModeUseCase: SetSortingModeUseCase,

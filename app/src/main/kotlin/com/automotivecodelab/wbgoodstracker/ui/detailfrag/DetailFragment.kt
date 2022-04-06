@@ -18,6 +18,7 @@ import com.automotivecodelab.wbgoodstracker.databinding.CardSizeLayoutBinding
 import com.automotivecodelab.wbgoodstracker.databinding.DetailFragmentBinding
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialSharedAxis
@@ -29,7 +30,9 @@ class DetailFragment : Fragment() {
 
     private val args: DetailFragmentArgs by navArgs()
     private val viewModel: DetailViewModel by viewModels {
-        DetailViewModelFactory(getItemsRepository(), args.itemid)
+        ViewModelFactory(
+            requireContext().appComponent.detailViewModelFactory().create(args.itemid)
+        )
     }
     private var viewDataBinding: DetailFragmentBinding? = null
 

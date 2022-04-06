@@ -6,18 +6,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.automotivecodelab.wbgoodstracker.dataStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 enum class AppTheme {
     LIGHT, DARK, AUTO;
 }
 
-class AppThemeSource(private val dataStore: DataStore<Preferences>) {
+class AppThemeSource @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) {
     private val THEME_KEY = stringPreferencesKey("theme")
 
     suspend fun getAppTheme(): AppTheme = dataStore.data

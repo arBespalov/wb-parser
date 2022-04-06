@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.getItemsRepository
-import com.automotivecodelab.wbgoodstracker.navigate
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -19,7 +18,7 @@ class ConfirmDeleteGroupDialogFragment : BottomSheetDialogFragment() {
 
     private val args: ConfirmDeleteGroupDialogFragmentArgs by navArgs()
     private val viewModel: ConfirmDeleteGroupDialogViewModel by viewModels {
-        ConfirmDeleteGroupDialogViewModelFactory(getItemsRepository())
+        ViewModelFactory(requireContext().appComponent.confirmDeleteGroupDialogViewModel())
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

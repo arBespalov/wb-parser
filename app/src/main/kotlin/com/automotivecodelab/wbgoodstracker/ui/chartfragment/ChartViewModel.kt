@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.GetOrdersChartDataUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
-class ChartViewModel(
+class ChartViewModel @AssistedInject constructor(
     getOrdersChartDataUseCase: GetOrdersChartDataUseCase,
-    itemId: String
+    @Assisted itemId: String
 ) : ViewModel() {
 
     private val _chartData = MutableLiveData<List<Pair<Long, Int>>>()

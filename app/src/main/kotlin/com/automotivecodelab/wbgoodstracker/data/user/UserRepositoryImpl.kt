@@ -8,9 +8,10 @@ import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 
-class UserRepositoryImpl(
+class UserRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val authenticationService: AuthenticationService
 ) : UserRepository {
@@ -25,6 +26,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun setUserAuthenticated(isAuthenticated: Boolean) {
+        // todo migration
         dataStore.edit { prefs ->
             prefs[IS_USER_AUTHENTICATED] = isAuthenticated
         }

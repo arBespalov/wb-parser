@@ -1,6 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.ui.additemfrag
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
@@ -18,13 +16,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.AddItemFragmentBinding
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
-import com.automotivecodelab.wbgoodstracker.ui.SignOutSnackbar
+import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.transition.MaterialContainerTransform
 
 class AddItemFragment : Fragment() {
 
     private val viewModel: AddItemViewModel by viewModels {
-        AddItemViewModelFactory(getItemsRepository(), getUserRepository())
+        ViewModelFactory(requireContext().appComponent.addItemViewModel())
     }
     private var viewDataBinding: AddItemFragmentBinding? = null
     private val args: AddItemFragmentArgs by navArgs()
@@ -97,7 +95,7 @@ class AddItemFragment : Fragment() {
 
         }
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-                SignOutSnackbar().invoke(requireView()) { viewModel.signOut() }
+                requireView().signOutSnackbar { viewModel.signOut() }
             }
         )
         setupNavigation()
