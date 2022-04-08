@@ -230,7 +230,7 @@ class ItemsFragment : Fragment() {
                     setItemTouchHelperEnabled(false)
                     adapter?.tracker?.setItemsSelected(selectedItemsSet, true)
                 }
-                actionMode?.title = getString(R.string.selected) + selectedItemsSet.size
+                actionMode?.title = getString(R.string.selected) + ": " + selectedItemsSet.size
                 actionMode?.menu?.findItem(R.id.menu_edit)?.isEnabled =
                     selectedItemsSet.size == 1
             }
