@@ -2,6 +2,7 @@ package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
 import android.graphics.Canvas
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -124,6 +125,7 @@ class ItemsFragment : Fragment() {
                                 requireContext(),
                                 requireView().findViewById(item.itemId)
                             )
+                            popup.setForceShowIcon(true)
                             popup.menuInflater.inflate(R.menu.popup_sort_menu, popup.menu)
                             val sortingModeToMenuItemMap = mapOf(
                                 R.id.by_name_asc to SortingMode.BY_NAME_ASC,
@@ -140,6 +142,25 @@ class ItemsFragment : Fragment() {
                                 }
                                 scrollToStartOnUpdate = true
                                 return@setOnMenuItemClickListener true
+                            }
+
+                            viewModel.currentSortingModeWithItemsComparator
+                                .observe(viewLifecycleOwner) { (currentSortingMode, _) ->
+                                popup.menu.forEach { menuItem ->
+                                    val iconId = if (sortingModeToMenuItemMap[menuItem.itemId] ==
+                                        currentSortingMode)
+                                        R.drawable.ic_baseline_radio_button_checked_24
+                                    else
+                                        R.drawable.ic_baseline_radio_button_unchecked_24
+                                    val icon = getDrawable(
+                                        requireContext().resources,
+                                        iconId,
+                                        null
+                                    )
+                                    icon?.setTint(
+                                        requireContext().themeColor(R.attr.colorOnSurface))
+                                    menuItem.icon = icon
+                                }
                             }
                             popup.show()
                             true
@@ -290,7 +311,9 @@ class ItemsFragment : Fragment() {
         setupActionMode()
         setItemTouchHelperEnabled(true)
 
-        viewModel.itemsComparator.observe(viewLifecycleOwner) { comparator ->
+        viewModel.currentSortingModeWithItemsComparator.observe(
+            viewLifecycleOwner
+        ) { (_, comparator) ->
             adapter?.setItemsComparator(comparator)
             if (scrollToStartOnUpdate) {
                 viewDataBinding?.recyclerViewItems?.scrollToPosition(0)

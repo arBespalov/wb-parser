@@ -13,7 +13,8 @@ import javax.inject.Inject
 class SortRepositoryImpl @Inject constructor(
     private val localDataSource: SortLocalDataSource
 ): SortRepository {
-    override fun getSortingModeComparator(): Flow<Comparator<Item>> {
+    override fun observeSortingModeWithComparator():
+            Flow<Pair<SortingMode, Comparator<Item>>> {
         return localDataSource.getSortingMode()
             .map { sortingMode ->
                 val comp = Comparator<Item> { o1, o2 ->
@@ -32,11 +33,10 @@ class SortRepositoryImpl @Inject constructor(
                             o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
                     }
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                sortingMode to if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     comp.thenComparing(Item::id)
-                } else {
+                else
                     comp
-                }
             }
     }
 

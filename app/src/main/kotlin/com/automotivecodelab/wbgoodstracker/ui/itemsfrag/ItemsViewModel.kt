@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 class ItemsViewModel @Inject constructor(
     observeItemsByGroupUseCase: ObserveItemsWithGroupUseCase,
-    observeUserSortingModeComparatorUseCase: ObserveUserSortingModeComparatorUseCase,
+    observeSortingModeWithComparatorUseCase: ObserveSortingModeWithComparatorUseCase,
     private val setSortingModeUseCase: SetSortingModeUseCase,
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
     observeGroupsUseCase: ObserveGroupsUseCase,
@@ -25,8 +25,8 @@ class ItemsViewModel @Inject constructor(
 
     val groups: LiveData<List<String>> = observeGroupsUseCase().asLiveData()
 
-    val itemsComparator: LiveData<Comparator<Item>> = observeUserSortingModeComparatorUseCase()
-        .asLiveData()
+    val currentSortingModeWithItemsComparator: LiveData<Pair<SortingMode, Comparator<Item>>> =
+        observeSortingModeWithComparatorUseCase().asLiveData()
 
     private val searchQuery = MutableStateFlow("")
 

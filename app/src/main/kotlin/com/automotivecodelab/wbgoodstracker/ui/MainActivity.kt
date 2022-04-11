@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.R
+import com.automotivecodelab.wbgoodstracker.themeColor
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), KeyboardToggle {

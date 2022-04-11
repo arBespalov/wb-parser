@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import java.util.Comparator
 
 interface SortRepository {
-    fun getSortingModeComparator(): Flow<Comparator<Item>>
+    fun observeSortingModeWithComparator(): Flow<Pair<SortingMode, Comparator<Item>>>
     suspend fun setSortingMode(sortingMode: SortingMode)
 }
