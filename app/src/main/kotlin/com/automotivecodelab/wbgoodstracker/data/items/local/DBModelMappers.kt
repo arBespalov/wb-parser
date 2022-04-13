@@ -27,6 +27,7 @@ fun ItemWithSizesDBModel.toDomainModel() = Item(
         Size(
             sizeName = it.sizeName,
             quantity = it.quantity,
+            quantityDelta = it.quantityDelta,
             price = it.price,
             priceWithSale = it.priceWithSale,
             storesWithQuantity = it.storesWithQuantity
@@ -61,6 +62,7 @@ fun Item.toDBModel() = ItemWithSizesDBModel(
             itemId = id,
             sizeName = it.sizeName,
             quantity = it.quantity,
+            quantityDelta = it.quantityDelta,
             price = it.price,
             priceWithSale = it.priceWithSale,
             storesWithQuantity = it.storesWithQuantity

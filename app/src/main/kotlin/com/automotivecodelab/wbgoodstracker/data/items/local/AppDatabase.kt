@@ -98,6 +98,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "itemId TEXT NOT NULL, " +
                 "sizeName TEXT NOT NULL, " +
                 "quantity INTEGER NOT NULL, " +
+                "quantityDelta INTEGER NOT NULL, " +
                 "price INTEGER NOT NULL, " +
                 "priceWithSale INTEGER NOT NULL, " +
                 "storesWithQuantity TEXT, " +

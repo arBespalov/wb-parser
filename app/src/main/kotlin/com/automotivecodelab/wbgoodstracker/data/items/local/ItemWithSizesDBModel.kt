@@ -42,6 +42,7 @@ data class SizeDBModel(
     val itemId: String,
     val sizeName: String,
     val quantity: Int,
+    val quantityDelta: Int,
     val price: Int,
     val priceWithSale: Int,
     val storesWithQuantity: String?

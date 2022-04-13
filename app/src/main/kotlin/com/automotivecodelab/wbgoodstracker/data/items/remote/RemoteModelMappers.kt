@@ -12,10 +12,9 @@ fun ItemRemoteModel.toDBModel(
     previousTotalQuantity: Int,
     localName: String?,
     groupName: String?,
-    previousLastTotalQuantityDeltaUpdateTimestamp: Long
+    previousLastTotalQuantityDeltaUpdateTimestamp: Long,
+    previousSizeQuantity: Map<String, Int>? // sizeName, quantity
 ): ItemWithSizesDBModel {
-    val ordersCountDelta = info[0].ordersCount - previousOrdersCount
-    val averagePriceDelta = averagePrice - previousAveragePrice
     val totalQuantityDelta = totalQuantity - previousTotalQuantity
     return ItemWithSizesDBModel(
         item = ItemDBModel(
@@ -30,9 +29,9 @@ fun ItemRemoteModel.toDBModel(
             averagePrice = averagePrice,
             totalQuantity = totalQuantity,
             creationTimestamp = creationTimestamp,
-            ordersCountDelta = ordersCountDelta,
+            ordersCountDelta = info[0].ordersCount - previousOrdersCount,
             localName = localName,
-            averagePriceDelta = averagePriceDelta,
+            averagePriceDelta = averagePrice - previousAveragePrice,
             groupName = groupName,
             totalQuantityDelta = totalQuantityDelta,
             lastTotalQuantityDeltaUpdateTimestamp = if (totalQuantityDelta == 0)
@@ -45,6 +44,8 @@ fun ItemRemoteModel.toDBModel(
                 itemId = _id,
                 sizeName = it.sizeName,
                 quantity = it.quantity,
+                quantityDelta =
+                    it.quantity - (previousSizeQuantity?.get(it.sizeName) ?: it.quantity),
                 price = it.price,
                 priceWithSale = it.priceWithSale,
                 storesWithQuantity = it.storeIds?.joinToString(", ")

@@ -26,6 +26,7 @@ data class Item(
 data class Size(
     val sizeName: String,
     val quantity: Int,
+    val quantityDelta: Int,
     val price: Int,
     val priceWithSale: Int,
     val storesWithQuantity: String?

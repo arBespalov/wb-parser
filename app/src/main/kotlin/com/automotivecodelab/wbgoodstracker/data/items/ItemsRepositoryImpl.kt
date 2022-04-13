@@ -109,7 +109,10 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = dbModel.item.localName,
                         groupName = dbModel.item.groupName,
                         previousLastTotalQuantityDeltaUpdateTimestamp =
-                            dbModel.item.lastTotalQuantityDeltaUpdateTimestamp
+                            dbModel.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
+                            sizeDBModel.sizeName to sizeDBModel.quantity
+                        }
                     ))
                     return@withContext
                 }
@@ -122,7 +125,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = newItem.totalQuantity,
                         localName = null,
                         groupName = currentGroup,
-                        previousLastTotalQuantityDeltaUpdateTimestamp = 0
+                        previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                        previousSizeQuantity = null
                     )
                 )
             }
@@ -170,7 +174,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             previousTotalQuantity = item.totalQuantity,
                             localName = null,
                             groupName = null,
-                            previousLastTotalQuantityDeltaUpdateTimestamp = 0
+                            previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                            previousSizeQuantity = null
                         )
                     )
                 }
@@ -187,7 +192,10 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = localItem.item.localName,
                         groupName = localItem.item.groupName,
                         previousLastTotalQuantityDeltaUpdateTimestamp =
-                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp
+                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                            sizeDBModel.sizeName to sizeDBModel.quantity
+                        }
                     )
                 }.also {
                     localDataSource.updateItem(*it.toTypedArray())
@@ -210,7 +218,10 @@ class ItemsRepositoryImpl @Inject constructor(
                     localName = localItem.localName,
                     groupName = localItem.groupName,
                     previousLastTotalQuantityDeltaUpdateTimestamp =
-                        localItem.lastTotalQuantityDeltaUpdateTimestamp
+                        localItem.lastTotalQuantityDeltaUpdateTimestamp,
+                    previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                        sizeDBModel.sizeName to sizeDBModel.quantity
+                    }
                 )
             }.also {
                 localDataSource.updateItem(*it.toTypedArray())
@@ -240,7 +251,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = item.totalQuantity,
                         localName = null,
                         groupName = null,
-                        previousLastTotalQuantityDeltaUpdateTimestamp = 0
+                        previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                        previousSizeQuantity = null
                     )
                 )
             }
@@ -255,7 +267,10 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = localItem.item.localName,
                         groupName = localItem.item.groupName,
                         previousLastTotalQuantityDeltaUpdateTimestamp =
-                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp
+                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                            sizeDBModel.sizeName to sizeDBModel.quantity
+                        }
                     ))
                 }
             }
