@@ -10,7 +10,7 @@ class DeleteItemsUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(
-        itemsIdToDelete: Array<String>,
+        itemsIdToDelete: List<String>,
         onAuthenticationFailureCallback: () -> Unit = {}
     ) {
         if (userRepository.isUserAuthenticated()) {

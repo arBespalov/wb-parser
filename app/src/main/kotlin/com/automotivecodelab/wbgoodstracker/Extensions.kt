@@ -81,3 +81,9 @@ fun View.signOutSnackbar(onSignOutButtonClick: () -> Unit) {
     snackbar.setAction(R.string.sign_out) { onSignOutButtonClick() }
     snackbar.show()
 }
+
+fun Int.toStringWithSign() = when {
+    this > 0 -> "+$this"
+    this < 0 -> "$this"
+    else -> null
+}

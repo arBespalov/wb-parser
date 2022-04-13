@@ -2,13 +2,11 @@ package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat.getDrawable
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
@@ -115,81 +113,90 @@ class ItemsFragment : Fragment() {
                 findItem(R.id.menu_rename_group)?.isEnabled = isEnabled
             }
         }
-        viewDataBinding?.toolbar?.setOnMenuItemClickListener(
-            object : Toolbar.OnMenuItemClickListener {
-                override fun onMenuItemClick(item: MenuItem?): Boolean {
-                    return when (item?.itemId) {
-                        R.id.menu_search -> false
-                        R.id.menu_sort -> {
-                            val popup = PopupMenu(
-                                requireContext(),
-                                requireView().findViewById(item.itemId)
-                            )
-                            popup.setForceShowIcon(true)
-                            popup.menuInflater.inflate(R.menu.popup_sort_menu, popup.menu)
-                            val sortingModeToMenuItemMap = mapOf(
-                                R.id.by_name_asc to SortingMode.BY_NAME_ASC,
-                                R.id.by_name_desc to SortingMode.BY_NAME_DESC,
-                                R.id.by_date_asc to SortingMode.BY_DATE_ASC,
-                                R.id.by_date_desc to SortingMode.BY_DATE_DESC,
-                                R.id.by_orders_count_desc to SortingMode.BY_ORDERS_COUNT,
-                                R.id.by_orders_count_per_day_desc to
-                                        SortingMode.BY_ORDERS_COUNT_PER_DAY
-                            )
-                            popup.setOnMenuItemClickListener { menuItem ->
-                                sortingModeToMenuItemMap[menuItem.itemId]?.let { sortingMode ->
-                                    viewModel.setSortingMode(sortingMode)
-                                }
-                                scrollToStartOnUpdate = true
-                                return@setOnMenuItemClickListener true
-                            }
+        viewDataBinding?.toolbar?.setOnMenuItemClickListener { item ->
+            when (item?.itemId) {
+                R.id.menu_search -> false
+                R.id.menu_sort -> {
+                    showSortingPopupMenu(requireView().findViewById(R.id.menu_sort))
+                    true
+                }
+                R.id.menu_refresh -> {
+                    viewModel.updateItems()
+                    true
+                }
+                R.id.menu_delete_group -> {
+                    viewModel.deleteGroup()
+                    true
+                }
+                R.id.menu_backup -> {
+                    viewModel.signIn()
+                    true
+                }
+                R.id.menu_theme -> {
+                    viewModel.changeTheme()
+                    true
+                }
+                R.id.menu_rename_group -> {
+                    viewModel.renameGroup()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
 
-                            viewModel.currentSortingModeWithItemsComparator
-                                .observe(viewLifecycleOwner) { (currentSortingMode, _) ->
-                                popup.menu.forEach { menuItem ->
-                                    val iconId = if (sortingModeToMenuItemMap[menuItem.itemId] ==
-                                        currentSortingMode)
-                                        R.drawable.ic_baseline_radio_button_checked_24
-                                    else
-                                        R.drawable.ic_baseline_radio_button_unchecked_24
-                                    val icon = getDrawable(
-                                        requireContext().resources,
-                                        iconId,
-                                        null
-                                    )
-                                    icon?.setTint(
-                                        requireContext().themeColor(R.attr.colorOnSurface))
-                                    menuItem.icon = icon
-                                }
-                            }
-                            popup.show()
-                            true
-                        }
-                        R.id.menu_refresh -> {
-                            viewModel.updateItems()
-                            true
-                        }
-                        R.id.menu_delete_group -> {
-                            viewModel.deleteGroup()
-                            true
-                        }
-                        R.id.menu_backup -> {
-                            viewModel.signIn()
-                            true
-                        }
-                        R.id.menu_theme -> {
-                            viewModel.changeTheme()
-                            true
-                        }
-                        R.id.menu_rename_group -> {
-                            viewModel.renameGroup()
-                            true
-                        }
-                        else -> false
-                    }
+    private fun showSortingPopupMenu(anchor: View) {
+        val popup = PopupMenu(
+            requireContext(),
+            anchor
+        )
+        popup.setForceShowIcon(true)
+        SortingMode.values().forEachIndexed { index, sortingMode ->
+            val stringId = when (sortingMode) {
+                SortingMode.BY_NAME_ASC -> R.string.by_name_asc
+                SortingMode.BY_NAME_DESC -> R.string.by_name_desc
+                SortingMode.BY_DATE_ASC -> R.string.by_date_asc
+                SortingMode.BY_DATE_DESC -> R.string.by_date_desc
+                SortingMode.BY_ORDERS_COUNT -> R.string.by_orders_count
+                SortingMode.BY_ORDERS_COUNT_PER_DAY ->
+                    R.string.by_orders_count_per_day
+                SortingMode.BY_QUANTITY_DELTA -> R.string.by_quantity_delta
+            }
+            popup.menu.add(
+                0,
+                sortingMode.ordinal,
+                index,
+                getString(stringId)
+            )
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            viewModel.setSortingMode(SortingMode.values()[menuItem.itemId])
+            scrollToStartOnUpdate = true
+            true
+        }
+
+        viewModel.currentSortingModeWithItemsComparator
+            .observe(viewLifecycleOwner) { (currentSortingMode, _) ->
+                popup.menu.forEach { menuItem ->
+                    val iconId = if (SortingMode.values()[menuItem.itemId] ==
+                        currentSortingMode
+                    )
+                        R.drawable.ic_baseline_radio_button_checked_24
+                    else
+                        R.drawable.ic_baseline_radio_button_unchecked_24
+                    val icon = getDrawable(
+                        requireContext().resources,
+                        iconId,
+                        null
+                    )
+                    icon?.setTint(
+                        requireContext().themeColor(R.attr.colorOnSurface)
+                    )
+                    menuItem.icon = icon
                 }
             }
-        )
+        popup.show()
     }
 
     private fun setupActionMode() {

@@ -46,12 +46,13 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "averagePrice INTEGER NOT NULL, " +
                 "totalQuantity INTEGER NOT NULL, " +
                 "creationTimestamp INTEGER NOT NULL, " +
-                "ordersCountDelta TEXT, " +
+                "ordersCountDelta INTEGER NOT NULL DEFAULT 0, " +
                 "localName TEXT, " +
-                "averagePriceDelta TEXT, " +
+                "averagePriceDelta INTEGER NOT NULL DEFAULT 0, " +
                 "groupName TEXT, " +
-                "totalQuantityDelta TEXT, " +
+                "totalQuantityDelta INTEGER NOT NULL DEFAULT 0, " +
                 "lastUpdateTimestamp INTEGER NOT NULL DEFAULT 0, " +
+                "lastTotalQuantityDeltaUpdateTimestamp INTEGER NOT NULL DEFAULT 0," +
                 "ordersCount INTEGER NOT NULL DEFAULT 0, " +
                 "PRIMARY KEY (id))"
         )
@@ -73,6 +74,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "groupName) " +
                 //"totalQuantityDelta, " +
                 //"lastUpdateTimestamp, " +
+                //"lastTotalQuantityDeltaUpdateTimestamp, " +
                 //"ordersCount) " +
                 "SELECT " +
                 "_id, " +

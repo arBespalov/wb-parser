@@ -37,6 +37,7 @@ class ItemsRepositoryImpl @Inject constructor(
             .map {
                 it.map { itemDBModel -> itemDBModel.toDomainModel() } to _group
             }
+            .distinctUntilChanged()
     }
 
     override fun observeSingleItem(id: String): Flow<Item> {
@@ -44,18 +45,19 @@ class ItemsRepositoryImpl @Inject constructor(
             .map { dbModel ->
                 dbModel.toDomainModel()
             }
+            .distinctUntilChanged()
     }
 
-    override suspend fun deleteItems(itemsId: Array<String>) {
+    override suspend fun deleteItems(itemsId: List<String>) {
         deleteItemsWithNullableToken(itemsId, null)
     }
 
-    override suspend fun deleteItems(itemsId: Array<String>, token: String) {
+    override suspend fun deleteItems(itemsId: List<String>, token: String) {
         deleteItemsWithNullableToken(itemsId, token)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun deleteItemsWithNullableToken(itemsId: Array<String>, token: String?) {
+    private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         runCatching {
             val currentGroup = localDataSource.getCurrentGroup().first()
             if (currentGroup != null && localDataSource.getByGroup(currentGroup).size == 1) {
@@ -105,7 +107,9 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousAveragePrice = dbModel.item.averagePrice,
                         previousTotalQuantity = dbModel.item.totalQuantity,
                         localName = dbModel.item.localName,
-                        groupName = dbModel.item.groupName
+                        groupName = dbModel.item.groupName,
+                        previousLastTotalQuantityDeltaUpdateTimestamp =
+                            dbModel.item.lastTotalQuantityDeltaUpdateTimestamp
                     ))
                     return@withContext
                 }
@@ -117,7 +121,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousAveragePrice = newItem.averagePrice,
                         previousTotalQuantity = newItem.totalQuantity,
                         localName = null,
-                        groupName = currentGroup
+                        groupName = currentGroup,
+                        previousLastTotalQuantityDeltaUpdateTimestamp = 0
                     )
                 )
             }
@@ -134,7 +139,6 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    //todo test
     override suspend fun syncItems(token: String): Result<Unit> {
         return runCatching {
             withContext(Dispatchers.IO) {
@@ -154,7 +158,7 @@ class ItemsRepositoryImpl @Inject constructor(
                 Timber.d("items to delete: ${itemIdsToDelete.size}")
                 Timber.d("items to add: ${itemIdsToAdd.size}")
 
-                localDataSource.deleteItems(itemIdsToDelete.toTypedArray())
+                localDataSource.deleteItems(itemIdsToDelete)
 
                 itemIdsToAdd.forEach { id ->
                     val item = serverItems.find { remoteItem -> remoteItem._id == id }!!
@@ -165,7 +169,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             previousAveragePrice = item.averagePrice,
                             previousTotalQuantity = item.totalQuantity,
                             localName = null,
-                            groupName = null
+                            groupName = null,
+                            previousLastTotalQuantityDeltaUpdateTimestamp = 0
                         )
                     )
                 }
@@ -180,7 +185,9 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousAveragePrice = localItem.item.averagePrice,
                         previousTotalQuantity = localItem.item.totalQuantity,
                         localName = localItem.item.localName,
-                        groupName = localItem.item.groupName
+                        groupName = localItem.item.groupName,
+                        previousLastTotalQuantityDeltaUpdateTimestamp =
+                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp
                     )
                 }.also {
                     localDataSource.updateItem(*it.toTypedArray())
@@ -201,7 +208,9 @@ class ItemsRepositoryImpl @Inject constructor(
                     previousAveragePrice = localItem.averagePrice,
                     previousTotalQuantity = localItem.totalQuantity,
                     localName = localItem.localName,
-                    groupName = localItem.groupName
+                    groupName = localItem.groupName,
+                    previousLastTotalQuantityDeltaUpdateTimestamp =
+                        localItem.lastTotalQuantityDeltaUpdateTimestamp
                 )
             }.also {
                 localDataSource.updateItem(*it.toTypedArray())
@@ -209,7 +218,6 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    //todo test
     override suspend fun mergeItems(token: String): Result<Unit> {
         return runCatching {
             val localItems = localDataSource.getAll()
@@ -231,7 +239,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousAveragePrice = item.averagePrice,
                         previousTotalQuantity = item.totalQuantity,
                         localName = null,
-                        groupName = null
+                        groupName = null,
+                        previousLastTotalQuantityDeltaUpdateTimestamp = 0
                     )
                 )
             }
@@ -244,7 +253,9 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousAveragePrice = localItem.item.averagePrice,
                         previousTotalQuantity = localItem.item.totalQuantity,
                         localName = localItem.item.localName,
-                        groupName = localItem.item.groupName
+                        groupName = localItem.item.groupName,
+                        previousLastTotalQuantityDeltaUpdateTimestamp =
+                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp
                     ))
                 }
             }

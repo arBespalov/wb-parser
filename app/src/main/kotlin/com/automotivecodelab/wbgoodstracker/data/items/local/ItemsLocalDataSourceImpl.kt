@@ -49,7 +49,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
         return itemDao.observeById(id)
     }
 
-    override suspend fun deleteItems(itemsId: Array<String>) {
+    override suspend fun deleteItems(itemsId: List<String>) {
         withContext(Dispatchers.IO) {
             itemsId.map {
                 async {
@@ -108,7 +108,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
             .map { prefs ->
                 prefs[CURRENT_GROUP]
             }
-            //.distinctUntilChanged()
+            .distinctUntilChanged()
     }
 
     override suspend fun setCurrentGroup(groupName: String?) {
@@ -126,6 +126,6 @@ class ItemsLocalDataSourceImpl @Inject constructor(
             .map {
                 it.filterNotNull()
             }
-            //.distinctUntilChanged()
+            .distinctUntilChanged()
     }
 }

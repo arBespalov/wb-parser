@@ -98,7 +98,7 @@ class ItemsViewModel @Inject constructor(
 
     fun deleteSingleItem(itemId: String) {
         viewModelScope.launch {
-            deleteItemsUseCase(arrayOf(itemId))
+            deleteItemsUseCase(listOf(itemId))
         }
     }
 

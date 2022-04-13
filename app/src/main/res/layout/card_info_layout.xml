@@ -53,12 +53,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/default_margin"
-                android:text="@{delta ?? ``}"
+                android:text="@{delta}"
                 android:textColor="@color/red"
                 app:layout_constraintStart_toEndOf="@+id/count"
                 app:layout_constraintTop_toTopOf="@+id/count"
                 tools:text="+5"
-                android:textAppearance="@style/Body"/>
+                android:textAppearance="@style/Accent"/>
 
             <ImageView
                 android:layout_width="wrap_content"

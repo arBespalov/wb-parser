@@ -10,7 +10,6 @@ interface ServerApi {
         @Query("id_token") idToken: String?
     ): ItemRemoteModel
 
-    //todo test
     @POST("wbparserapi/delete_items")
     suspend fun deleteItems(
         @Body itemIds: List<Int>,
@@ -24,7 +23,6 @@ interface ServerApi {
     suspend fun getItemsForUserId(@Query("id_token") idToken: String)
     : List<ItemRemoteModel>
 
-    //todo test
     @POST("wbparserapi/merge_items")
     suspend fun mergeItems(
         @Body itemIds: List<Int>,

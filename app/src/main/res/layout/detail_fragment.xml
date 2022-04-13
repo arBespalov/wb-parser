@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="com.automotivecodelab.wbgoodstracker.ExtensionsKt"/>
         <variable
             name="viewmodel"
             type="com.automotivecodelab.wbgoodstracker.ui.detailfrag.DetailViewModel" />
@@ -91,7 +92,7 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/orders_count}"
                             bind:count="@{`` + viewmodel.item.ordersCount}"
-                            bind:delta="@{viewmodel.item.ordersCountDelta}"
+                            bind:delta="@{ExtensionsKt.toStringWithSign(viewmodel.item.ordersCountDelta) ?? ``}"
                             android:clickable="true"
                             android:focusable="true" />
                         <include
@@ -127,7 +128,7 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/price}"
                             bind:count="@{`` + viewmodel.item.averagePrice}"
-                            bind:delta="@{viewmodel.item.averagePriceDelta}"
+                            bind:delta="@{ExtensionsKt.toStringWithSign(viewmodel.item.averagePriceDelta) ?? ``}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -163,7 +164,7 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/quantity_in_warehouse}"
                             bind:count="@{`` + viewmodel.item.totalQuantity}"
-                            bind:delta="@{viewmodel.item.totalQuantityDelta}"
+                            bind:delta="@{ExtensionsKt.toStringWithSign(viewmodel.item.totalQuantityDelta) ?? ``}"
                             />
                         <include
                             android:layout_width="0dp"

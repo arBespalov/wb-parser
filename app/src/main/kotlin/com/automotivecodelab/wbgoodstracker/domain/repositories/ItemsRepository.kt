@@ -8,8 +8,8 @@ import java.util.Comparator
 interface ItemsRepository {
     fun observeItems(): Flow<Pair<List<Item>, String?>>
     fun observeSingleItem(id: String): Flow<Item>
-    suspend fun deleteItems(itemsId: Array<String>)
-    suspend fun deleteItems(itemsId: Array<String>, token: String)
+    suspend fun deleteItems(itemsId: List<String>)
+    suspend fun deleteItems(itemsId: List<String>, token: String)
     suspend fun updateItem(item: Item)
     suspend fun addItem(url: String): Result<Unit>
     suspend fun addItem(url: String, token: String): Result<Unit>

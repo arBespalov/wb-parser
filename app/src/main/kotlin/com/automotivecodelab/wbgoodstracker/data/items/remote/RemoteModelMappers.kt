@@ -3,6 +3,7 @@ package com.automotivecodelab.wbgoodstracker.data.items.remote
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.SizeDBModel
+import java.util.*
 
 fun ItemRemoteModel.toDBModel(
     creationTimestamp: Long,
@@ -10,30 +11,12 @@ fun ItemRemoteModel.toDBModel(
     previousAveragePrice: Int,
     previousTotalQuantity: Int,
     localName: String?,
-    groupName: String?
+    groupName: String?,
+    previousLastTotalQuantityDeltaUpdateTimestamp: Long
 ): ItemWithSizesDBModel {
-
     val ordersCountDelta = info[0].ordersCount - previousOrdersCount
-    val sOrdersCountDelta: String? = when {
-        ordersCountDelta < 0 -> "$ordersCountDelta"
-        ordersCountDelta > 0 -> "+$ordersCountDelta"
-        else -> null
-    }
-
     val averagePriceDelta = averagePrice - previousAveragePrice
-    val sAveragePriceDelta: String? = when {
-        averagePriceDelta < 0 -> "$averagePriceDelta"
-        averagePriceDelta > 0 -> "+$averagePriceDelta"
-        else -> null
-    }
-
     val totalQuantityDelta = totalQuantity - previousTotalQuantity
-    val sTotalQuantityDelta: String? = when {
-        totalQuantityDelta < 0 -> "$totalQuantityDelta"
-        totalQuantityDelta > 0 -> "+$totalQuantityDelta"
-        else -> null
-    }
-
     return ItemWithSizesDBModel(
         item = ItemDBModel(
             id = _id,
@@ -47,11 +30,13 @@ fun ItemRemoteModel.toDBModel(
             averagePrice = averagePrice,
             totalQuantity = totalQuantity,
             creationTimestamp = creationTimestamp,
-            ordersCountDelta = sOrdersCountDelta,
+            ordersCountDelta = ordersCountDelta,
             localName = localName,
-            averagePriceDelta = sAveragePriceDelta,
+            averagePriceDelta = averagePriceDelta,
             groupName = groupName,
-            totalQuantityDelta = sTotalQuantityDelta,
+            totalQuantityDelta = totalQuantityDelta,
+            lastTotalQuantityDeltaUpdateTimestamp = if (totalQuantityDelta == 0)
+                previousLastTotalQuantityDeltaUpdateTimestamp else Date().time,
             lastUpdateTimestamp = info[0].timeOfCreationInMs,
             ordersCount = info[0].ordersCount,
         ),

@@ -6,8 +6,10 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class SortRepositoryImpl @Inject constructor(
@@ -17,8 +19,8 @@ class SortRepositoryImpl @Inject constructor(
             Flow<Pair<SortingMode, Comparator<Item>>> {
         return localDataSource.getSortingMode()
             .map { sortingMode ->
-                val comp = Comparator<Item> { o1, o2 ->
-                    when (sortingMode) {
+                sortingMode to Comparator { o1, o2 ->
+                    val comp = when (sortingMode) {
                         SortingMode.BY_NAME_ASC ->
                             o1.name.compareTo(o2.name)
                         SortingMode.BY_NAME_DESC ->
@@ -31,12 +33,14 @@ class SortRepositoryImpl @Inject constructor(
                             o2.ordersCount.compareTo(o1.ordersCount)
                         SortingMode.BY_ORDERS_COUNT_PER_DAY ->
                             o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
+                        SortingMode.BY_QUANTITY_DELTA -> o2.lastTotalQuantityDeltaUpdateTimestamp
+                                .compareTo(o1.lastTotalQuantityDeltaUpdateTimestamp)
                     }
+                    if (comp == 0)
+                        o2.id.compareTo(o1.id)
+                    else
+                        comp
                 }
-                sortingMode to if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    comp.thenComparing(Item::id)
-                else
-                    comp
             }
     }
 

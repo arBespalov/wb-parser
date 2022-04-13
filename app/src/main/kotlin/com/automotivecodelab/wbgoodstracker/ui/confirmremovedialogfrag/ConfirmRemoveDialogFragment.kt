@@ -28,7 +28,7 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
 
         bottomSheetDialog.findViewById<Button>(R.id.cancel)?.setOnClickListener { dismiss() }
         bottomSheetDialog.findViewById<Button>(R.id.ok)?.setOnClickListener {
-            viewModel.deleteItems(args.itemsIdToDelete)
+            viewModel.deleteItems(args.itemsIdToDelete.toList())
         }
 
         bottomSheetDialog.findViewById<FrameLayout>(

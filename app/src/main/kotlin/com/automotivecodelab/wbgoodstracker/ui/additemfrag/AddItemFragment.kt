@@ -1,6 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.ui.additemfrag
 
 import android.os.Bundle
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,6 +28,7 @@ class AddItemFragment : Fragment() {
     private var viewDataBinding: AddItemFragmentBinding? = null
     private val args: AddItemFragmentArgs by navArgs()
     private var isArgsUrlHandled = false
+    private var urlTextChangedListener: TextWatcher? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +50,8 @@ class AddItemFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        viewDataBinding?.URL?.removeTextChangedListener(urlTextChangedListener)
+        urlTextChangedListener = null
         viewDataBinding = null
         super.onDestroyView()
     }
@@ -84,7 +88,7 @@ class AddItemFragment : Fragment() {
                 }
             }
             fabSave.isEnabled = false
-            URL.addTextChangedListener {
+            urlTextChangedListener = URL.addTextChangedListener {
                 fabSave.isEnabled = !it.isNullOrEmpty()
                 viewModel.handleTextInput(it.toString())
             }
@@ -92,7 +96,6 @@ class AddItemFragment : Fragment() {
                 args.url?.let { URL.setText(it) }
                 isArgsUrlHandled = true
             }
-
         }
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 requireView().signOutSnackbar { viewModel.signOut() }
@@ -107,7 +110,6 @@ class AddItemFragment : Fragment() {
                 findNavController().navigateUp()
             }
         )
-
         viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = AddItemFragmentDirections
                     .actionAddItemFragmentToErrorDialogFragment(it)

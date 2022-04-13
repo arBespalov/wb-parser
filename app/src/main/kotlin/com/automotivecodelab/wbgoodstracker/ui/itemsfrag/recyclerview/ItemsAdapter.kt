@@ -12,6 +12,7 @@ import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.automotivecodelab.wbgoodstracker.R
@@ -21,10 +22,11 @@ import com.automotivecodelab.wbgoodstracker.httpToHttps
 import com.automotivecodelab.wbgoodstracker.themeColor
 import com.google.android.material.textview.MaterialTextView
 import com.squareup.picasso.Picasso
+import timber.log.Timber
 
 class ItemsAdapter(
     private var comparator: Comparator<Item>?,
-    private val onOpenItemDetails: (recyclerItemPosition: Int) -> Unit
+    private val onOpenItemDetails: (recyclerItemPosition: Int) -> Unit,
 ) : RecyclerView.Adapter<ItemsAdapter.ItemViewHolder>() {
 
     private val ITEM_CONTENT_CHANGED_PAYLOAD = "itemContentChangedPayload"
@@ -49,7 +51,7 @@ class ItemsAdapter(
         tracker = null
     }
 
-    fun setItemsComparator(comparator: Comparator<Item>?) {
+    fun setItemsComparator(comparator: Comparator<Item>) {
         this.comparator = comparator
         sortedList.beginBatchedUpdates()
         var isItemsInWrongPlaces = true
@@ -58,7 +60,7 @@ class ItemsAdapter(
                 sortedList.recalculatePositionOfItemAt(position)
             isItemsInWrongPlaces = false
             for (position in 1 until sortedList.size()) {
-                if (comparator!!.compare(sortedList[position], sortedList[position - 1]) > 0) {
+                if (comparator.compare(sortedList[position], sortedList[position - 1]) > 0) {
                     isItemsInWrongPlaces = false
                 } else {
                     isItemsInWrongPlaces = true
@@ -69,44 +71,46 @@ class ItemsAdapter(
         sortedList.endBatchedUpdates()
     }
 
-    private val sortedList = SortedList(Item::class.java, object : SortedList.Callback<Item>() {
-        override fun getChangePayload(item1: Item?, item2: Item?): Any {
-            return ITEM_CONTENT_CHANGED_PAYLOAD
+    private val sortedList = SortedList(
+        Item::class.java,
+        object : SortedList.Callback<Item>() {
+            override fun getChangePayload(item1: Item?, item2: Item?): Any {
+                return ITEM_CONTENT_CHANGED_PAYLOAD
+            }
+            override fun areItemsTheSame(item1: Item?, item2: Item?): Boolean {
+                return item1?.id == item2?.id
+            }
+            override fun onMoved(fromPosition: Int, toPosition: Int) {
+                notifyItemMoved(fromPosition, toPosition)
+            }
+            override fun onChanged(position: Int, count: Int) {
+                notifyItemRangeChanged(position, count)
+            }
+            override fun onChanged(position: Int, count: Int, payload: Any?) {
+                notifyItemRangeChanged(position, count, payload)
+            }
+            override fun onInserted(position: Int, count: Int) {
+                notifyItemRangeInserted(position, count)
+            }
+            override fun onRemoved(position: Int, count: Int) {
+                notifyItemRangeRemoved(position, count)
+            }
+            override fun compare(o1: Item?, o2: Item?): Int {
+                return comparator?.compare(o1, o2) ?: 0
+            }
+            override fun areContentsTheSame(oldItem: Item?, newItem: Item?): Boolean {
+                return (oldItem != null && newItem != null &&
+                        oldItem.localName == newItem.localName &&
+                        oldItem.name == newItem.name &&
+                        oldItem.averagePrice == newItem.averagePrice &&
+                        oldItem.averagePriceDelta == newItem.averagePriceDelta &&
+                        oldItem.ordersCount == newItem.ordersCount &&
+                        oldItem.ordersCountDelta == newItem.ordersCountDelta &&
+                        oldItem.averageOrdersCountPerDay == newItem.averageOrdersCountPerDay &&
+                        oldItem.totalQuantity == newItem.totalQuantity &&
+                        oldItem.totalQuantityDelta == newItem.totalQuantityDelta)
+            }
         }
-        override fun areItemsTheSame(item1: Item?, item2: Item?): Boolean {
-            return item1?.id == item2?.id
-        }
-        override fun onMoved(fromPosition: Int, toPosition: Int) {
-            notifyItemMoved(fromPosition, toPosition)
-        }
-        override fun onChanged(position: Int, count: Int) {
-            notifyItemRangeChanged(position, count)
-        }
-
-        override fun onChanged(position: Int, count: Int, payload: Any?) {
-            notifyItemRangeChanged(position, count, payload)
-        }
-        override fun onInserted(position: Int, count: Int) {
-            notifyItemRangeInserted(position, count)
-        }
-        override fun onRemoved(position: Int, count: Int) {
-            notifyItemRangeRemoved(position, count)
-        }
-        override fun compare(o1: Item?, o2: Item?): Int {
-            return comparator?.compare(o1, o2) ?: 0
-        }
-        override fun areContentsTheSame(oldItem: Item?, newItem: Item?): Boolean {
-            return (oldItem != null && newItem != null &&
-                    oldItem.localName == newItem.localName &&
-                    oldItem.name == newItem.name &&
-                    oldItem.averagePrice == newItem.averagePrice &&
-                    oldItem.averagePriceDelta == newItem.averagePriceDelta &&
-                    oldItem.ordersCount == newItem.ordersCount &&
-                    oldItem.ordersCountDelta == newItem.ordersCountDelta &&
-                    oldItem.averageOrdersCountPerDay == newItem.averageOrdersCountPerDay &&
-                    oldItem.totalQuantity == newItem.totalQuantity &&
-                    oldItem.totalQuantityDelta == newItem.totalQuantityDelta)
-        } }
     )
 
     fun add(item: Item) {
@@ -122,18 +126,35 @@ class ItemsAdapter(
     }
 
     fun replaceAll(items: List<Item>) {
-        sortedList.replaceAll(items)
+        val currentList = mutableListOf<Item>()
+        for (index in 0 until sortedList.size()) {
+            currentList.add(sortedList.get(index))
+        }
+        val currentItemsId = currentList.map { it.id }.sorted().toTypedArray()
+        val newItemsId = items.map { it.id }.sorted().toTypedArray()
+        if (!currentItemsId.contentEquals(newItemsId)) {
+            Timber.d("replace all")
+            sortedList.replaceAll(items)
+            return
+        }
+        sortedList.beginBatchedUpdates()
+        Timber.d("update one by one")
+        for (index in 0 until sortedList.size()) {
+            sortedList.updateItemAt(
+                index,
+                items.find { it.id == sortedList[index].id }
+            )
+        }
+        sortedList.endBatchedUpdates()
     }
 
     inner class ItemViewHolder(val recyclerViewItemBinding: RecyclerviewItemBinding) :
         RecyclerView.ViewHolder(recyclerViewItemBinding.root), ViewHolderWithDetails<String> {
-
         init {
             recyclerViewItemBinding.card.setOnClickListener {
                 onOpenItemDetails(bindingAdapterPosition)
             }
         }
-
         override fun getItemDetail() = MyItemDetails(
             bindingAdapterPosition,
             sortedList.get(bindingAdapterPosition).id

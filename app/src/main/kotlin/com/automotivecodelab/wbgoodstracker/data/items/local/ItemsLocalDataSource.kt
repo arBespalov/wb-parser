@@ -12,7 +12,7 @@ interface ItemsLocalDataSource {
     suspend fun addItem(item: ItemWithSizesDBModel)
     suspend fun getItem(id: String): ItemWithSizesDBModel
     fun observeItem(id: String): Flow<ItemWithSizesDBModel>
-    suspend fun deleteItems(itemsId: Array<String>)
+    suspend fun deleteItems(itemsId: List<String>)
     suspend fun updateItem(vararg item: ItemWithSizesDBModel)
     fun getCurrentGroup(): Flow<String?>
     suspend fun setCurrentGroup(groupName: String?)

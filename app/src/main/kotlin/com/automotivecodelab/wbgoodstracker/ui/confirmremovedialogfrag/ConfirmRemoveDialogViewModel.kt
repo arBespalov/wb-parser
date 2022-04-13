@@ -16,7 +16,7 @@ class ConfirmRemoveDialogViewModel @Inject constructor(
     private val _taskCompletedEvent = MutableLiveData<Event<Unit>>()
     val taskCompletedEvent: LiveData<Event<Unit>> = _taskCompletedEvent
 
-    fun deleteItems(itemsIdToDelete: Array<String>) {
+    fun deleteItems(itemsIdToDelete: List<String>) {
         viewModelScope.launch {
             deleteItemsUseCase(itemsIdToDelete)
             _taskCompletedEvent.value = Event(Unit)
