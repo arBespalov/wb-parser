@@ -35,9 +35,11 @@ class ItemsViewModel @Inject constructor(
         .flatMapLatest { (items, group) ->
             searchQuery.mapLatest { query ->
                 items.filter { item ->
-                    (item.localName ?: item.name)
-                        .lowercase(Locale.ROOT)
-                        .contains(query.lowercase(Locale.ROOT))
+                    val byName = (item.localName ?: item.name)
+                        .lowercase()
+                        .contains(query.lowercase())
+                    val byId = item.id.contains(query.lowercase())
+                    byName || byId
                 } to group
             }
         }
