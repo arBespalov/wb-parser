@@ -30,8 +30,8 @@ interface ItemDao {
     @Query("SELECT * FROM item WHERE groupName IN (:group)")
     suspend fun getByGroup(group: String): List<ItemWithSizesDBModel>
 
-    @Query("SELECT groupName FROM item GROUP BY groupName")
-    fun getGroups(): Flow<List<String?>>
+    @Query("SELECT groupName, COUNT(*) AS count FROM item GROUP BY groupName")
+    fun getGroups(): Flow<List<GroupNameWithCount>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg item: ItemDBModel)
@@ -42,3 +42,8 @@ interface ItemDao {
     @Update
     suspend fun update(vararg item: ItemDBModel): Int
 }
+
+data class GroupNameWithCount(
+    val groupName: String?,
+    val count: Int
+)

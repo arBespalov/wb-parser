@@ -49,12 +49,8 @@ class DetailViewModel @AssistedInject constructor(
     fun refreshItem() {
         viewModelScope.launch {
             _dataLoading.value = true
-            if (item.value != null) {
-                refreshSingleItemUseCase(item.value!!)
-                    .onFailure {
-                        _updateErrorEvent.value = Event(it)
-                    }
-            }
+            refreshSingleItemUseCase(itemId)
+                .onFailure { _updateErrorEvent.value = Event(it) }
             _dataLoading.value = false
         }
     }

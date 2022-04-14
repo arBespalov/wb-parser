@@ -17,7 +17,7 @@ data class Item(
     val averagePriceDelta: Int,
     val groupName: String?,
     val totalQuantityDelta: Int,
-    val lastTotalQuantityDeltaUpdateTimestamp: Long, // for sort by quantity change
+    val lastTotalQuantityDeltaUpdateTimestamp: Long, // for sort by quantity delta
     val lastUpdateTimestamp: Long,
     val ordersCount: Int,
     val sizes: List<Size>

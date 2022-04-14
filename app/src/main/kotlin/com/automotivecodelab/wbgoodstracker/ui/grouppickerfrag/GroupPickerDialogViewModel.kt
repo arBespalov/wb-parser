@@ -18,7 +18,7 @@ class GroupPickerDialogViewModel @Inject constructor(
     private val _newGroupEvent = MutableLiveData<Event<Unit>>()
     val newGroupEvent: LiveData<Event<Unit>> = _newGroupEvent
 
-    val groups: LiveData<List<String>> = observeGroupsUseCase().asLiveData()
+    val groups = observeGroupsUseCase().asLiveData()
 
     fun setGroupToItems(itemsId: List<String>, group: String?) {
         viewModelScope.launch {

@@ -4,10 +4,10 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import javax.inject.Inject
 
-class EditItemUseCase @Inject constructor(
+class SetLocalNameToItemUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository
 ) {
-    suspend operator fun invoke(item: Item) {
-        itemsRepository.updateItem(item)
+    suspend operator fun invoke(itemId: String, localName: String?) {
+        itemsRepository.setItemLocalName(itemId, localName)
     }
 }

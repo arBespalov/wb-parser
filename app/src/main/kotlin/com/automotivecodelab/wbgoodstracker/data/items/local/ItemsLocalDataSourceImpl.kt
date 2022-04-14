@@ -4,11 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class ItemsLocalDataSourceImpl @Inject constructor(
@@ -72,7 +74,8 @@ class ItemsLocalDataSourceImpl @Inject constructor(
                         val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
                         val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)
                         val sizesToDelete = localItemSizeNames.minus(updatedItemSizeNames)
-                        val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd).minus(sizesToDelete)
+                        val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd)
+                            .minus(sizesToDelete)
 
                         sizesToAdd.map { sizeName ->
                             updatedItem.sizes.find { sizeDBModel ->
@@ -121,10 +124,15 @@ class ItemsLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getGroups(): Flow<List<String>> {
+    override fun getItemGroups(): Flow<ItemGroups> {
         return itemDao.getGroups()
-            .map {
-                it.filterNotNull()
+            .map { list ->
+                ItemGroups(
+                    totalItemsQuantity = list.sumOf { it.count },
+                    groups = list
+                        .filter { it.groupName != null }
+                        .map { it.groupName!! to it.count }
+                )
             }
             .distinctUntilChanged()
     }

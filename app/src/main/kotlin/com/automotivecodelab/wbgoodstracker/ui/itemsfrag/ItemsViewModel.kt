@@ -3,6 +3,7 @@ package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
+import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +24,7 @@ class ItemsViewModel @Inject constructor(
     private val deleteItemsUseCase: DeleteItemsUseCase
 ) : ViewModel() {
 
-    val groups: LiveData<List<String>> = observeGroupsUseCase().asLiveData()
+    val itemGroups: LiveData<ItemGroups> = observeGroupsUseCase().asLiveData()
 
     val currentSortingModeWithItemsComparator: LiveData<Pair<SortingMode, Comparator<Item>>> =
         observeSortingModeWithComparatorUseCase().asLiveData()

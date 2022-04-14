@@ -1,7 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.data.items
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.local.toDBModel
@@ -9,7 +7,7 @@ import com.automotivecodelab.wbgoodstracker.data.items.local.toDomainModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
+import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import kotlinx.coroutines.*
 import java.util.*
@@ -56,6 +54,17 @@ class ItemsRepositoryImpl @Inject constructor(
         deleteItemsWithNullableToken(itemsId, token)
     }
 
+    override suspend fun setItemLocalName(itemId: String, localName: String?) {
+        val itemDbModel = localDataSource.getItem(itemId)
+        localDataSource.updateItem(
+            itemDbModel.copy(
+                item = itemDbModel.item.copy(
+                    localName = localName
+                )
+            )
+        )
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         runCatching {
@@ -70,10 +79,6 @@ class ItemsRepositoryImpl @Inject constructor(
                 }
             }
         }
-    }
-
-    override suspend fun updateItem(item: Item) {
-        localDataSource.updateItem(item.toDBModel())
     }
 
     override suspend fun addItem(url: String): Result<Unit> {
@@ -133,14 +138,12 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshSingleItem(item: Item): Result<Unit> {
-        return refreshItems(listOf(item))
+    override suspend fun refreshSingleItem(itemId: String): Result<Unit> {
+        return refreshItems(listOf(itemId))
     }
 
     override suspend fun refreshAllItems(): Result<Unit> {
-        localDataSource.getAll().also {
-            return refreshItems(it.map { dbItem -> dbItem.toDomainModel() })
-        }
+        return refreshItems(localDataSource.getAll().map { dbItem -> dbItem.item.id })
     }
 
     override suspend fun syncItems(token: String): Result<Unit> {
@@ -204,21 +207,21 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun refreshItems(items: List<Item>): Result<Unit> {
+    private suspend fun refreshItems(itemIds: List<String>): Result<Unit> {
         return runCatching {
-            val itemIds = items.map { item -> item.id.toInt() }
-            val updatedItems = remoteDataSource.updateItems(itemIds)
+            val intItemIds = itemIds.map { it.toInt() }
+            val updatedItems = remoteDataSource.updateItems(intItemIds)
             updatedItems.map { updatedItem ->
-                val localItem = items.find { localItem -> localItem.id == updatedItem._id }!!
+                val localItem = localDataSource.getItem(updatedItem._id)
                 updatedItem.toDBModel(
-                    creationTimestamp = localItem.creationTimestamp,
-                    previousOrdersCount = localItem.ordersCount,
-                    previousAveragePrice = localItem.averagePrice,
-                    previousTotalQuantity = localItem.totalQuantity,
-                    localName = localItem.localName,
-                    groupName = localItem.groupName,
+                    creationTimestamp = localItem.item.creationTimestamp,
+                    previousOrdersCount = localItem.item.ordersCount,
+                    previousAveragePrice = localItem.item.averagePrice,
+                    previousTotalQuantity = localItem.item.totalQuantity,
+                    localName = localItem.item.localName,
+                    groupName = localItem.item.groupName,
                     previousLastTotalQuantityDeltaUpdateTimestamp =
-                        localItem.lastTotalQuantityDeltaUpdateTimestamp,
+                        localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
                     previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                         sizeDBModel.sizeName to sizeDBModel.quantity
                     }
@@ -324,8 +327,8 @@ class ItemsRepositoryImpl @Inject constructor(
         setCurrentGroup(null)
     }
 
-    override fun getGroups(): Flow<List<String>> {
-        return localDataSource.getGroups()
+    override fun observeGroups(): Flow<ItemGroups> {
+        return localDataSource.getItemGroups()
     }
 
     override suspend fun setCurrentGroup(groupName: String?) {

@@ -65,8 +65,8 @@ class ChartFragment : Fragment() {
             }
             chart.setNoDataText(getString(R.string.please_wait))
             viewModel.chartData.observe(viewLifecycleOwner) { list ->
-                val entries = list.map {
-                    Entry(it.first.toFloat(), it.second.toFloat())
+                val entries = list.map { (x, y) ->
+                    Entry(x.toFloat(), y.toFloat())
                 }
                 val dataSet = LineDataSet(entries, "exampleLabel")
                 dataSet.color = requireContext().themeColor(R.attr.colorPrimary)

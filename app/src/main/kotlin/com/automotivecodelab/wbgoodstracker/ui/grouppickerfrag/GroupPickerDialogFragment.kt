@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.ListView
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
@@ -27,29 +28,31 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(R.layout.group_picker_dialog_fragment)
 
-        val listView = bottomSheetDialog.findViewById<ListView>(R.id.list_view)
-
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
             mutableListOf<String>()
         )
-        listView?.adapter = adapter
 
-        viewModel.groups.observe(this) { groups ->
+        bottomSheetDialog.findViewById<ListView>(R.id.list_view)?.apply {
+            this.adapter = adapter
+            setOnItemClickListener { _, view, _, _ ->
+                when (val chosenText = (view as TextView).text) {
+                    requireContext().getString(R.string.all_items) ->
+                        viewModel.setGroupToItems(args.itemsId.toList(), null)
+                    requireContext().getString(R.string.new_group) -> viewModel.createNewGroup()
+                    else -> viewModel.setGroupToItems(args.itemsId.toList(), chosenText.toString())
+                }
+            }
+        }
+
+        viewModel.groups.observe(this) { (_, groups) ->
             val groupsPlusDefaultGroupPlusNewGroup = groups
+                .map { (name, _) -> name }
                 .plus(requireContext().getString(R.string.all_items))
                 .plus(requireContext().getString(R.string.new_group))
             adapter.clear()
             adapter.addAll(groupsPlusDefaultGroupPlusNewGroup)
-            listView?.setOnItemClickListener { _, _, position, _ ->
-                when (val chosenText = groupsPlusDefaultGroupPlusNewGroup[position]) {
-                    requireContext().getString(R.string.all_items) ->
-                        viewModel.setGroupToItems(args.itemsId.toList(), null)
-                    requireContext().getString(R.string.new_group) -> viewModel.createNewGroup()
-                    else -> viewModel.setGroupToItems(args.itemsId.toList(), chosenText)
-                }
-            }
         }
 
         bottomSheetDialog.findViewById<FrameLayout>(

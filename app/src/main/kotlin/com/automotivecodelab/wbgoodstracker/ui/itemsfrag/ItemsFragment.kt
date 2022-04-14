@@ -8,6 +8,8 @@ import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.res.ResourcesCompat.getDrawable
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -268,37 +270,37 @@ class ItemsFragment : Fragment() {
     private fun setupSpinner() {
         viewDataBinding?.toolbar?.title = null
         val defaultGroup = requireContext().getString(R.string.all_items)
-        val groups = mutableListOf(defaultGroup)
 
-        viewDataBinding?.spinner?.setOnClickListener { view ->
-            val popup = PopupMenu(requireContext(), view)
-            groups.forEach { group ->
-                popup.menu.add(group)
-            }
-            popup.setOnMenuItemClickListener { menuItem ->
-                val selectedText = menuItem.title
-                if (selectedText != null) {
-                    val group = if (selectedText == defaultGroup) null
-                        else selectedText.toString()
-                    if (group != viewModel.itemsWithCurrentGroup.value?.second) {
-                        viewModel.setCurrentGroup(group)
-                        scrollToStartOnUpdate = true
-                    }
-                }
-                true
-            }
-            popup.show()
-        }
-
-        viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
-            val groupsToAdd = savedGroups.minus(groups)
-            val groupsToRemove = groups.minus(savedGroups).minus(defaultGroup)
-            groups.addAll(groupsToAdd)
-            groups.removeAll(groupsToRemove)
-        }
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
             viewDataBinding?.spinner?.text = group ?: defaultGroup
         }
+        viewModel.itemGroups.observe(viewLifecycleOwner) { itemGroups ->
+            viewDataBinding?.spinner?.setOnClickListener { view ->
+                val popup = PopupMenu(requireContext(), view)
+                val groups = itemGroups.groups.plus(
+                    defaultGroup to itemGroups.totalItemsQuantity)
+                groups.forEachIndexed { index, (group, count) ->
+                    val spannableString = buildSpannedString {
+                        bold { append("$count ") }
+                        append(group)
+                    }
+                    popup.menu.add(0, index, index, spannableString)
+                }
+                popup.setOnMenuItemClickListener { menuItem ->
+                    val group = if (groups[menuItem.itemId].first == defaultGroup)
+                        null
+                    else
+                        groups[menuItem.itemId]
+                    if (group?.first != viewModel.itemsWithCurrentGroup.value?.second) {
+                        viewModel.setCurrentGroup(group?.first)
+                        scrollToStartOnUpdate = true
+                    }
+                    true
+                }
+                popup.show()
+            }
+        }
+
     }
 
     private fun setupRecycler() {

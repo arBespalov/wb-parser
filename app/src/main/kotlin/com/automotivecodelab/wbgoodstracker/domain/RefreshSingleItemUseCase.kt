@@ -7,7 +7,7 @@ import javax.inject.Inject
 class RefreshSingleItemUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository
 ) {
-    suspend operator fun invoke(item: Item): Result<Unit> {
-        return itemsRepository.refreshSingleItem(item)
+    suspend operator fun invoke(itemId: String): Result<Unit> {
+        return itemsRepository.refreshSingleItem(itemId)
     }
 }

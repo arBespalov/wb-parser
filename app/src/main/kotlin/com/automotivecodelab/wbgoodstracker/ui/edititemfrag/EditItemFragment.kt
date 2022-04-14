@@ -71,11 +71,10 @@ class EditItemFragment : Fragment() {
 
             // setupAutoCompleteTextView
             val defaultGroup = getString(R.string.all_items)
-            val groups = mutableListOf(defaultGroup)
             val adapter = ArrayAdapter(
                 requireContext(),
                 R.layout.dropdown_menu_list_item,
-                groups
+                mutableListOf(defaultGroup)
             )
 
             autoCompleteTextView.setAdapter(adapter)
@@ -88,11 +87,12 @@ class EditItemFragment : Fragment() {
                 autoCompleteTextView.setText(currentGroup, false)
             }
 
-            viewModel.groups.observe(viewLifecycleOwner) { savedGroups ->
-                val groupsToAdd = savedGroups.minus(groups)
-                val groupsToRemove = groups.minus(savedGroups).minus(defaultGroup)
-                groups.addAll(groupsToAdd)
-                groups.removeAll(groupsToRemove)
+            viewModel.groups.observe(viewLifecycleOwner) { (_, savedGroups) ->
+                adapter.clear()
+                adapter.addAll(savedGroups
+                    .map { (name, _) -> name }
+                    .plus(defaultGroup)
+                )
             }
 
             name.addTextChangedListener {
