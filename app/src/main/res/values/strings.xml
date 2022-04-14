@@ -61,7 +61,7 @@
     <string name="undo">Undo</string>
     <string name="no_connection">No Internet Connection</string>
     <string name="rename_group">Rename group</string>
-    <string name="by_quantity_delta">By quantity changes &#9660;</string>
+    <string name="by_last_changes">By last changes</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

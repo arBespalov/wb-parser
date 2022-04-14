@@ -58,5 +58,5 @@
     <string name="undo">Отмена</string>
     <string name="no_connection">Отсутствует интернет-соединение</string>
     <string name="rename_group">Переименовать группу</string>
-    <string name="by_quantity_delta">По изменению остатков &#9660;</string>
+    <string name="by_last_changes">По обновлениям</string>
 </resources>

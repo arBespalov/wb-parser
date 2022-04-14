@@ -1,15 +1,10 @@
 package com.automotivecodelab.wbgoodstracker.data.sort
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import javax.inject.Inject
 
 class SortRepositoryImpl @Inject constructor(
@@ -33,8 +28,8 @@ class SortRepositoryImpl @Inject constructor(
                             o2.ordersCount.compareTo(o1.ordersCount)
                         SortingMode.BY_ORDERS_COUNT_PER_DAY ->
                             o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
-                        SortingMode.BY_QUANTITY_DELTA -> o2.lastTotalQuantityDeltaUpdateTimestamp
-                                .compareTo(o1.lastTotalQuantityDeltaUpdateTimestamp)
+                        SortingMode.BY_LAST_CHANGES -> o2.lastChangesTimestamp
+                                .compareTo(o1.lastChangesTimestamp)
                     }
                     if (comp == 0)
                         o2.id.compareTo(o1.id)

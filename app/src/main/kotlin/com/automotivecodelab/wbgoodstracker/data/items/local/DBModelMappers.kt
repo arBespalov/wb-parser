@@ -20,7 +20,7 @@ fun ItemWithSizesDBModel.toDomainModel() = Item(
     averagePriceDelta = item.averagePriceDelta,
     groupName = item.groupName,
     totalQuantityDelta = item.totalQuantityDelta,
-    lastTotalQuantityDeltaUpdateTimestamp = item.lastTotalQuantityDeltaUpdateTimestamp,
+    lastChangesTimestamp = item.lastChangesTimestamp,
     lastUpdateTimestamp = item.lastUpdateTimestamp,
     ordersCount = item.ordersCount,
     sizes = sizes.map {
@@ -53,7 +53,7 @@ fun Item.toDBModel() = ItemWithSizesDBModel(
         averagePriceDelta = averagePriceDelta,
         groupName = groupName,
         totalQuantityDelta = totalQuantityDelta,
-        lastTotalQuantityDeltaUpdateTimestamp = lastTotalQuantityDeltaUpdateTimestamp,
+        lastChangesTimestamp = lastChangesTimestamp,
         lastUpdateTimestamp = lastUpdateTimestamp,
         ordersCount = ordersCount,
     ),

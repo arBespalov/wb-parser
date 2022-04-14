@@ -21,7 +21,7 @@ data class ItemDBModel(
     val averagePriceDelta: Int,
     val groupName: String?,
     val totalQuantityDelta: Int,
-    val lastTotalQuantityDeltaUpdateTimestamp: Long,
+    val lastChangesTimestamp: Long,
     val lastUpdateTimestamp: Long,
     val ordersCount: Int,
 )

@@ -4,51 +4,50 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.room.RoomDatabase
+import androidx.room.withTransaction
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
 class ItemsLocalDataSourceImpl @Inject constructor(
-    private val itemDao: ItemDao,
-    private val sizeDao: SizeDao,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val appDatabase: AppDatabase
 ) : ItemsLocalDataSource {
 
     private val CURRENT_GROUP = stringPreferencesKey("current_group")
 
     override fun observeAll(): Flow<List<ItemWithSizesDBModel>> {
-        return itemDao.observeAll()
+        return appDatabase.itemDao().observeAll()
     }
 
     override fun observeByGroup(groupName: String): Flow<List<ItemWithSizesDBModel>> {
-        return itemDao.observeByGroup(groupName)
+        return appDatabase.itemDao().observeByGroup(groupName)
     }
 
     override suspend fun getAll(): List<ItemWithSizesDBModel> {
-        return itemDao.getAll()
+        return appDatabase.itemDao().getAll()
     }
 
     override suspend fun getByGroup(groupName: String): List<ItemWithSizesDBModel> {
-        return itemDao.getByGroup(groupName)
+        return appDatabase.itemDao().getByGroup(groupName)
     }
 
     override suspend fun addItem(item: ItemWithSizesDBModel) {
-        // if make this calls async, sqlite throws "foreign key constraints failed"
-        itemDao.insert(item.item)
-        sizeDao.insert(*item.sizes.toTypedArray())
+        appDatabase.withTransaction {
+            appDatabase.itemDao().insert(item.item)
+            appDatabase.sizeDao().insert(*item.sizes.toTypedArray())
+        }
     }
 
     override suspend fun getItem(id: String): ItemWithSizesDBModel {
-        return itemDao.getById(id)
+        return appDatabase.itemDao().getById(id)
     }
 
     override fun observeItem(id: String): Flow<ItemWithSizesDBModel> {
-        return itemDao.observeById(id)
+        return appDatabase.itemDao().observeById(id)
     }
 
     override suspend fun deleteItems(itemsId: List<String>) {
@@ -56,7 +55,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
             itemsId.map {
                 async {
                     val item = getItem(it)
-                    itemDao.delete(item.item)
+                    appDatabase.itemDao().delete(item.item)
                 }
             }.awaitAll()
         }
@@ -64,46 +63,44 @@ class ItemsLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateItem(vararg item: ItemWithSizesDBModel) {
-        return withContext(Dispatchers.IO) {
-            itemDao.update(*item.map { it.item }.toTypedArray())
-            withContext(Dispatchers.IO) {
-                item.map { updatedItem ->
-                    async {
-                        val localItemSizes = itemDao.getById(updatedItem.item.id).sizes
-                        val localItemSizeNames = localItemSizes.map { it.sizeName }
-                        val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
-                        val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)
-                        val sizesToDelete = localItemSizeNames.minus(updatedItemSizeNames)
-                        val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd)
-                            .minus(sizesToDelete)
-
-                        sizesToAdd.map { sizeName ->
-                            updatedItem.sizes.find { sizeDBModel ->
-                                sizeDBModel.sizeName == sizeName
-                            }!!
-                        }.also { list ->
-                            sizeDao.insert(*list.toTypedArray())
+            appDatabase.withTransaction {
+                withContext(Dispatchers.IO) {
+                    appDatabase.itemDao().update(*item.map { it.item }.toTypedArray())
+                    item.map { updatedItem ->
+                        async {
+                            val localItemSizes = appDatabase.itemDao()
+                                .getById(updatedItem.item.id).sizes
+                            val localItemSizeNames = localItemSizes.map { it.sizeName }
+                            val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
+                            val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)
+                            val sizesToDelete = localItemSizeNames.minus(updatedItemSizeNames)
+                            val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd)
+                                .minus(sizesToDelete)
+                            sizesToAdd.map { sizeName ->
+                                updatedItem.sizes.find { sizeDBModel ->
+                                    sizeDBModel.sizeName == sizeName
+                                }!!
+                            }.also { list ->
+                                appDatabase.sizeDao().insert(*list.toTypedArray())
+                            }
+                            sizesToDelete.map { sizeName ->
+                                localItemSizes.find { sizeDBModel ->
+                                    sizeDBModel.sizeName == sizeName
+                                }!!
+                            }.also { list ->
+                                appDatabase.sizeDao().delete(*list.toTypedArray())
+                            }
+                            sizesToUpdate.map { sizeName ->
+                                updatedItem.sizes.find { sizeDBModel ->
+                                    sizeDBModel.sizeName == sizeName
+                                }!!
+                            }.also { list ->
+                                appDatabase.sizeDao().update(*list.toTypedArray())
+                            }
                         }
-
-                        sizesToDelete.map { sizeName ->
-                            localItemSizes.find { sizeDBModel ->
-                                sizeDBModel.sizeName == sizeName
-                            }!!
-                        }.also { list ->
-                            sizeDao.delete(*list.toTypedArray())
-                        }
-
-                        sizesToUpdate.map { sizeName ->
-                            updatedItem.sizes.find { sizeDBModel ->
-                                sizeDBModel.sizeName == sizeName
-                            }!!
-                        }.also { list ->
-                            sizeDao.update(*list.toTypedArray())
-                        }
-                    }
-                }.awaitAll()
+                    }.awaitAll()
+                }
             }
-        }
     }
 
     override fun getCurrentGroup(): Flow<String?> {
@@ -125,7 +122,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
     }
 
     override fun getItemGroups(): Flow<ItemGroups> {
-        return itemDao.getGroups()
+        return appDatabase.itemDao().getGroups()
             .map { list ->
                 ItemGroups(
                     totalItemsQuantity = list.sumOf { it.count },

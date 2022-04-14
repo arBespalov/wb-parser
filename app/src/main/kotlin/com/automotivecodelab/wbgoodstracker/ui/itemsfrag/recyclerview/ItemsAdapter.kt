@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.*
@@ -108,7 +109,8 @@ class ItemsAdapter(
                         oldItem.ordersCountDelta == newItem.ordersCountDelta &&
                         oldItem.averageOrdersCountPerDay == newItem.averageOrdersCountPerDay &&
                         oldItem.totalQuantity == newItem.totalQuantity &&
-                        oldItem.totalQuantityDelta == newItem.totalQuantityDelta)
+                        oldItem.totalQuantityDelta == newItem.totalQuantityDelta &&
+                        isUpdateIndicatorVisible(oldItem) == isUpdateIndicatorVisible(newItem))
             }
         }
     )
@@ -199,18 +201,20 @@ class ItemsAdapter(
                     } else {
                         holder.recyclerViewItemBinding.item = item
                     }
+                    holder.recyclerViewItemBinding.updateIndicator.visibility =
+                        if (isUpdateIndicatorVisible(item)) View.VISIBLE else View.INVISIBLE
                 }
                 else -> super.onBindViewHolder(holder, position, payloads)
             }
         }
-
     }
 
     @SuppressLint("PrivateResource")
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = sortedList[position]
         holder.recyclerViewItemBinding.item = item
-
+        holder.recyclerViewItemBinding.updateIndicator.visibility =
+            if (isUpdateIndicatorVisible(item)) View.VISIBLE else View.INVISIBLE
         val loadImage = {
             Picasso.get()
                 .load(item.img.httpToHttps())
@@ -262,4 +266,10 @@ class ItemsAdapter(
             }
         }
     }
+
+    private fun isUpdateIndicatorVisible(item: Item) =
+        item.averagePriceDelta == 0 &&
+        item.ordersCountDelta == 0 &&
+        item.totalQuantityDelta == 0 &&
+        item.sizes.any { it.quantityDelta != 0 }
 }

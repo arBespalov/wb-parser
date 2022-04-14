@@ -2,7 +2,6 @@ package com.automotivecodelab.wbgoodstracker.data.items
 
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.toDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.toDomainModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
@@ -113,8 +112,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = dbModel.item.totalQuantity,
                         localName = dbModel.item.localName,
                         groupName = dbModel.item.groupName,
-                        previousLastTotalQuantityDeltaUpdateTimestamp =
-                            dbModel.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousLastChangesTimestamp =
+                            dbModel.item.lastChangesTimestamp,
                         previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
                         }
@@ -130,7 +129,7 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = newItem.totalQuantity,
                         localName = null,
                         groupName = currentGroup,
-                        previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                        previousLastChangesTimestamp = 0,
                         previousSizeQuantity = null
                     )
                 )
@@ -177,7 +176,7 @@ class ItemsRepositoryImpl @Inject constructor(
                             previousTotalQuantity = item.totalQuantity,
                             localName = null,
                             groupName = null,
-                            previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                            previousLastChangesTimestamp = 0,
                             previousSizeQuantity = null
                         )
                     )
@@ -194,8 +193,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = localItem.item.totalQuantity,
                         localName = localItem.item.localName,
                         groupName = localItem.item.groupName,
-                        previousLastTotalQuantityDeltaUpdateTimestamp =
-                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousLastChangesTimestamp =
+                            localItem.item.lastChangesTimestamp,
                         previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
                         }
@@ -220,8 +219,8 @@ class ItemsRepositoryImpl @Inject constructor(
                     previousTotalQuantity = localItem.item.totalQuantity,
                     localName = localItem.item.localName,
                     groupName = localItem.item.groupName,
-                    previousLastTotalQuantityDeltaUpdateTimestamp =
-                        localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
+                    previousLastChangesTimestamp =
+                        localItem.item.lastChangesTimestamp,
                     previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                         sizeDBModel.sizeName to sizeDBModel.quantity
                     }
@@ -254,7 +253,7 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = item.totalQuantity,
                         localName = null,
                         groupName = null,
-                        previousLastTotalQuantityDeltaUpdateTimestamp = 0,
+                        previousLastChangesTimestamp = 0,
                         previousSizeQuantity = null
                     )
                 )
@@ -269,8 +268,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         previousTotalQuantity = localItem.item.totalQuantity,
                         localName = localItem.item.localName,
                         groupName = localItem.item.groupName,
-                        previousLastTotalQuantityDeltaUpdateTimestamp =
-                            localItem.item.lastTotalQuantityDeltaUpdateTimestamp,
+                        previousLastChangesTimestamp =
+                            localItem.item.lastChangesTimestamp,
                         previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
                         }

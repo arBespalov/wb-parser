@@ -26,16 +26,24 @@
                 android:gravity="center_vertical"
                 android:padding="@dimen/default_margin"
                 >
+
+                <View
+                    android:id="@+id/update_indicator"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/circle"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
+
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/name"
-                    android:text="@{item.localName ?? item.name}"
-                    tools:text="name"
-                    android:textAppearance="@style/Subtitle"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    />
+                    android:text="@{item.localName ?? item.name}"
+                    android:textAppearance="@style/Subtitle"
+                    tools:text="name" />
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -12,10 +12,22 @@ fun ItemRemoteModel.toDBModel(
     previousTotalQuantity: Int,
     localName: String?,
     groupName: String?,
-    previousLastTotalQuantityDeltaUpdateTimestamp: Long,
+    previousLastChangesTimestamp: Long,
     previousSizeQuantity: Map<String, Int>? // sizeName, quantity
 ): ItemWithSizesDBModel {
     val totalQuantityDelta = totalQuantity - previousTotalQuantity
+    val ordersCountDelta = info[0].ordersCount - previousOrdersCount
+    val averagePriceDelta = averagePrice - previousAveragePrice
+    val quantityDelta = info[0].sizes.associate {
+        it.sizeName to it.quantity - (previousSizeQuantity?.get(it.sizeName) ?: it.quantity)
+    }
+    val lastChangesTimestamp = if (totalQuantityDelta == 0 &&
+            ordersCountDelta == 0 &&
+            averagePriceDelta == 0 &&
+            quantityDelta.all { (_, delta) -> delta == 0 })
+        previousLastChangesTimestamp
+    else
+        Date().time
     return ItemWithSizesDBModel(
         item = ItemDBModel(
             id = _id,
@@ -29,13 +41,12 @@ fun ItemRemoteModel.toDBModel(
             averagePrice = averagePrice,
             totalQuantity = totalQuantity,
             creationTimestamp = creationTimestamp,
-            ordersCountDelta = info[0].ordersCount - previousOrdersCount,
+            ordersCountDelta = ordersCountDelta,
             localName = localName,
-            averagePriceDelta = averagePrice - previousAveragePrice,
+            averagePriceDelta = averagePriceDelta,
             groupName = groupName,
             totalQuantityDelta = totalQuantityDelta,
-            lastTotalQuantityDeltaUpdateTimestamp = if (totalQuantityDelta == 0)
-                previousLastTotalQuantityDeltaUpdateTimestamp else Date().time,
+            lastChangesTimestamp = lastChangesTimestamp,
             lastUpdateTimestamp = info[0].timeOfCreationInMs,
             ordersCount = info[0].ordersCount,
         ),
@@ -44,8 +55,7 @@ fun ItemRemoteModel.toDBModel(
                 itemId = _id,
                 sizeName = it.sizeName,
                 quantity = it.quantity,
-                quantityDelta =
-                    it.quantity - (previousSizeQuantity?.get(it.sizeName) ?: it.quantity),
+                quantityDelta = quantityDelta[it.sizeName] ?: 0,
                 price = it.price,
                 priceWithSale = it.priceWithSale,
                 storesWithQuantity = it.storeIds?.joinToString(", ")
