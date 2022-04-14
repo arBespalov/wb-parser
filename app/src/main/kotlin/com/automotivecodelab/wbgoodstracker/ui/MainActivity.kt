@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 class MainActivity : AppCompatActivity(), KeyboardToggle {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_WBParser)
         super.onCreate(savedInstanceState)
         val appThemeSource = application.appComponent.appThemeSource()
         runBlocking {
