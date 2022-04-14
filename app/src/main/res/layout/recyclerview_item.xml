@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="com.automotivecodelab.wbgoodstracker.ExtensionsKt"/>
@@ -18,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/relative_layout"
@@ -26,14 +27,16 @@
                 android:gravity="center_vertical"
                 android:padding="@dimen/default_margin"
                 >
-
                 <View
                     android:id="@+id/update_indicator"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:background="@drawable/circle"
                     android:visibility="invisible"
-                    tools:visibility="visible"/>
+                    app:layout_constraintBottom_toBottomOf="@+id/name"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/name"
+                    tools:visibility="visible" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/name"
@@ -43,157 +46,145 @@
                     android:gravity="center"
                     android:text="@{item.localName ?? item.name}"
                     android:textAppearance="@style/Subtitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="name" />
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/name"
-                    android:id="@+id/price_container"
-                    android:layout_marginTop="@dimen/default_margin">
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/price_hint"
-                        android:text="@{@string/price + `: `}"
-                        tools:text="@string/price"
-                        android:layout_marginRight="@dimen/default_margin"
-                        android:textAppearance="@style/Body"
-                        />
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/price"
-                        android:text="@{`` + item.averagePrice}"
-                        tools:text="1990"
-                        android:textAppearance="@style/Accent"
-                        />
-
-                </LinearLayout>
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/price_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/average_price_delta"
-                    android:text="@{ExtensionsKt.toStringWithSign(item.averagePriceDelta) ?? ``}"
-                    tools:text="+1000"
-                    android:textColor="@color/red"
-                    android:layout_margin="@dimen/default_margin"
-                    android:layout_toRightOf="@id/price_container"
-                    android:layout_below="@id/name"
-                    android:textAppearance="@style/Accent"
-                    />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/price_container"
-                    android:id="@+id/orders_container"
-                    android:layout_marginTop="@dimen/default_margin">
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/orders_count_hint"
-                        android:text="@{@string/orders_count + `: `}"
-                        tools:text="@string/orders_count"
-                        android:layout_marginRight="@dimen/default_margin"
-                        android:textAppearance="@style/Body"
-                        />
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/orders_count"
-                        android:text="@{`` + item.ordersCount}"
-                        tools:text="20"
-                        android:textAppearance="@style/Accent"
-                        />
-                </LinearLayout>
-
+                    android:text="@{@string/price + `: `}"
+                    android:textAppearance="@style/Body"
+                    app:layout_constraintBottom_toBottomOf="@+id/price"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/price"
+                    tools:text="@string/price" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/orders_count_delta"
-                    android:text="@{ExtensionsKt.toStringWithSign(item.ordersCountDelta) ?? ``}"
-                    tools:text="+50"
-                    android:textColor="@color/red"
-                    android:layout_below="@id/price_container"
-                    android:layout_margin="@dimen/default_margin"
-                    android:layout_toRightOf="@id/orders_container"
-                    android:textAppearance="@style/Accent"
-                    />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/orders_container"
-                    android:id="@+id/average_orders_count_per_day_container"
-                    android:layout_marginTop="@dimen/default_margin">
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/average_orders_count_per_day_hint"
-                        android:text="@{@string/average_orders_count_per_day + `: `}"
-                        tools:text="@{@string/average_orders_count_per_day + `: `}"
-                        android:layout_marginRight="@dimen/default_margin"
-                        android:textAppearance="@style/Body"
-                    />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/average_orders_count_per_day"
-                        android:text="@{`` + item.averageOrdersCountPerDay}"
-                        tools:text="1"
-                        android:textAppearance="@style/Accent"
-                        />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/average_orders_count_per_day_container"
-                    android:id="@+id/total_quantity_container"
-
-                    android:layout_marginTop="@dimen/default_margin">
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/total_quantity_hint"
-                        android:text="@{@string/quantity_in_warehouse + `: `}"
-                        tools:text="@string/quantity_in_warehouse"
-                        android:layout_marginRight="@dimen/default_margin"
-                        android:textAppearance="@style/Body"/>
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/total_quantity"
-                        android:text="@{`` + item.totalQuantity}"
-                        tools:text="17"
-                        android:textAppearance="@style/Accent"/>
-                </LinearLayout>
-
-
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/total_quantity_delta"
-                    android:text="@{ExtensionsKt.toStringWithSign(item.totalQuantityDelta) ?? ``}"
-                    tools:text="+5"
-                    android:textColor="@color/red"
-                    android:layout_below="@id/average_orders_count_per_day_container"
-                    android:layout_marginLeft="@dimen/default_margin"
+                    android:layout_marginStart="@dimen/default_margin"
                     android:layout_marginTop="@dimen/default_margin"
-                    android:layout_toRightOf="@id/total_quantity_container"
+                    android:text="@{`` + item.averagePrice}"
                     android:textAppearance="@style/Accent"
-                    />
+                    app:layout_constraintStart_toEndOf="@+id/price_hint"
+                    app:layout_constraintTop_toBottomOf="@+id/name"
+                    tools:text="1990" />
 
-            </RelativeLayout>
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/average_price_delta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/name"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:text="@{ExtensionsKt.toStringWithSign(item.averagePriceDelta) ?? ``}"
+                    android:textAppearance="@style/Accent"
+                    android:textColor="@color/red"
+                    app:layout_constraintBottom_toBottomOf="@+id/price"
+                    app:layout_constraintStart_toEndOf="@+id/price"
+                    app:layout_constraintTop_toTopOf="@+id/price"
+                    tools:text="+1000" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/orders_count_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/orders_count + `: `}"
+                    android:textAppearance="@style/Body"
+                    app:layout_constraintBottom_toBottomOf="@+id/orders_count"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/orders_count"
+                    tools:text="@string/orders_count" />
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/orders_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:text="@{`` + item.ordersCount}"
+                    android:textAppearance="@style/Accent"
+                    app:layout_constraintStart_toEndOf="@+id/orders_count_hint"
+                    app:layout_constraintTop_toBottomOf="@+id/price"
+                    tools:text="20" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/orders_count_delta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:text="@{ExtensionsKt.toStringWithSign(item.ordersCountDelta) ?? ``}"
+                    android:textAppearance="@style/Accent"
+                    android:textColor="@color/red"
+                    app:layout_constraintBottom_toBottomOf="@+id/orders_count"
+                    app:layout_constraintStart_toEndOf="@+id/orders_count"
+                    app:layout_constraintTop_toTopOf="@+id/orders_count"
+                    tools:text="+50" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/average_orders_count_per_day_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/average_orders_count_per_day + `: `}"
+                    android:textAppearance="@style/Body"
+                    app:layout_constraintBottom_toBottomOf="@+id/average_orders_count_per_day"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/average_orders_count_per_day"
+                    tools:text="@string/average_orders_count_per_day" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/average_orders_count_per_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:text="@{`` + item.averageOrdersCountPerDay}"
+                    android:textAppearance="@style/Accent"
+                    app:layout_constraintStart_toEndOf="@+id/average_orders_count_per_day_hint"
+                    app:layout_constraintTop_toBottomOf="@+id/orders_count"
+                    tools:text="1" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/total_quantity_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/quantity_in_warehouse + `: `}"
+                    android:textAppearance="@style/Body"
+                    app:layout_constraintBottom_toBottomOf="@+id/total_quantity"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/total_quantity"
+                    tools:text="@string/quantity_in_warehouse" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/total_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:text="@{`` + item.totalQuantity}"
+                    android:textAppearance="@style/Accent"
+                    app:layout_constraintStart_toEndOf="@+id/total_quantity_hint"
+                    app:layout_constraintTop_toBottomOf="@+id/average_orders_count_per_day"
+                    tools:text="17" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/total_quantity_delta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:text="@{ExtensionsKt.toStringWithSign(item.totalQuantityDelta) ?? ``}"
+                    android:textAppearance="@style/Accent"
+                    android:textColor="@color/red"
+                    app:layout_constraintBottom_toBottomOf="@+id/total_quantity"
+                    app:layout_constraintStart_toEndOf="@+id/total_quantity"
+                    app:layout_constraintTop_toTopOf="@+id/total_quantity"
+                    tools:text="+5" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
