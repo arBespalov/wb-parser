@@ -23,8 +23,8 @@
     <string name="average_orders_count_per_day">Average orders count per day</string>
     <string name="days_observing">Days observing</string>
     <string name="orders_count">Orders count</string>
-    <string name="by_orders_count">Orders count &#9660;</string>
-    <string name="by_orders_count_per_day">Orders count per day &#9660;</string>
+    <string name="by_orders_count">By orders count</string>
+    <string name="by_orders_count_per_day">By orders count per day</string>
     <string name="price">Price</string>
     <string name="error">Error</string>
     <string name="error_body">Error. Please try again later</string>

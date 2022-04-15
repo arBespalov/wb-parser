@@ -19,28 +19,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/relative_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/relative_layout"
                 android:layout_weight="3"
                 android:gravity="center_vertical"
-                android:padding="@dimen/default_margin"
+                android:paddingBottom="@dimen/default_margin"
                 >
+
                 <View
                     android:id="@+id/update_indicator"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:background="@drawable/circle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@drawable/rounded_rectangle"
                     android:visibility="invisible"
-                    app:layout_constraintBottom_toBottomOf="@+id/name"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/name"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
@@ -49,7 +50,9 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="name" />
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:layout_marginHorizontal="@dimen/default_margin"
+                    tools:text="namenamenamenamenamenamenamenamenamenamenamename" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/price_hint"
@@ -60,6 +63,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/price"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/price"
+                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/price" />
 
                 <com.google.android.material.textview.MaterialTextView
@@ -97,6 +101,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/orders_count"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/orders_count"
+                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/orders_count" />
 
 
@@ -134,6 +139,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/average_orders_count_per_day"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/average_orders_count_per_day"
+                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/average_orders_count_per_day" />
 
                 <com.google.android.material.textview.MaterialTextView
@@ -157,6 +163,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/total_quantity"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/total_quantity"
+                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/quantity_in_warehouse" />
 
                 <com.google.android.material.textview.MaterialTextView

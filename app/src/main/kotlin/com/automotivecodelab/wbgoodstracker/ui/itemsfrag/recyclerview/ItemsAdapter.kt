@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.selection.SelectionTracker
@@ -128,6 +129,11 @@ class ItemsAdapter(
     }
 
     fun replaceAll(items: List<Item>) {
+        // replaceAll() do not triggers onMove callback: it goes like onRemoved-onInsert, so
+        // animation suffers. in case of updating item in sorted list one by one - onMoved is
+        // triggered, but we need to check if the items in the new list are the same as items in
+        // existing list. for example, when signed-in user delete item on one device and then
+        // sync another device
         val currentList = mutableListOf<Item>()
         for (index in 0 until sortedList.size()) {
             currentList.add(sortedList.get(index))
@@ -234,13 +240,18 @@ class ItemsAdapter(
         }
         tracker?.let { selectionTracker ->
             val context = holder.itemView.context
-            val backgroundColor = if (selectionTracker.isSelected(item.id)) {
+            val backgroundColor = if (selectionTracker.isSelected(item.id))
                 context.themeColor(R.attr.colorSecondary)
-            } else {
+            else
                 // colorSurfaceVariant - default material3 card background
                 context.themeColor(R.attr.colorSurfaceVariant)
-            }
             holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
+
+            val indicatorColor = if (selectionTracker.isSelected(item.id))
+                context.themeColor(R.attr.colorOnSecondary)
+            else
+                ContextCompat.getColor(context, R.color.red)
+            holder.recyclerViewItemBinding.updateIndicator.background.setTint(indicatorColor)
 
             if (defaultTextViewColors.isEmpty()) {
                 holder.itemView.allViews.forEach { view ->
@@ -268,8 +279,6 @@ class ItemsAdapter(
     }
 
     private fun isUpdateIndicatorVisible(item: Item) =
-        item.averagePriceDelta == 0 &&
-        item.ordersCountDelta == 0 &&
         item.totalQuantityDelta == 0 &&
         item.sizes.any { it.quantityDelta != 0 }
 }
