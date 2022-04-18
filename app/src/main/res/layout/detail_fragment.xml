@@ -77,10 +77,20 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:layout_marginTop="@dimen/default_margin">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/error"
+                        tools:text="@string/update_error"
+                        android:textAppearance="@style/Accent"
+                        android:textColor="@color/red"
+                        android:layout_marginHorizontal="@dimen/default_margin"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
                     <GridLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:rowCount="4"
+                        android:rowCount="5"
                         android:columnCount="2">
                         <include
                             android:layout_width="0dp"
@@ -105,7 +115,6 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/orders_count_since_observing_started}"
                             bind:count="@{`` + viewmodel.item.ordersCountSinceObservingStarted}"
-                            bind:delta="@{null}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -116,7 +125,6 @@
                             android:id="@+id/days_observing"
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/days_observing}"
-                            bind:delta="@{null}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -140,7 +148,6 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/average_orders_count_per_day}"
                             bind:count="@{`` + viewmodel.item.averageOrdersCountPerDay}"
-                            bind:delta="@{null}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -152,7 +159,6 @@
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/estimated_income}"
                             bind:count="@{`` + viewmodel.item.estimatedIncome}"
-                            bind:delta="@{null}"
                             />
                         <include
                             android:layout_width="0dp"
@@ -175,7 +181,29 @@
                             android:id="@+id/updating_time"
                             layout="@layout/card_info_layout"
                             bind:text="@{@string/updated}"
-                            bind:delta="@{null}"
+                            />
+                        <include
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_rowWeight="1"
+                            android:layout_margin="@dimen/default_margin"
+                            android:id="@+id/feedbacks"
+                            layout="@layout/card_info_layout"
+                            bind:text="@{@string/feedbacks}"
+                            bind:count="@{`` + viewmodel.item.feedbacks}"
+                            bind:delta="@{ExtensionsKt.toStringWithSign(viewmodel.item.feedbacksDelta) ?? ``}"
+                            />
+                        <include
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_rowWeight="1"
+                            android:layout_margin="@dimen/default_margin"
+                            android:id="@+id/sku_id"
+                            layout="@layout/card_info_layout"
+                            bind:text="@{@string/sku_id}"
+                            bind:count="@{`` + viewmodel.item.id}"
                             />
                     </GridLayout>
                     <LinearLayout

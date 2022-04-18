@@ -24,6 +24,9 @@ data class ItemDBModel(
     val lastChangesTimestamp: Long,
     val lastUpdateTimestamp: Long,
     val ordersCount: Int,
+    val feedbacks: Int,
+    val feedbacksDelta: Int,
+    val updateError: Boolean?
 )
 
 @Entity(

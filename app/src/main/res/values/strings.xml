@@ -62,6 +62,10 @@
     <string name="no_connection">No Internet Connection</string>
     <string name="rename_group">Rename group</string>
     <string name="by_last_changes">By last changes</string>
+    <string name="update_error">Update failure. Last successful update: %1$s</string>
+    <string name="feedbacks">Feedbacks</string>
+    <string name="sku_id">ID</string>
+    <string name="id_copied">ID copied to clipboard</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

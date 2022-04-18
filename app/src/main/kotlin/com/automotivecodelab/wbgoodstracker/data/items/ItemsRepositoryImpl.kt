@@ -116,7 +116,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             dbModel.item.lastChangesTimestamp,
                         previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
-                        }
+                        },
+                        previousFeedbacks = dbModel.item.feedbacks
                     ))
                     return@withContext
                 }
@@ -130,7 +131,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = null,
                         groupName = currentGroup,
                         previousLastChangesTimestamp = 0,
-                        previousSizeQuantity = null
+                        previousSizeQuantity = null,
+                        previousFeedbacks = newItem.feedbacks
                     )
                 )
             }
@@ -177,7 +179,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             localName = null,
                             groupName = null,
                             previousLastChangesTimestamp = 0,
-                            previousSizeQuantity = null
+                            previousSizeQuantity = null,
+                            previousFeedbacks = item.feedbacks
                         )
                     )
                 }
@@ -197,7 +200,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             localItem.item.lastChangesTimestamp,
                         previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
-                        }
+                        },
+                        previousFeedbacks = localItem.item.feedbacks
                     )
                 }.also {
                     localDataSource.updateItem(*it.toTypedArray())
@@ -223,7 +227,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         localItem.item.lastChangesTimestamp,
                     previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                         sizeDBModel.sizeName to sizeDBModel.quantity
-                    }
+                    },
+                    previousFeedbacks = localItem.item.feedbacks
                 )
             }.also {
                 localDataSource.updateItem(*it.toTypedArray())
@@ -254,7 +259,8 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = null,
                         groupName = null,
                         previousLastChangesTimestamp = 0,
-                        previousSizeQuantity = null
+                        previousSizeQuantity = null,
+                        previousFeedbacks = item.feedbacks
                     )
                 )
             }
@@ -272,7 +278,8 @@ class ItemsRepositoryImpl @Inject constructor(
                             localItem.item.lastChangesTimestamp,
                         previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
-                        }
+                        },
+                        previousFeedbacks = localItem.item.feedbacks
                     ))
                 }
             }

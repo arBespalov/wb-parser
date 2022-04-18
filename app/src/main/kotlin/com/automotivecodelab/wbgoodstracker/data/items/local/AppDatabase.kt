@@ -54,6 +54,9 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "lastUpdateTimestamp INTEGER NOT NULL DEFAULT 0, " +
                 "lastChangesTimestamp INTEGER NOT NULL DEFAULT 0," +
                 "ordersCount INTEGER NOT NULL DEFAULT 0, " +
+                "feedbacks INTEGER NOT NULL DEFAULT 0, " +
+                "feedbacksDelta INTEGER NOT NULL DEFAULT 0, " +
+                "updateError INTEGER, " + //todo test migration
                 "PRIMARY KEY (id))"
         )
         database.execSQL("INSERT INTO item_new (" +
@@ -75,7 +78,10 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 //"totalQuantityDelta, " +
                 //"lastUpdateTimestamp, " +
                 //"lastChangesTimestamp, " +
-                //"ordersCount) " +
+                //"ordersCount, " +
+                //"feedbacks, " +
+                //"feedbacksDelta, " +
+                //"updateError, " + //todo test migration
                 "SELECT " +
                 "_id, " +
                 "name, " +

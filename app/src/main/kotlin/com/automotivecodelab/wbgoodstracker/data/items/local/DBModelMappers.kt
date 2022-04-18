@@ -23,6 +23,9 @@ fun ItemWithSizesDBModel.toDomainModel() = Item(
     lastChangesTimestamp = item.lastChangesTimestamp,
     lastUpdateTimestamp = item.lastUpdateTimestamp,
     ordersCount = item.ordersCount,
+    feedbacks = item.feedbacks,
+    feedbacksDelta = item.feedbacksDelta,
+    updateError = item.updateError,
     sizes = sizes.map {
         Size(
             sizeName = it.sizeName,
@@ -56,6 +59,9 @@ fun Item.toDBModel() = ItemWithSizesDBModel(
         lastChangesTimestamp = lastChangesTimestamp,
         lastUpdateTimestamp = lastUpdateTimestamp,
         ordersCount = ordersCount,
+        feedbacks = feedbacks,
+        feedbacksDelta = feedbacksDelta,
+        updateError = updateError,
     ),
     sizes = sizes.map {
         SizeDBModel(

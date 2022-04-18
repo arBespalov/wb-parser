@@ -59,4 +59,8 @@
     <string name="no_connection">Отсутствует интернет-соединение</string>
     <string name="rename_group">Переименовать группу</string>
     <string name="by_last_changes">По обновлениям</string>
+    <string name="update_error">Ошибка. Последнее успешное обновление: %1$s</string>
+    <string name="feedbacks">Отзывы</string>
+    <string name="sku_id">Артикул</string>
+    <string name="id_copied">Артикул скопирован в буфер обмена</string>
 </resources>

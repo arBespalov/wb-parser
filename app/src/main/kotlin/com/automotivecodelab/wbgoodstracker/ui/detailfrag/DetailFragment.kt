@@ -1,5 +1,8 @@
 package com.automotivecodelab.wbgoodstracker.ui.detailfrag
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
@@ -20,6 +23,7 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.elevation.ElevationOverlayProvider
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialSharedAxis
 import com.squareup.picasso.Picasso
@@ -92,12 +96,11 @@ class DetailFragment : Fragment() {
 
             viewDataBinding?.daysObserving?.count?.text =
                 item.observingTimeInMs.millisToDays().toString()
-            viewDataBinding?.updatingTime?.count?.text =
-                SimpleDateFormat(
-                    "dd.MM HH:mm",
-                    Locale("en")
-                ).format(item.lastUpdateTimestamp)
-
+            val updatingTime = SimpleDateFormat(
+                "dd.MM HH:mm",
+                Locale("en")
+            ).format(item.lastUpdateTimestamp)
+            viewDataBinding?.updatingTime?.count?.text = updatingTime
             viewDataBinding?.sizesLayout?.removeAllViews()
             item.sizes.forEach { size ->
                 val cardSizeLayoutBinding = DataBindingUtil.inflate<CardSizeLayoutBinding>(
@@ -115,6 +118,15 @@ class DetailFragment : Fragment() {
                     cardSizeLayoutBinding.count5.text = storeIds
                 }
             }
+
+            if (item.updateError == true) {
+                viewDataBinding?.error?.apply {
+                    text = getString(R.string.update_error, updatingTime)
+                    visibility = View.VISIBLE
+                }
+            } else {
+                viewDataBinding?.error?.visibility = View.GONE
+            }
         }
 
         viewDataBinding?.swipeRefresh?.setOnRefreshListener {
@@ -128,6 +140,16 @@ class DetailFragment : Fragment() {
         viewDataBinding?.ordersCount?.apply {
             icon.setImageResource(R.drawable.ic_baseline_bar_chart_24)
             root.setOnClickListener { viewModel.showOrdersChart() }
+        }
+
+        viewDataBinding?.skuId?.apply {
+            icon.setImageResource(R.drawable.ic_baseline_content_copy_24)
+            root.setOnClickListener {
+                val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as?
+                        ClipboardManager
+                clipboard?.setPrimaryClip(ClipData.newPlainText("id", args.itemid))
+                Snackbar.make(requireView(), R.string.id_copied, Snackbar.LENGTH_SHORT).show()
+            }
         }
 
         view.doOnPreDraw { startPostponedEnterTransition() }

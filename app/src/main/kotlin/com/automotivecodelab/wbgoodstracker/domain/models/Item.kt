@@ -1,5 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.domain.models
 
+import android.text.BoringLayout
+
 data class Item(
     val id: String,
     val name: String,
@@ -20,7 +22,10 @@ data class Item(
     val lastChangesTimestamp: Long, // for sort by changes
     val lastUpdateTimestamp: Long,
     val ordersCount: Int,
-    val sizes: List<Size>
+    val sizes: List<Size>,
+    val feedbacks: Int,
+    val feedbacksDelta: Int,
+    val updateError: Boolean?
 )
 
 data class Size(

@@ -279,6 +279,6 @@ class ItemsAdapter(
     }
 
     private fun isUpdateIndicatorVisible(item: Item) =
-        item.totalQuantityDelta == 0 &&
-        item.sizes.any { it.quantityDelta != 0 }
+        (item.totalQuantityDelta == 0 && item.sizes.any { it.quantityDelta != 0 }) ||
+                item.feedbacksDelta != 0
 }

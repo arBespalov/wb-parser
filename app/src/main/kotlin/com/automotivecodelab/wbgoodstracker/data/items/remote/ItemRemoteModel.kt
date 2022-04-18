@@ -12,7 +12,9 @@ data class ItemRemoteModel(
     val estimatedIncome: Int,
     val averageOrdersCountInDay: Int,
     val averagePrice: Int,
-    val totalQuantity: Int
+    val totalQuantity: Int,
+    val feedbacks: Int,
+    val updateError: Boolean?
 )
 
 data class ItemInfoRemoteModel(

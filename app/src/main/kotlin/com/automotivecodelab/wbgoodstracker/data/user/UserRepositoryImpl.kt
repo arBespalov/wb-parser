@@ -15,7 +15,7 @@ class UserRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val authenticationService: AuthenticationService
 ) : UserRepository {
-    private val IS_USER_AUTHENTICATED = booleanPreferencesKey("isUserAuthenticated")
+    private val IS_USER_AUTHENTICATED = booleanPreferencesKey("isUserSignedIn")
 
     override suspend fun isUserAuthenticated(): Boolean {
         return dataStore.data
