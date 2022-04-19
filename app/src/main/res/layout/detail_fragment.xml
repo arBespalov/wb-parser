@@ -29,7 +29,7 @@
                 app:collapsedTitleTextColor="?attr/colorControlNormal"
                 app:expandedTitleTextColor="?attr/colorControlNormal"
                 app:titleCollapseMode="scale"
-                app:maxLines="3"
+                app:maxLines="2"
                 app:extraMultilineHeightEnabled="false">
                 <ImageView
                     android:id="@+id/image_view"

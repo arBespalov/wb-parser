@@ -85,6 +85,9 @@ class ItemsViewModel @Inject constructor(
     private val _renameCurrentGroupEvent = MutableLiveData<Event<Unit>>()
     val renameCurrentGroupEvent: LiveData<Event<Unit>> = _renameCurrentGroupEvent
 
+    private val _askUserForReviewEvent = MutableLiveData<Event<Unit>>()
+    val askUserForReviewEvent: LiveData<Event<Unit>> = _askUserForReviewEvent
+
     fun openItem(recyclerItemPosition: Int) {
         _openItemEvent.value = Event(recyclerItemPosition)
     }
@@ -123,9 +126,10 @@ class ItemsViewModel @Inject constructor(
     fun updateItems() {
         viewModelScope.launch {
             _dataLoading.value = true
-            refreshAllItemsUseCase(onAuthenticationFailureCallback = {
-                _authorizationErrorEvent.value = Event(Unit)
-            })
+            refreshAllItemsUseCase(
+                onAuthenticationFailureCallback = { _authorizationErrorEvent.value = Event(Unit) },
+                askUserForReviewCallback = { _askUserForReviewEvent.value = Event(Unit) }
+            )
                 .onFailure {
                     _updateErrorEvent.value = Event(it)
                 }

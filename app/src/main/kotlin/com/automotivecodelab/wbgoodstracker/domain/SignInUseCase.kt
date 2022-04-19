@@ -10,7 +10,7 @@ class SignInUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository
 ) {
     suspend operator fun invoke(user: User): Result<Unit> {
-        userRepository.setUserAuthenticated(true)
+        userRepository.signIn()
         return itemsRepository.mergeItems(user.idToken)
     }
 }

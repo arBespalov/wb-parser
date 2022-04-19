@@ -25,11 +25,19 @@ class UserRepositoryImpl @Inject constructor(
             .first()
     }
 
-    override suspend fun setUserAuthenticated(isAuthenticated: Boolean) {
-        // todo migration
+    override suspend fun signIn() {
         dataStore.edit { prefs ->
-            prefs[IS_USER_AUTHENTICATED] = isAuthenticated
+            prefs[IS_USER_AUTHENTICATED] = true
         }
+    }
+
+    override suspend fun signOut() {
+        authenticationService.signOut()
+            .onSuccess {
+                dataStore.edit { prefs ->
+                    prefs[IS_USER_AUTHENTICATED] = false
+                }
+            }
     }
 
     override suspend fun getUser(): Result<User> {

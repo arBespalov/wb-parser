@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.automotivecodelab.wbgoodstracker.di.AppComponent
 import com.automotivecodelab.wbgoodstracker.di.DaggerAppComponent
+import com.google.android.play.core.review.ReviewManager
 import dagger.internal.DaggerGenerated
 import timber.log.Timber
 

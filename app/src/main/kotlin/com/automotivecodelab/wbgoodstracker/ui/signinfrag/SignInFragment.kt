@@ -38,7 +38,7 @@ class SignInFragment : Fragment() {
                 val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
                 val user = User(credential.googleIdToken!!, email = null)
                 viewModel.signIn(user)
-            } catch (e: ApiException) {
+            } catch (e: Exception) {
                 Timber.d(e.message.toString())
             }
         }
@@ -134,7 +134,6 @@ class SignInFragment : Fragment() {
             signOutButton.apply {
                 visibility = View.VISIBLE
                 setOnClickListener {
-                    oneTapClient.signOut()
                     viewModel.signOut()
                     Snackbar.make(rootView, R.string.sign_out_message, Snackbar.LENGTH_LONG).show()
                 }
@@ -145,7 +144,7 @@ class SignInFragment : Fragment() {
     }
 
     private fun beginAuthenticationFlow(signUp: Boolean) {
-        val signInRequest: BeginSignInRequest = BeginSignInRequest.builder()
+        val signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)

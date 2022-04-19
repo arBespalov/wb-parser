@@ -4,6 +4,7 @@ import com.automotivecodelab.wbgoodstracker.domain.models.User
 
 interface UserRepository {
     suspend fun isUserAuthenticated(): Boolean
-    suspend fun setUserAuthenticated(isAuthenticated: Boolean)
+    suspend fun signIn()
+    suspend fun signOut()
     suspend fun getUser(): Result<User>
 }

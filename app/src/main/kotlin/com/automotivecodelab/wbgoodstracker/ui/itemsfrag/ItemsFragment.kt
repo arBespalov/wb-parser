@@ -30,6 +30,8 @@ import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapt
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
 import com.google.android.material.transition.MaterialSharedAxis
+import com.google.android.play.core.review.ReviewManagerFactory
+import timber.log.Timber
 
 class ItemsFragment : Fragment() {
 
@@ -90,7 +92,24 @@ class ItemsFragment : Fragment() {
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
             requireView().signOutSnackbar { viewModel.signOut() }
         })
+        viewModel.askUserForReviewEvent.observe(viewLifecycleOwner, EventObserver {
+            runCatching {
+                val manager = ReviewManagerFactory.create(requireContext())
+                manager.requestReviewFlow().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val reviewInfo = task.result
+                        manager.launchReviewFlow(requireActivity(), reviewInfo)
+                    } else {
+                        Timber.d(task.exception)
+                    }
+                }
+            }
+        })
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (items, _) ->
+            viewDataBinding?.swipeRefresh?.isEnabled = items.isNotEmpty()
+            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_refresh)?.isEnabled =
+                items.isNotEmpty()
+
             adapter?.replaceAll(items)
             if (scrollToStartOnUpdate) {
                 viewDataBinding?.recyclerViewItems?.scrollToPosition(0)

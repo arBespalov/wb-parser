@@ -104,4 +104,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+
+    // ===for in-app-review===
+    implementation("com.google.android.play:core:1.10.3")
+    implementation("com.google.android.play:core-ktx:1.8.1")
 }
