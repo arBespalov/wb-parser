@@ -18,7 +18,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.SignInFragmentBinding
-import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -36,10 +35,9 @@ class SignInFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             try {
                 val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
-                val user = User(credential.googleIdToken!!, email = null)
-                viewModel.signIn(user)
+                viewModel.signIn(credential.googleIdToken!!)
             } catch (e: Exception) {
-                Timber.d(e.message.toString())
+                viewModel.setError(e)
             }
         }
     }
@@ -162,11 +160,15 @@ class SignInFragment : Fragment() {
                         result.pendingIntent.intentSender).build())
                 } catch (e: IntentSender.SendIntentException) {
                     Timber.d("Couldn't start One Tap UI: ${e.message}")
+                    viewModel.setError(e)
                 }
             }
             .addOnFailureListener { e ->
                 Timber.d(e.message.toString())
-                if (!signUp) beginAuthenticationFlow(signUp = true)
+                if (signUp)
+                    viewModel.setError(e)
+                else
+                    beginAuthenticationFlow(signUp = true)
             }
     }
 }

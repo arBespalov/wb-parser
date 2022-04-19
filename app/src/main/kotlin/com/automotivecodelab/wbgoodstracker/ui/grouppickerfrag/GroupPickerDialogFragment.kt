@@ -25,23 +25,27 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
-        bottomSheetDialog.setContentView(R.layout.group_picker_dialog_fragment)
-
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_list_item_1,
+            R.layout.group_picker_item,
+            R.id.text1,
             mutableListOf<String>()
         )
 
-        bottomSheetDialog.findViewById<ListView>(R.id.list_view)?.apply {
-            this.adapter = adapter
-            setOnItemClickListener { _, view, _, _ ->
-                when (val chosenText = (view as TextView).text) {
-                    requireContext().getString(R.string.all_items) ->
-                        viewModel.setGroupToItems(args.itemsId.toList(), null)
-                    requireContext().getString(R.string.new_group) -> viewModel.createNewGroup()
-                    else -> viewModel.setGroupToItems(args.itemsId.toList(), chosenText.toString())
+        val bottomSheetDialog = BottomSheetDialog(requireContext()).apply {
+            setContentView(R.layout.group_picker_dialog_fragment)
+            findViewById<ListView>(R.id.list_view)?.apply {
+                this.adapter = adapter
+                setOnItemClickListener { _, view, _, _ ->
+                    when (val chosenText = view.findViewById<TextView>(R.id.text1).text) {
+                        requireContext().getString(R.string.all_items) ->
+                            viewModel.setGroupToItems(args.itemsId.toList(), null)
+                        requireContext().getString(R.string.new_group) -> viewModel.createNewGroup()
+                        else -> viewModel.setGroupToItems(
+                            args.itemsId.toList(),
+                            chosenText.toString()
+                        )
+                    }
                 }
             }
         }
@@ -53,11 +57,8 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
                 .plus(requireContext().getString(R.string.new_group))
             adapter.clear()
             adapter.addAll(groupsPlusDefaultGroupPlusNewGroup)
+            bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-
-        bottomSheetDialog.findViewById<FrameLayout>(
-            com.google.android.material.R.id.design_bottom_sheet
-        )?.let { BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED }
         setupNavigation()
         return bottomSheetDialog
     }

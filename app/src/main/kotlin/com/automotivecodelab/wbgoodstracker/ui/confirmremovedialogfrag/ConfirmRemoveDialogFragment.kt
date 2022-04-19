@@ -23,22 +23,14 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
-        bottomSheetDialog.setContentView(R.layout.confirm_remove_bottom_sheet)
-
-        bottomSheetDialog.findViewById<Button>(R.id.cancel)?.setOnClickListener { dismiss() }
-        bottomSheetDialog.findViewById<Button>(R.id.ok)?.setOnClickListener {
-            viewModel.deleteItems(args.itemsIdToDelete.toList())
+        val bottomSheetDialog = BottomSheetDialog(requireContext()).apply {
+            setContentView(R.layout.confirm_remove_bottom_sheet)
+            findViewById<Button>(R.id.cancel)?.setOnClickListener { dismiss() }
+            findViewById<Button>(R.id.ok)?.setOnClickListener {
+                viewModel.deleteItems(args.itemsIdToDelete.toList())
+            }
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-
-        bottomSheetDialog.findViewById<FrameLayout>(
-            com.google.android.material.R.id.design_bottom_sheet
-        )?.let {
-            BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED
-        }
-
-        setupNavigation()
-
         return bottomSheetDialog
     }
 

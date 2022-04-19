@@ -105,7 +105,7 @@
         android:id="@+id/newGroupDialogFragment"
         android:name="com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag.NewGroupDialogFragment"
         android:label="NewGroupDialogFragment"
-        tools:layout="@layout/fragment_new_group_dialog">
+        tools:layout="@layout/new_group_dialog_fragment">
         <argument
             android:name="itemIds"
             app:argType="string[]"

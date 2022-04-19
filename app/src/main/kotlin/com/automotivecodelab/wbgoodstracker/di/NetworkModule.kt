@@ -30,8 +30,7 @@ class NetworkModule {
     fun provideOkHttpClient(networkStatusListener: NetworkStatusListener): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
-                if (!networkStatusListener.isNetworkAvailable)
-                    throw NoInternetConnectionException()
+                if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
                 chain.proceed(chain.request())
             }
             .readTimeout(15, TimeUnit.SECONDS)

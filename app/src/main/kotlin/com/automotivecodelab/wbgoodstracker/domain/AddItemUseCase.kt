@@ -15,13 +15,13 @@ class AddItemUseCase @Inject constructor(
         url: String,
         onAuthenticationFailureCallback: () -> Unit = {}
     ): Result<Unit> {
-        if (!url.contains("https://wildberries.") &&
-            !url.contains("https://www.wildberries.") &&
-            !url.contains("http://wildberries.") &&
-            !url.contains("http://www.wildberries.")
-        ) {
-            return Result.failure(InvalidUrlException())
-        }
+        val isUrlValid = (url.contains("https://wildberries.") ||
+                url.contains("https://www.wildberries.") ||
+                url.contains("http://wildberries.") ||
+                url.contains("http://www.wildberries.")) &&
+                url.contains("/catalog/")
+        if (!isUrlValid) return Result.failure(InvalidUrlException())
+        // removing sku name before url when copying from official wb app
         val pureUrl = url.replaceBefore("http", "")
         return if (userRepository.isUserAuthenticated()) {
             val user = userRepository.getUser()

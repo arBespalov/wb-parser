@@ -27,18 +27,10 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     private val args: NewGroupDialogFragmentArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
-        bottomSheetDialog.setContentView(R.layout.fragment_new_group_dialog)
-
-        bottomSheetDialog.window?.setSoftInputMode(
-            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-        )
-        bottomSheetDialog.setOnShowListener {
-            val bottomSheet = (bottomSheetDialog as? BottomSheetDialog)
-                ?.findViewById<View>(R.id.design_bottom_sheet) as? FrameLayout
-            bottomSheet?.let {
-                BottomSheetBehavior.from(it).state = BottomSheetBehavior.STATE_EXPANDED
-            }
+        val bottomSheetDialog = BottomSheetDialog(requireContext()).apply {
+            setContentView(R.layout.new_group_dialog_fragment)
+            window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         val editText = bottomSheetDialog.findViewById<EditText>(R.id.group_name)!!
@@ -68,11 +60,8 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
                 else -> false
             }
         }
-
         (requireActivity() as KeyboardToggle).showKeyboard(editText)
-
         setupNavigation()
-
         return bottomSheetDialog
     }
 

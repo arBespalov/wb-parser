@@ -37,7 +37,6 @@
     <string name="price_with_sale">Цена со скидкой</string>
     <string name="new_group">Новая группа</string>
     <string name="all_items">Все товары</string>
-    <string name="group_name">Группа</string>
     <string name="delete_group">Удалить группу</string>
     <string name="add_to_group">Добавить в группу</string>
     <string name="backup_and_sync">Синхронизация</string>
@@ -63,4 +62,6 @@
     <string name="feedbacks">Отзывы</string>
     <string name="sku_id">Артикул</string>
     <string name="id_copied">Артикул скопирован в буфер обмена</string>
+    <string name="url">URL товара</string>
+    <string name="group_name">Название группы</string>
 </resources>

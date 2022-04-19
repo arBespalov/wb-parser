@@ -58,7 +58,7 @@
                 android:id="@+id/new_group"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:text="@string/new_group"
-                app:icon="@drawable/ic_baseline_add_24"
+                app:icon="@drawable/ic_outline_create_new_folder_24"
                 android:layout_gravity="center"/>
         </LinearLayout>
 

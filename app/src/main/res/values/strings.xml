@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">WB Tracker</string>
     <string name="save">Save</string>
     <string name="add_item">Add Item</string>
-    <string name="url" translatable="false">URL</string>
+    <string name="url">URL</string>
     <string name="http" translatable="false">http://</string>
     <string name="delete">Delete</string>
     <string name="delete_question">Delete?</string>
@@ -39,12 +39,11 @@
     <string name="price_with_sale">Price with sale</string>
     <string name="new_group">New group</string>
     <string name="all_items">All items</string>
-    <string name="group_name">Group name</string>
     <string name="delete_group">Delete group</string>
     <string name="add_to_group">Add to group</string>
     <string name="backup_and_sync">Backup and sync</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_out">Sign Out</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
     <string name="sign_in_hint">Sign in to enable sync and auto-backup features</string>
     <string name="sign_out_hint">You`re signed in as %1$s</string>
     <string name="sign_out_hint_without_personalization">You`re signed in. Sync and auto-backup features are enabled</string>
@@ -66,6 +65,7 @@
     <string name="feedbacks">Feedbacks</string>
     <string name="sku_id">ID</string>
     <string name="id_copied">ID copied to clipboard</string>
+    <string name="group_name">Group name</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

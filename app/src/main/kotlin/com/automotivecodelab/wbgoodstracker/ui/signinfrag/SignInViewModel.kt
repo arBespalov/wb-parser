@@ -43,17 +43,21 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun signIn(user: User) {
+    fun signIn(idToken: String) {
         viewModelScope.launch {
             _viewState.value = SignInViewState.LoadingState
-            signInUseCase(user)
+            signInUseCase(idToken)
                 .onFailure {
                     _viewState.value = SignInViewState.SignedOutState
                     _networkErrorEvent.value = Event(it)
                 }
                 .onSuccess {
-                    _viewState.value = SignInViewState.SignedInState(user.email)
+                    _viewState.value = SignInViewState.SignedInState(null)
                 }
         }
+    }
+
+    fun setError(t: Throwable) {
+        _networkErrorEvent.value = Event(t)
     }
 }
