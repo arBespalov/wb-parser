@@ -11,7 +11,7 @@ class DeleteItemsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         itemsIdToDelete: List<String>,
-        onAuthenticationFailureCallback: () -> Unit = {}
+        onAuthenticationFailureCallback: () -> Unit
     ) {
         if (userRepository.isUserAuthenticated()) {
             userRepository.getUser()

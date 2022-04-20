@@ -49,7 +49,7 @@
     <string name="sign_out_hint_without_personalization">You`re signed in. Sync and auto-backup features are enabled</string>
     <string name="sign_out_message">You`re successfully signed out</string>
     <string name="please_wait">Please wait…</string>
-    <string name="snackbar_sign_out_text">Problem occurs with your account</string>
+    <string name="snackbar_account_error_text">Problem occurs with your account</string>
     <string name="system_default">System default</string>
     <string name="day">Day</string>
     <string name="night">Night</string>
@@ -66,6 +66,8 @@
     <string name="sku_id">ID</string>
     <string name="id_copied">ID copied to clipboard</string>
     <string name="group_name">Group name</string>
+    <string name="empty_list_hint">Press + to add new SKU</string>
+    <string name="items_count_quota">Items count quota exceeded. Max count: %1$s</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

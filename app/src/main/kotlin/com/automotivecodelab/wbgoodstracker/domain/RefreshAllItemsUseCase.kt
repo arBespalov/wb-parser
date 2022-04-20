@@ -11,13 +11,13 @@ class RefreshAllItemsUseCase @Inject constructor(
     private val usageStatisticsRepository: UsageStatisticsRepository
 ) {
     suspend operator fun invoke(
-        onAuthenticationFailureCallback: () -> Unit = {},
-        askUserForReviewCallback: () -> Unit = {}
+        onAuthenticationFailureCallback: () -> Unit,
+        askUserForReviewCallback: () -> Unit
     ): Result<Unit> {
         val result = if (userRepository.isUserAuthenticated()) {
             val user = userRepository.getUser()
             if (user.isFailure) {
-                onAuthenticationFailureCallback.invoke()
+                onAuthenticationFailureCallback()
                 itemsRepository.refreshAllItems()
             } else {
                 itemsRepository.syncItems(user.getOrThrow().idToken)

@@ -20,8 +20,8 @@ class AddItemViewModel @Inject constructor(
     private val _invalidUrl = MutableLiveData<Boolean>()
     val invalidUrl: LiveData<Boolean> = _invalidUrl
 
-    private val _networkErrorEvent = MutableLiveData<Event<Throwable>>()
-    val networkErrorEvent: LiveData<Event<Throwable>> = _networkErrorEvent
+    private val _errorEvent = MutableLiveData<Event<Throwable>>()
+    val errorEvent: LiveData<Event<Throwable>> = _errorEvent
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
@@ -43,7 +43,8 @@ class AddItemViewModel @Inject constructor(
                 .onFailure {
                 when (it) {
                     is InvalidUrlException -> _invalidUrl.value = true
-                    else -> _networkErrorEvent.value = Event(it)
+                    is ItemsQuotaExceededException -> _errorEvent.value = Event(it)
+                    else -> _errorEvent.value = Event(it)
                 }
             }
                 .onSuccess {
@@ -57,12 +58,6 @@ class AddItemViewModel @Inject constructor(
         if (text != url) {
             _invalidUrl.value = false
             url = text
-        }
-    }
-
-    fun signOut() {
-        viewModelScope.launch {
-            signOutUseCase()
         }
     }
 }

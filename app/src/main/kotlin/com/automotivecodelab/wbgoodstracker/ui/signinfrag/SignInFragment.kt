@@ -30,6 +30,7 @@ import timber.log.Timber
 
 class SignInFragment : Fragment() {
 
+    private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
     private val getUserCredentials = registerForActivityResult(ActivityResultContracts
         .StartIntentSenderForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -45,7 +46,6 @@ class SignInFragment : Fragment() {
         ViewModelFactory(requireContext().appComponent.signInViewModel())
     }
     private var viewDataBinding: SignInFragmentBinding? = null
-    private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -152,7 +152,6 @@ class SignInFragment : Fragment() {
             )
             // .setAutoSelectEnabled(true)
             .build()
-
         oneTapClient.beginSignIn(signInRequest)
             .addOnSuccessListener { result ->
                 try {

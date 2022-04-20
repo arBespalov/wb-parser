@@ -104,7 +104,10 @@ class ItemsViewModel @Inject constructor(
 
     fun deleteSingleItem(itemId: String) {
         viewModelScope.launch {
-            deleteItemsUseCase(listOf(itemId))
+            deleteItemsUseCase(
+                itemsIdToDelete = listOf(itemId),
+                onAuthenticationFailureCallback = { _authorizationErrorEvent.value = Event(Unit) }
+            )
         }
     }
 
@@ -161,12 +164,6 @@ class ItemsViewModel @Inject constructor(
 
     fun signIn() {
         _signInEvent.value = Event(Unit)
-    }
-
-    fun signOut() {
-        viewModelScope.launch {
-            signOutUseCase()
-        }
     }
 
     fun changeTheme() {

@@ -1,9 +1,7 @@
 package com.automotivecodelab.wbgoodstracker
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -13,9 +11,6 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
-import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
-import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.ceil
 
@@ -76,9 +71,11 @@ fun Context.themeColor(
     }
 }
 
-fun View.signOutSnackbar(onSignOutButtonClick: () -> Unit) {
-    val snackbar = Snackbar.make(this, R.string.snackbar_sign_out_text, Snackbar.LENGTH_LONG)
-    snackbar.setAction(R.string.sign_out) { onSignOutButtonClick() }
+fun View.syncErrorSnackbar() {
+    val snackbar = Snackbar.make(
+        this,
+        R.string.snackbar_account_error_text,
+        Snackbar.LENGTH_LONG)
     snackbar.show()
 }
 

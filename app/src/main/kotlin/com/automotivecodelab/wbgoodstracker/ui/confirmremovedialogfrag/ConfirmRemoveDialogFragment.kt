@@ -3,12 +3,11 @@ package com.automotivecodelab.wbgoodstracker.ui.confirmremovedialogfrag
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.appComponent
+import com.automotivecodelab.wbgoodstracker.syncErrorSnackbar
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -31,6 +30,10 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
             }
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+        viewModel.authorizationErrorEvent.observe(this, EventObserver {
+            parentFragment?.view?.syncErrorSnackbar()
+        })
+        setupNavigation()
         return bottomSheetDialog
     }
 

@@ -34,6 +34,18 @@
                     style="@style/SpinnerButton"/>
             </com.google.android.material.appbar.MaterialToolbar>
         </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Accent"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:id="@+id/empty_list_hint"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="@string/empty_list_hint" />
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -47,11 +59,10 @@
                 android:id="@+id/recycler_view_items"
                 android:clickable="true"
                 android:focusable="true"
-                android:paddingTop="@dimen/default_margin"
                 android:paddingBottom="@dimen/default_margin"
-                android:clipToPadding="false"/>
-
-
+                android:clipToPadding="false"
+                tools:visibility="visible"
+                />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

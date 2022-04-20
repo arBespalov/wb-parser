@@ -69,9 +69,7 @@ class AddItemFragment : Fragment() {
             toolbar.navigationIcon = cancelButton
             swipeRefresh.isEnabled = false
             fabSave.setOnClickListener { viewModel.saveItem() }
-            viewModel.invalidUrl.observe(
-                viewLifecycleOwner
-            ) {
+            viewModel.invalidUrl.observe(viewLifecycleOwner) {
                 if (it) {
                     textInputLayout.error = getString(R.string.invalid_url)
                 } else {
@@ -98,7 +96,7 @@ class AddItemFragment : Fragment() {
             }
         }
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-                requireView().signOutSnackbar { viewModel.signOut() }
+                requireView().syncErrorSnackbar()
             }
         )
         setupNavigation()
@@ -110,7 +108,7 @@ class AddItemFragment : Fragment() {
                 findNavController().navigateUp()
             }
         )
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.errorEvent.observe(viewLifecycleOwner, EventObserver {
                 val action = AddItemFragmentDirections
                     .actionAddItemFragmentToErrorDialogFragment(it)
                 navigate(action)

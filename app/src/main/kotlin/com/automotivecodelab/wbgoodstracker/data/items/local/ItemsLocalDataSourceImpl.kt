@@ -103,7 +103,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
             }
     }
 
-    override fun getCurrentGroup(): Flow<String?> {
+    override fun observeCurrentGroup(): Flow<String?> {
         return dataStore.data
             .map { prefs ->
                 prefs[CURRENT_GROUP]
@@ -121,7 +121,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getItemGroups(): Flow<ItemGroups> {
+    override fun observeItemGroups(): Flow<ItemGroups> {
         return appDatabase.itemDao().getGroups()
             .map { list ->
                 ItemGroups(

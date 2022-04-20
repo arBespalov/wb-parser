@@ -41,12 +41,12 @@
     <string name="add_to_group">Добавить в группу</string>
     <string name="backup_and_sync">Синхронизация</string>
     <string name="sign_in">Войти</string>
-    <string name="sign_in_hint">Войдите, чтобы включить сихнронизацию между устройствами</string>
+    <string name="sign_in_hint">Войдите, чтобы включить автоматическое создание резервных копий и сихнронизацию между вашими устройствами</string>
     <string name="sign_out_hint">Вы вошли как %1$s</string>
     <string name="sign_out_hint_without_personalization">Синхронизация между устройствами включена</string>
     <string name="sign_out_message">Вы успешно вышли из аккаунта</string>
     <string name="please_wait">Подождите…</string>
-    <string name="snackbar_sign_out_text">С вашим аккаунтом возникли проблемы</string>
+    <string name="snackbar_account_error_text">Проблемы при синхронизации аккаунта</string>
     <string name="system_default">По умолчанию</string>
     <string name="day">Дневная</string>
     <string name="night">Ночная</string>
@@ -64,4 +64,6 @@
     <string name="id_copied">Артикул скопирован в буфер обмена</string>
     <string name="url">URL товара</string>
     <string name="group_name">Название группы</string>
+    <string name="empty_list_hint">Для добавления нового товара нажмите +</string>
+    <string name="items_count_quota">Превышено максимальное количество добавленных товаров: %1$s</string>
 </resources>

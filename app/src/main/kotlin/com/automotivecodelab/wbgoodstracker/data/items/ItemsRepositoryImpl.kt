@@ -22,7 +22,7 @@ class ItemsRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeItems(): Flow<Pair<List<Item>, String?>> {
         var _group: String? = null
-        return localDataSource.getCurrentGroup()
+        return localDataSource.observeCurrentGroup()
             .flatMapLatest { group ->
                 _group = group
                 if (group == null) {
@@ -67,7 +67,7 @@ class ItemsRepositoryImpl @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         runCatching {
-            val currentGroup = localDataSource.getCurrentGroup().first()
+            val currentGroup = localDataSource.observeCurrentGroup().first()
             if (currentGroup != null && localDataSource.getByGroup(currentGroup).size == 1) {
                 setCurrentGroup(null)
             }
@@ -96,7 +96,7 @@ class ItemsRepositoryImpl @Inject constructor(
             withContext(Dispatchers.IO) {
                 val newItemDeferred = async { remoteDataSource.addItem(url, token) }
                 val localItemsDeferred = async { localDataSource.getAll() }
-                val currentGroupDeferred = async { localDataSource.getCurrentGroup().first() }
+                val currentGroupDeferred = async { localDataSource.observeCurrentGroup().first() }
 
                 val newItem = newItemDeferred.await()
                 val localItems = localItemsDeferred.await()
@@ -288,14 +288,14 @@ class ItemsRepositoryImpl @Inject constructor(
 
     override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
         setGroupNameToItemsList(itemIds.map { localDataSource.getItem(it) }, groupName)
-        val currentGroup = localDataSource.getCurrentGroup().first()
+        val currentGroup = localDataSource.observeCurrentGroup().first()
         if (currentGroup != null && localDataSource.getByGroup(currentGroup).isEmpty()) {
             setCurrentGroup(null)
         }
     }
 
     override suspend fun renameCurrentGroup(newGroupName: String) {
-        val currentGroup = localDataSource.getCurrentGroup().first()
+        val currentGroup = localDataSource.observeCurrentGroup().first()
         if (currentGroup != null) {
             val items = localDataSource.getByGroup(currentGroup)
             setGroupNameToItemsList(items, newGroupName)
@@ -304,7 +304,7 @@ class ItemsRepositoryImpl @Inject constructor(
     }
 
     override fun observeCurrentGroup(): Flow<String?> {
-        return localDataSource.getCurrentGroup()
+        return localDataSource.observeCurrentGroup()
     }
 
     private suspend fun setGroupNameToItemsList(
@@ -334,7 +334,7 @@ class ItemsRepositoryImpl @Inject constructor(
     }
 
     override fun observeGroups(): Flow<ItemGroups> {
-        return localDataSource.getItemGroups()
+        return localDataSource.observeItemGroups()
     }
 
     override suspend fun setCurrentGroup(groupName: String?) {

@@ -90,7 +90,7 @@ class ItemsFragment : Fragment() {
             viewDataBinding?.swipeRefresh?.isRefreshing = it
         }
         viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            requireView().signOutSnackbar { viewModel.signOut() }
+            requireView().syncErrorSnackbar()
         })
         viewModel.askUserForReviewEvent.observe(viewLifecycleOwner, EventObserver {
             runCatching {
@@ -105,11 +105,28 @@ class ItemsFragment : Fragment() {
                 }
             }
         })
-        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (items, _) ->
-            viewDataBinding?.swipeRefresh?.isEnabled = items.isNotEmpty()
-            viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_refresh)?.isEnabled =
-                items.isNotEmpty()
 
+        viewModel.itemGroups.observe(viewLifecycleOwner) { itemGroups ->
+            if (itemGroups.totalItemsQuantity == 0) {
+                viewDataBinding?.apply {
+                    emptyListHint.setText(R.string.empty_list_hint)
+                    emptyListHint.visibility = View.VISIBLE
+                    toolbar.menu?.findItem(R.id.menu_refresh)?.isEnabled = false
+                    toolbar.menu?.findItem(R.id.menu_search)?.isEnabled = false
+                    // disable toolbar moving on scroll
+                    swipeRefresh.visibility = View.INVISIBLE
+                }
+            } else {
+                viewDataBinding?.apply {
+                    emptyListHint.visibility = View.GONE
+                    toolbar.menu?.findItem(R.id.menu_refresh)?.isEnabled = true
+                    toolbar.menu?.findItem(R.id.menu_search)?.isEnabled = true
+                    swipeRefresh.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (items, _) ->
             adapter?.replaceAll(items)
             if (scrollToStartOnUpdate) {
                 viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
@@ -280,8 +297,7 @@ class ItemsFragment : Fragment() {
                     adapter?.tracker?.setItemsSelected(selectedItemsSet, true)
                 }
                 actionMode?.title = getString(R.string.selected) + ": " + selectedItemsSet.size
-                actionMode?.menu?.findItem(R.id.menu_edit)?.isEnabled =
-                    selectedItemsSet.size == 1
+                actionMode?.menu?.findItem(R.id.menu_edit)?.isEnabled = selectedItemsSet.size == 1
             }
         }
     }
@@ -365,20 +381,27 @@ class ItemsFragment : Fragment() {
                 (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
                     ?.let { item ->
                         val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
-                        adapter?.remove(item)
                         val snackbar = Snackbar.make(
                             viewDataBinding?.fabAdditem ?: requireView(),
                             R.string.item_deleted,
                             Snackbar.LENGTH_LONG)
                         snackbar.setAction(R.string.undo) {
+                            Timber.d("undo")
                             adapter?.add(item)
                             if (isItemInFirstPosition)
                                 viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
                         }
                         snackbar.addCallback(object : Snackbar.Callback() {
+                            override fun onShown(sb: Snackbar?) {
+                                Timber.d("remove")
+                                adapter?.remove(item)
+                                super.onShown(sb)
+                            }
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                Timber.d("dismissed")
                                 if (event != DISMISS_EVENT_ACTION) {
                                     viewModel.deleteSingleItem(item.id)
+                                    Timber.d("delete")
                                 }
                                 viewDataBinding?.fabAdditem?.show()
                                 super.onDismissed(transientBottomBar, event)
