@@ -66,4 +66,5 @@
     <string name="group_name">Название группы</string>
     <string name="empty_list_hint">Для добавления нового товара нажмите +</string>
     <string name="items_count_quota">Превышено максимальное количество добавленных товаров: %1$s</string>
+    <string name="help">Помощь</string>
 </resources>

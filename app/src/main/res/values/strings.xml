@@ -68,6 +68,8 @@
     <string name="group_name">Group name</string>
     <string name="empty_list_hint">Press + to add new SKU</string>
     <string name="items_count_quota">Items count quota exceeded. Max count: %1$s</string>
+    <string name="help">Help</string>
+    <string name="support_email" translatable="false">support@automotivecodelab.ru</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

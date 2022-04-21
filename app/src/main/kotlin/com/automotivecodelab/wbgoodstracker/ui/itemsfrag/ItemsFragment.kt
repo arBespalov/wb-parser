@@ -178,6 +178,10 @@ class ItemsFragment : Fragment() {
                     viewModel.renameGroup()
                     true
                 }
+                R.id.menu_contacts -> {
+                    viewModel.showContacts()
+                    true
+                }
                 else -> false
             }
         }
@@ -392,6 +396,7 @@ class ItemsFragment : Fragment() {
                                 viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
                         }
                         snackbar.addCallback(object : Snackbar.Callback() {
+                            // for correct behavior when swiping cards fastly
                             override fun onShown(sb: Snackbar?) {
                                 Timber.d("remove")
                                 adapter?.remove(item)
@@ -550,6 +555,11 @@ class ItemsFragment : Fragment() {
         viewModel.renameCurrentGroupEvent.observe(viewLifecycleOwner, EventObserver {
             val action = ItemsFragmentDirections
                 .actionItemsFragmentToNewGroupDialogFragment(null, true)
+            navigate(action)
+        })
+
+        viewModel.showContactsEvent.observe(viewLifecycleOwner, EventObserver {
+            val action = ItemsFragmentDirections.actionItemsFragmentToContactsDialogFragment()
             navigate(action)
         })
     }

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--idk how to handle with splash screen theme on screen previews - the
+only way i found is to change default app theme in manifest-->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -35,6 +37,9 @@
         <action
             android:id="@+id/action_itemsFragment_to_newGroupDialogFragment"
             app:destination="@id/newGroupDialogFragment" />
+        <action
+            android:id="@+id/action_itemsFragment_to_contactsDialogFragment"
+            app:destination="@id/contactsDialogFragment" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -164,4 +169,9 @@
             app:destination="@id/errorDialogFragment" />
     </fragment>
     <action android:id="@+id/action_global_addItemFragment" app:destination="@id/addItemFragment" />
+    <dialog
+        android:id="@+id/contactsDialogFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.contactsdialog.ContactsDialogFragment"
+        android:label="ContactsDialogFragment"
+        tools:layout="@layout/contacts_dialog_layout"/>
 </navigation>

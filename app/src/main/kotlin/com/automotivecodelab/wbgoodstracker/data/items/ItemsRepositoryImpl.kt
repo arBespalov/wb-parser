@@ -66,16 +66,16 @@ class ItemsRepositoryImpl @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
-        runCatching {
-            val currentGroup = localDataSource.observeCurrentGroup().first()
-            if (currentGroup != null && localDataSource.getByGroup(currentGroup).size == 1) {
-                setCurrentGroup(null)
-            }
-            localDataSource.deleteItems(itemsId)
-            if (token != null) {
-                GlobalScope.launch {
+        val currentGroup = localDataSource.observeCurrentGroup().first()
+        if (currentGroup != null && localDataSource.getByGroup(currentGroup).size == 1) {
+            setCurrentGroup(null)
+        }
+        localDataSource.deleteItems(itemsId)
+        if (token != null) {
+            GlobalScope.launch {
+                runCatching {
                     remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
-                }
+                }.onFailure { Timber.d(it) }
             }
         }
     }

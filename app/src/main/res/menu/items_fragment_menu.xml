@@ -32,4 +32,8 @@
         android:id="@+id/menu_theme"
         android:title="@string/theme"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_contacts"
+        android:title="@string/help"
+        app:showAsAction="never"/>
 </menu>

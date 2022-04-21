@@ -88,6 +88,9 @@ class ItemsViewModel @Inject constructor(
     private val _askUserForReviewEvent = MutableLiveData<Event<Unit>>()
     val askUserForReviewEvent: LiveData<Event<Unit>> = _askUserForReviewEvent
 
+    private val _showContactsEvent = MutableLiveData<Event<Unit>>()
+    val showContactsEvent: LiveData<Event<Unit>> = _showContactsEvent
+
     fun openItem(recyclerItemPosition: Int) {
         _openItemEvent.value = Event(recyclerItemPosition)
     }
@@ -184,5 +187,9 @@ class ItemsViewModel @Inject constructor(
 
     fun renameGroup() {
         _renameCurrentGroupEvent.value = Event(Unit)
+    }
+
+    fun showContacts() {
+        _showContactsEvent.value = Event(Unit)
     }
 }
