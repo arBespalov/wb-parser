@@ -2,7 +2,7 @@
     <string name="app_name" translatable="false">WB Tracker</string>
     <string name="save">Save</string>
     <string name="add_item">Add Item</string>
-    <string name="url">URL</string>
+    <string name="add_item_input">URL or vendor code</string>
     <string name="http" translatable="false">http://</string>
     <string name="delete">Delete</string>
     <string name="delete_question">Delete?</string>
@@ -70,6 +70,8 @@
     <string name="items_count_quota">Items count quota exceeded. Max count: %1$s</string>
     <string name="help">Help</string>
     <string name="support_email" translatable="false">support@automotivecodelab.ru</string>
+    <string name="add_item_hint">Please add a direct link to SKU you want to track, or use WB vendor code</string>
+    <string name="invalid_vendor_code">Invalid vendor code</string>
 
     <string name="shared_element_container_add_item" translatable="false">shared_element_container_add_item</string>
     <string name="shared_element_container_detail_fragment" translatable="false">shared_element_container_detail_fragment</string>

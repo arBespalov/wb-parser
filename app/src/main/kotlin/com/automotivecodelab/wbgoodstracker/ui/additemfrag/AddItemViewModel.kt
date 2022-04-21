@@ -10,15 +10,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AddItemViewModel @Inject constructor(
-    private val addItemUseCase: AddItemUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val addItemUseCase: AddItemUseCase
 ) : ViewModel() {
 
     private val _saveSuccessfulEvent = MutableLiveData<Event<Unit>>()
     val saveSuccessfulEvent: LiveData<Event<Unit>> = _saveSuccessfulEvent
 
-    private val _invalidUrl = MutableLiveData<Boolean>()
-    val invalidUrl: LiveData<Boolean> = _invalidUrl
+    private val _inputState = MutableLiveData<UserInputState>()
+    val inputState: LiveData<UserInputState> = _inputState
 
     private val _errorEvent = MutableLiveData<Event<Throwable>>()
     val errorEvent: LiveData<Event<Throwable>> = _errorEvent
@@ -29,22 +28,27 @@ class AddItemViewModel @Inject constructor(
     private val _authorizationErrorEvent = MutableLiveData<Event<Unit>>()
     val authorizationErrorEvent: LiveData<Event<Unit>> = _authorizationErrorEvent
 
-    private var url: String = ""
+    private var input: String = ""
 
     fun saveItem() {
         viewModelScope.launch {
             _dataLoading.value = true
             addItemUseCase(
-                url = url,
+                input = input,
                 onAuthenticationFailureCallback =  {
                     _authorizationErrorEvent.value = Event(Unit)
                 }
             )
                 .onFailure {
-                when (it) {
-                    is InvalidUrlException -> _invalidUrl.value = true
-                    is ItemsQuotaExceededException -> _errorEvent.value = Event(it)
-                    else -> _errorEvent.value = Event(it)
+                    when (it) {
+                        is InvalidUrlException -> _inputState.value =
+                            UserInputState.INVALID_URL
+                        is InvalidVendorCodeException -> _inputState.value =
+                            UserInputState.INVALID_VENDOR_CODE
+                        is ItemsQuotaExceededException ->
+                            _errorEvent.value = Event(it)
+                        else ->
+                            _errorEvent.value = Event(it)
                 }
             }
                 .onSuccess {
@@ -55,9 +59,9 @@ class AddItemViewModel @Inject constructor(
     }
 
     fun handleTextInput(text: String) {
-        if (text != url) {
-            _invalidUrl.value = false
-            url = text
+        if (text != input) {
+            _inputState.value = UserInputState.OK
+            input = text
         }
     }
 }

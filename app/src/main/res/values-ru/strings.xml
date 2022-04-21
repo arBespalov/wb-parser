@@ -62,9 +62,12 @@
     <string name="feedbacks">Отзывы</string>
     <string name="sku_id">Артикул</string>
     <string name="id_copied">Артикул скопирован в буфер обмена</string>
-    <string name="url">URL товара</string>
+    <string name="add_item_input">Ссылка или артикул</string>
     <string name="group_name">Название группы</string>
     <string name="empty_list_hint">Для добавления нового товара нажмите +</string>
     <string name="items_count_quota">Превышено максимальное количество добавленных товаров: %1$s</string>
     <string name="help">Помощь</string>
+    <string name="add_item_hint">Для начала отслеживания вставьте ссылку на товар вида
+        http://wildberries.ru/catalog/…, либо укажите артикул интересующего товара</string>
+    <string name="invalid_vendor_code">Неверный артикул</string>
 </resources>

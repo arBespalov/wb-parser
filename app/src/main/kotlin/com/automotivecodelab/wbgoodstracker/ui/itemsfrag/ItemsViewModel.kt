@@ -20,7 +20,6 @@ class ItemsViewModel @Inject constructor(
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
     observeGroupsUseCase: ObserveGroupsUseCase,
     private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
-    private val signOutUseCase: SignOutUseCase,
     private val deleteItemsUseCase: DeleteItemsUseCase
 ) : ViewModel() {
 

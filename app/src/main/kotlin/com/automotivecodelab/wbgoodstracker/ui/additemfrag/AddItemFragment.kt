@@ -28,7 +28,7 @@ class AddItemFragment : Fragment() {
     private var viewDataBinding: AddItemFragmentBinding? = null
     private val args: AddItemFragmentArgs by navArgs()
     private var isArgsUrlHandled = false
-    private var urlTextChangedListener: TextWatcher? = null
+    private var inputTextChangedListener: TextWatcher? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,8 +50,8 @@ class AddItemFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        viewDataBinding?.URL?.removeTextChangedListener(urlTextChangedListener)
-        urlTextChangedListener = null
+        viewDataBinding?.input?.removeTextChangedListener(inputTextChangedListener)
+        inputTextChangedListener = null
         viewDataBinding = null
         super.onDestroyView()
     }
@@ -69,11 +69,12 @@ class AddItemFragment : Fragment() {
             toolbar.navigationIcon = cancelButton
             swipeRefresh.isEnabled = false
             fabSave.setOnClickListener { viewModel.saveItem() }
-            viewModel.invalidUrl.observe(viewLifecycleOwner) {
-                if (it) {
-                    textInputLayout.error = getString(R.string.invalid_url)
-                } else {
-                    textInputLayout.error = null
+            viewModel.inputState.observe(viewLifecycleOwner) { state ->
+                textInputLayout.error =  when (state) {
+                    UserInputState.INVALID_URL -> getString(R.string.invalid_url)
+                    UserInputState.INVALID_VENDOR_CODE -> getString(R.string.invalid_vendor_code)
+                    UserInputState.OK -> null
+                    else -> null
                 }
             }
             viewModel.dataLoading.observe(viewLifecycleOwner) {
@@ -86,12 +87,12 @@ class AddItemFragment : Fragment() {
                 }
             }
             fabSave.isEnabled = false
-            urlTextChangedListener = URL.addTextChangedListener {
+            inputTextChangedListener = input.addTextChangedListener {
                 fabSave.isEnabled = !it.isNullOrEmpty()
                 viewModel.handleTextInput(it.toString())
             }
             if (!isArgsUrlHandled) {
-                args.url?.let { URL.setText(it) }
+                args.url?.let { input.setText(it) }
                 isArgsUrlHandled = true
             }
         }
