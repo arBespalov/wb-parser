@@ -76,8 +76,9 @@ class DetailFragment : Fragment() {
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         if (isDarkTheme) {
             viewDataBinding?.collapsingToolbar?.setContentScrimColor(
-                ElevationOverlayProvider(requireContext())
-                    .compositeOverlayWithThemeSurfaceColorIfNeeded(12f)
+                requireContext().themeColor(android.R.attr.colorBackground)
+//                ElevationOverlayProvider(requireContext())
+//                    .compositeOverlayWithThemeSurfaceColorIfNeeded(12f)
             )
         }
 

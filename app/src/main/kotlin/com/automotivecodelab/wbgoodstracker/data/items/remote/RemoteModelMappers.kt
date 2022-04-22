@@ -22,7 +22,7 @@ fun ItemRemoteModel.toDBModel(
     val quantityDelta = info[0].sizes.associate {
         it.sizeName to it.quantity - (previousSizeQuantity?.get(it.sizeName) ?: it.quantity)
     }
-    val feedbacksDelta = feedbacks -previousFeedbacks
+    val feedbacksDelta = feedbacks - previousFeedbacks
 
     val lastChangesTimestamp = if (totalQuantityDelta == 0 &&
             ordersCountDelta == 0 &&

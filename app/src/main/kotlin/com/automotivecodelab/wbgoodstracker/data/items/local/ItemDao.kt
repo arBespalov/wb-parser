@@ -43,7 +43,3 @@ interface ItemDao {
     suspend fun update(vararg item: ItemDBModel): Int
 }
 
-data class GroupNameWithCount(
-    val groupName: String?,
-    val count: Int
-)

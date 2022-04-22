@@ -8,6 +8,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.R
@@ -17,12 +18,12 @@ import kotlinx.coroutines.runBlocking
 class MainActivity : AppCompatActivity(), KeyboardToggle {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_WBParser)
         super.onCreate(savedInstanceState)
         val appThemeSource = application.appComponent.appThemeSource()
         runBlocking {
             appThemeSource.saveAndSetupAppTheme(appThemeSource.getAppTheme())
         }
+        setTheme(R.style.Theme_WBParser)
         setContentView(R.layout.activity_main)
         handleIntentAndNavigateToAddItemFragment(intent)
     }
@@ -39,7 +40,9 @@ class MainActivity : AppCompatActivity(), KeyboardToggle {
             intent.removeExtra(Intent.EXTRA_TEXT)
             if (intentValue != null && intentValue.contains("wildberries")) {
                 val action = MainNavDirections.actionGlobalAddItemFragment(intentValue)
-                findNavController(R.id.fragment).navigate(action)
+                // findNavController() will fail when launched from onCreate()
+                (supportFragmentManager.findFragmentById(R.id.fragment) as? NavHostFragment)
+                    ?.navController?.navigate(action)
             }
         }
     }

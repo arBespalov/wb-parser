@@ -56,7 +56,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "ordersCount INTEGER NOT NULL DEFAULT 0, " +
                 "feedbacks INTEGER NOT NULL DEFAULT 0, " +
                 "feedbacksDelta INTEGER NOT NULL DEFAULT 0, " +
-                "updateError INTEGER, " + //todo test migration
+                "updateError INTEGER, " +
                 "PRIMARY KEY (id))"
         )
         database.execSQL("INSERT INTO item_new (" +
@@ -81,7 +81,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 //"ordersCount, " +
                 //"feedbacks, " +
                 //"feedbacksDelta, " +
-                //"updateError, " + //todo test migration
+                //"updateError, " +
                 "SELECT " +
                 "_id, " +
                 "name, " +

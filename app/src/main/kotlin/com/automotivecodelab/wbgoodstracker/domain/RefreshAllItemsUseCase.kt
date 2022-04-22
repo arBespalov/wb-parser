@@ -10,6 +10,10 @@ class RefreshAllItemsUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository,
     private val usageStatisticsRepository: UsageStatisticsRepository
 ) {
+    companion object {
+        const val REFRESHES_COUNT_WHEN_ASK_FOR_REVIEW = 20
+    }
+
     suspend operator fun invoke(
         onAuthenticationFailureCallback: () -> Unit,
         askUserForReviewCallback: () -> Unit
@@ -26,7 +30,8 @@ class RefreshAllItemsUseCase @Inject constructor(
             itemsRepository.refreshAllItems()
         }
         if (result.isSuccess) usageStatisticsRepository.incrementUpdateAllItemsAction()
-        if (usageStatisticsRepository.getCountOfUpdateAllItemsAction() == 20)
+        if (usageStatisticsRepository.getCountOfUpdateAllItemsAction() ==
+            REFRESHES_COUNT_WHEN_ASK_FOR_REVIEW)
             askUserForReviewCallback()
         return result
     }

@@ -21,7 +21,9 @@ class AddItemUseCase @Inject constructor(
         onAuthenticationFailureCallback: () -> Unit
     ): Result<Unit> {
         val url = when {
-            input.isDigitsOnly() -> {
+            // isDigitsOnly() is in androidx library, so unit test fails and clean arch rule
+            // violates
+            input.all { it.isDigit() } -> {
                 if (input.length < 6 || input.length > 9)
                     return Result.failure(InvalidVendorCodeException())
                 "https://wildberries.ru/catalog/$input/detail.aspx"

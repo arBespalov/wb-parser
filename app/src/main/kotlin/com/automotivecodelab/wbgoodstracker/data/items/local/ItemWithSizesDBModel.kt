@@ -59,3 +59,8 @@ data class ItemWithSizesDBModel(
     )
     val sizes: List<SizeDBModel>
 )
+
+data class GroupNameWithCount(
+    val groupName: String?,
+    val count: Int
+)

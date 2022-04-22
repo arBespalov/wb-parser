@@ -2,10 +2,17 @@ package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.automotivecodelab.wbgoodstracker.data.items.itemWithSizesDbModel
+import com.automotivecodelab.wbgoodstracker.data.items.sizeDBModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 
@@ -14,74 +21,47 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
-@RunWith(AndroidJUnit4::class)
 class ItemsLocalDataSourceImplTest {
     lateinit var db: AppDatabase
     lateinit var itemsLocalDataSourceImpl: ItemsLocalDataSourceImpl
+    lateinit var testDataStore: DataStore<Preferences>
 
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(
-            db.itemDao(),
-            db.sizeDao(),
-            context.getSharedPreferences("sp", Context.MODE_PRIVATE)
+        testDataStore = PreferenceDataStoreFactory.create(
+            produceFile = { context.preferencesDataStoreFile (UUID.randomUUID().toString()) }
         )
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
+        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(testDataStore, db)
     }
 
     @After
     fun tearDown() {
         db.close()
+        runBlocking {
+            testDataStore.edit {
+                it.clear()
+            }
+        }
     }
 
     @Test
     fun updateItem() {
-        val itemId = "id"
-        val sizeDBModel = SizeDBModel(
-            itemId = itemId,
-            price = 1000,
-            priceWithSale = 800,
-            quantity = 50,
-            sizeName = "",
-            storesWithQuantity = ""
-        )
-        val item = ItemWithSizesDBModel(
-            item = ItemDBModel(
-                        id = itemId,
-                        name = "name",
-                        url = "example.com",
-                        img = "example.com/img.png",
-                        observingTimeInMs = 1000,
-                        ordersCountSinceObservingStarted = 0,
-                        estimatedIncome = 0,
-                        averageOrdersCountPerDay = 0,
-                        averagePrice = 500,
-                        totalQuantity = 100,
-                        creationTimestamp = Date().time,
-                        ordersCountDelta = null,
-                        localName = null,
-                        averagePriceDelta = null,
-                        groupName = null,
-                        totalQuantityDelta = null,
-                        lastUpdateTimestamp = 1000,
-                        ordersCount = 0,
-            ),
-            sizes = listOf(
-                sizeDBModel.copy(sizeName = "s"),
-                sizeDBModel.copy(sizeName = "m")
-            )
-        )
         runBlocking {
-            itemsLocalDataSourceImpl.addItem(item)
+            val itemId = "123"
+            itemsLocalDataSourceImpl.addItem(itemWithSizesDbModel(itemId))
             val newSizes = listOf(
-                sizeDBModel.copy(sizeName = "m"),
-                sizeDBModel.copy(sizeName = "l")
+                sizeDBModel(itemId).copy(sizeName = "m"),
+                sizeDBModel(itemId).copy(sizeName = "l")
             )
-            itemsLocalDataSourceImpl.updateItem(item.copy(
-                sizes = newSizes
-            ))
+            itemsLocalDataSourceImpl.updateItem(
+                itemWithSizesDbModel(itemId).copy(
+                    sizes = newSizes
+                )
+            )
             assert(itemsLocalDataSourceImpl.getItem(itemId).sizes
                 .sortedBy { it.sizeName }
                 .toTypedArray()

@@ -53,4 +53,5 @@ class NetworkStatusListener @Inject constructor(context: Context) {
     }
 }
 
-class NoInternetConnectionException : IOException("No internet connection")
+// kind of clean acrh violation, because ui layer knows about this entity
+class NoInternetConnectionException : IOException("NoInternetConnectionException")

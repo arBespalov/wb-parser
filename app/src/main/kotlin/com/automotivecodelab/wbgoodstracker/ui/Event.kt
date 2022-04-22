@@ -2,6 +2,7 @@ package com.automotivecodelab.wbgoodstracker.ui
 
 import androidx.lifecycle.Observer
 
+// https://github.com/android/architecture-samples/blob/main/app/src/main/java/com/example/android/architecture/blueprints/todoapp/Event.kt
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */

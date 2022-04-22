@@ -27,22 +27,6 @@ fun Long.millisToDays(): Int {
 }
 
 // avoiding duplicate navigation to prevent crashes when click 2 views simultaneously
-fun Fragment.navigate(directions: NavDirections) {
-    val controller = findNavController()
-    val className = when (val currentDestination = controller.currentDestination) {
-        is DialogFragmentNavigator.Destination -> {
-            currentDestination.className
-        }
-        is FragmentNavigator.Destination -> {
-            currentDestination.className
-        }
-        else -> return
-    }
-    if (className == this.javaClass.name) {
-        controller.navigate(directions)
-    }
-}
-
 fun Fragment.navigate(directions: NavDirections, extras: FragmentNavigator.Extras? = null) {
     val controller = findNavController()
     val className = when (val currentDestination = controller.currentDestination) {
