@@ -1,0 +1,130 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "2c899dc7bf49c4739b750d70e8ccc434",
+    "entities": [
+      {
+        "tableName": "Item",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `img` TEXT NOT NULL, `info` TEXT, `observingTimeInMs` INTEGER NOT NULL, `ordersCountSinceObservingStarted` INTEGER NOT NULL, `estimatedIncome` INTEGER NOT NULL, `averageOrdersCountInDay` INTEGER NOT NULL, `averagePrice` INTEGER NOT NULL, `totalQuantity` INTEGER NOT NULL, `local_creationTimeInMs` INTEGER NOT NULL, `local_ordersCountDelta` TEXT, `local_name` TEXT, `local_averagePriceDelta` TEXT, `local_groupName` TEXT, `local_totalQuantityDelta` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "img",
+            "columnName": "img",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "info",
+            "columnName": "info",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "observingTimeInMs",
+            "columnName": "observingTimeInMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordersCountSinceObservingStarted",
+            "columnName": "ordersCountSinceObservingStarted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estimatedIncome",
+            "columnName": "estimatedIncome",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageOrdersCountInDay",
+            "columnName": "averageOrdersCountInDay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averagePrice",
+            "columnName": "averagePrice",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalQuantity",
+            "columnName": "totalQuantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "local_creationTimeInMs",
+            "columnName": "local_creationTimeInMs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "local_ordersCountDelta",
+            "columnName": "local_ordersCountDelta",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "local_name",
+            "columnName": "local_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "local_averagePriceDelta",
+            "columnName": "local_averagePriceDelta",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "local_groupName",
+            "columnName": "local_groupName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "local_totalQuantityDelta",
+            "columnName": "local_totalQuantityDelta",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2c899dc7bf49c4739b750d70e8ccc434')"
+    ]
+  }
+}

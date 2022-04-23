@@ -32,6 +32,11 @@ android {
             "String", "SERVER_CLIENT_ID",
             gradleLocalProperties(rootDir).getProperty("SERVER_CLIENT_ID")
         )
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
+            }
+        }
     }
 
     buildTypes {
@@ -55,6 +60,9 @@ android {
     }
     dataBinding {
         isEnabled = true
+    }
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 }
 
@@ -104,6 +112,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+    androidTestImplementation("androidx.room:room-testing:2.4.2")
 
     // ===for in-app-review===
     implementation("com.google.android.play:core:1.10.3")
