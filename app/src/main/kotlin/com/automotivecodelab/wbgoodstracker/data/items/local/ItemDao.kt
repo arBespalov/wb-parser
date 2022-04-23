@@ -1,6 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -42,4 +41,3 @@ interface ItemDao {
     @Update
     suspend fun update(vararg item: ItemDBModel): Int
 }
-

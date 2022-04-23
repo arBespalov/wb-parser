@@ -23,7 +23,6 @@ import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import timber.log.Timber
@@ -31,8 +30,10 @@ import timber.log.Timber
 class SignInFragment : Fragment() {
 
     private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
-    private val getUserCredentials = registerForActivityResult(ActivityResultContracts
-        .StartIntentSenderForResult()) { result: ActivityResult ->
+    private val getUserCredentials = registerForActivityResult(
+        ActivityResultContracts
+            .StartIntentSenderForResult()
+    ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             try {
                 val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
@@ -94,7 +95,9 @@ class SignInFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.networkErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = SignInFragmentDirections.actionSignInFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
@@ -155,8 +158,11 @@ class SignInFragment : Fragment() {
         oneTapClient.beginSignIn(signInRequest)
             .addOnSuccessListener { result ->
                 try {
-                    getUserCredentials.launch(IntentSenderRequest.Builder(
-                        result.pendingIntent.intentSender).build())
+                    getUserCredentials.launch(
+                        IntentSenderRequest.Builder(
+                            result.pendingIntent.intentSender
+                        ).build()
+                    )
                 } catch (e: IntentSender.SendIntentException) {
                     Timber.d("Couldn't start One Tap UI: ${e.message}")
                     viewModel.setError(e)

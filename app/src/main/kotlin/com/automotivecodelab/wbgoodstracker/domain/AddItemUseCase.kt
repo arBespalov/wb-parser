@@ -1,11 +1,10 @@
 package com.automotivecodelab.wbgoodstracker.domain
 
-import androidx.core.text.isDigitsOnly
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
-import kotlinx.coroutines.flow.first
 import java.lang.Exception
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
 
 class AddItemUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository,
@@ -29,11 +28,13 @@ class AddItemUseCase @Inject constructor(
                 "https://wildberries.ru/catalog/$input/detail.aspx"
             }
             else -> {
-                val isUrlValid = (input.contains("https://wildberries.") ||
+                val isUrlValid = (
+                    input.contains("https://wildberries.") ||
                         input.contains("https://www.wildberries.") ||
                         input.contains("http://wildberries.") ||
-                        input.contains("http://www.wildberries.")) &&
-                        input.contains("/catalog/")
+                        input.contains("http://www.wildberries.")
+                    ) &&
+                    input.contains("/catalog/")
                 if (!isUrlValid) return Result.failure(InvalidUrlException())
                 // removing sku name before url when copying from official wb app
                 input.replaceBefore("http", "")
@@ -58,5 +59,5 @@ class AddItemUseCase @Inject constructor(
 }
 
 class InvalidUrlException : Exception("InvalidUrlException")
-class ItemsQuotaExceededException: Exception("ItemsQuotaExceededException")
-class InvalidVendorCodeException: Exception("InvalidVendorCodeException")
+class ItemsQuotaExceededException : Exception("ItemsQuotaExceededException")
+class InvalidVendorCodeException : Exception("InvalidVendorCodeException")

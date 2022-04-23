@@ -70,7 +70,7 @@ class AddItemFragment : Fragment() {
             swipeRefresh.isEnabled = false
             fabSave.setOnClickListener { viewModel.saveItem() }
             viewModel.inputState.observe(viewLifecycleOwner) { state ->
-                textInputLayout.error =  when (state) {
+                textInputLayout.error = when (state) {
                     UserInputState.INVALID_URL -> getString(R.string.invalid_url)
                     UserInputState.INVALID_VENDOR_CODE -> getString(R.string.invalid_vendor_code)
                     UserInputState.OK -> null
@@ -96,7 +96,9 @@ class AddItemFragment : Fragment() {
                 isArgsUrlHandled = true
             }
         }
-        viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.authorizationErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 requireView().syncErrorSnackbar()
             }
         )
@@ -105,11 +107,15 @@ class AddItemFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.saveSuccessfulEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.saveSuccessfulEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 findNavController().navigateUp()
             }
         )
-        viewModel.errorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.errorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = AddItemFragmentDirections
                     .actionAddItemFragmentToErrorDialogFragment(it)
                 navigate(action)

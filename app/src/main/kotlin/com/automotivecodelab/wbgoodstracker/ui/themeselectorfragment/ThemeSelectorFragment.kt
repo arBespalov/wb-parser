@@ -1,11 +1,9 @@
 package com.automotivecodelab.wbgoodstracker.ui.themeselectorfragment
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.get
@@ -14,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.automotivecodelab.wbgoodstracker.MyApplication
 import com.automotivecodelab.wbgoodstracker.R
 import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.databinding.ThemeSelectorFragmentBinding

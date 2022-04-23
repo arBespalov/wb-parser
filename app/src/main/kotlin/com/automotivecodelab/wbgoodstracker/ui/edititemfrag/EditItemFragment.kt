@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.doOnNextLayout
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -89,9 +88,10 @@ class EditItemFragment : Fragment() {
 
             viewModel.groups.observe(viewLifecycleOwner) { (_, savedGroups) ->
                 adapter.clear()
-                adapter.addAll(savedGroups
-                    .map { (name, _) -> name }
-                    .plus(defaultGroup)
+                adapter.addAll(
+                    savedGroups
+                        .map { (name, _) -> name }
+                        .plus(defaultGroup)
                 )
             }
 
@@ -112,12 +112,16 @@ class EditItemFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.closeScreenEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.closeScreenEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 findNavController().navigateUp()
             }
         )
 
-        viewModel.createNewGroupEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.createNewGroupEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = EditItemFragmentDirections
                     .actionEditItemFragmentToNewGroupDialogFragment(arrayOf(it), false)
                 navigate(action)

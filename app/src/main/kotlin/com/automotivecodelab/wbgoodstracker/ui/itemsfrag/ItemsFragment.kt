@@ -89,22 +89,28 @@ class ItemsFragment : Fragment() {
         viewModel.dataLoading.observe(viewLifecycleOwner) {
             viewDataBinding?.swipeRefresh?.isRefreshing = it
         }
-        viewModel.authorizationErrorEvent.observe(viewLifecycleOwner, EventObserver {
-            requireView().syncErrorSnackbar()
-        })
-        viewModel.askUserForReviewEvent.observe(viewLifecycleOwner, EventObserver {
-            runCatching {
-                val manager = ReviewManagerFactory.create(requireContext())
-                manager.requestReviewFlow().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val reviewInfo = task.result
-                        manager.launchReviewFlow(requireActivity(), reviewInfo)
-                    } else {
-                        Timber.d(task.exception)
+        viewModel.authorizationErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                requireView().syncErrorSnackbar()
+            }
+        )
+        viewModel.askUserForReviewEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                runCatching {
+                    val manager = ReviewManagerFactory.create(requireContext())
+                    manager.requestReviewFlow().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val reviewInfo = task.result
+                            manager.launchReviewFlow(requireActivity(), reviewInfo)
+                        } else {
+                            Timber.d(task.exception)
+                        }
                     }
                 }
             }
-        })
+        )
 
         viewModel.itemGroups.observe(viewLifecycleOwner) { itemGroups ->
             if (itemGroups.totalItemsQuantity == 0) {
@@ -146,7 +152,7 @@ class ItemsFragment : Fragment() {
     private fun setupOptionsMenu() {
         viewModel.itemsWithCurrentGroup.observe(viewLifecycleOwner) { (_, group) ->
             viewDataBinding?.toolbar?.menu?.apply {
-                val isEnabled = group!= null
+                val isEnabled = group != null
                 findItem(R.id.menu_delete_group)?.isEnabled = isEnabled
                 findItem(R.id.menu_rename_group)?.isEnabled = isEnabled
             }
@@ -287,9 +293,10 @@ class ItemsFragment : Fragment() {
                 actionMode = null
                 setItemTouchHelperEnabled(true)
                 if (viewDataBinding?.toolbar?.menu?.findItem(R.id.menu_search)
-                        ?.isActionViewExpanded == false) {
-                            viewDataBinding?.fabAdditem?.show()
-                            viewDataBinding?.swipeRefresh?.isEnabled = true
+                    ?.isActionViewExpanded == false
+                ) {
+                    viewDataBinding?.fabAdditem?.show()
+                    viewDataBinding?.swipeRefresh?.isEnabled = true
                 }
                 adapter?.tracker?.clearSelection()
             } else {
@@ -317,7 +324,8 @@ class ItemsFragment : Fragment() {
             viewDataBinding?.spinner?.setOnClickListener { view ->
                 val popup = PopupMenu(requireContext(), view)
                 val groups = itemGroups.groups.plus(
-                    defaultGroup to itemGroups.totalItemsQuantity)
+                    defaultGroup to itemGroups.totalItemsQuantity
+                )
                 groups.forEachIndexed { index, (group, count) ->
                     val spannableString = buildSpannedString {
                         bold { append("$count ") }
@@ -339,7 +347,6 @@ class ItemsFragment : Fragment() {
                 popup.show()
             }
         }
-
     }
 
     private fun setupRecycler() {
@@ -375,89 +382,98 @@ class ItemsFragment : Fragment() {
             0,
             ItemTouchHelper.LEFT
         ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ) = false
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ) = false
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
-                    ?.let { item ->
-                        val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
-                        val snackbar = Snackbar.make(
-                            viewDataBinding?.fabAdditem ?: requireView(),
-                            R.string.item_deleted,
-                            Snackbar.LENGTH_LONG)
-                        snackbar.setAction(R.string.undo) {
-                            Timber.d("undo")
-                            adapter?.add(item)
-                            if (isItemInFirstPosition)
-                                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                        }
-                        snackbar.addCallback(object : Snackbar.Callback() {
-                            // for correct behavior when swiping cards fastly
-                            override fun onShown(sb: Snackbar?) {
-                                Timber.d("remove")
-                                adapter?.remove(item)
-                                super.onShown(sb)
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
+                        ?.let { item ->
+                            val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
+                            val snackbar = Snackbar.make(
+                                viewDataBinding?.fabAdditem ?: requireView(),
+                                R.string.item_deleted,
+                                Snackbar.LENGTH_LONG
+                            )
+                            snackbar.setAction(R.string.undo) {
+                                Timber.d("undo")
+                                adapter?.add(item)
+                                if (isItemInFirstPosition)
+                                    viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
                             }
-                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                Timber.d("dismissed")
-                                if (event != DISMISS_EVENT_ACTION) {
-                                    viewModel.deleteSingleItem(item.id)
-                                    Timber.d("delete")
+                            snackbar.addCallback(object : Snackbar.Callback() {
+                                // for correct behavior when swiping cards fastly
+                                override fun onShown(sb: Snackbar?) {
+                                    Timber.d("remove")
+                                    adapter?.remove(item)
+                                    super.onShown(sb)
                                 }
-                                viewDataBinding?.fabAdditem?.show()
-                                super.onDismissed(transientBottomBar, event)
-                            }
-                        })
-                        viewDataBinding?.fabAdditem?.hide()
-                        snackbar.show()
-                    }
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                val card = (viewHolder as ItemsAdapter.ItemViewHolder).recyclerViewItemBinding.card
-                c.clipRect(
-                    card.right + dX,
-                    card.top.toFloat(),
-                    card.right.toFloat(),
-                    card.bottom.toFloat()
-                )
-                val editIcon = getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_delete_24,
-                    requireActivity().theme
-                )
-                if (editIcon != null) {
-                    editIcon.setTint(requireContext().themeColor(R.attr.colorOnBackground))
-                    val rect = Rect(
-                        card.right - editIcon.intrinsicWidth - (card.height - editIcon
-                            .intrinsicHeight) / 4,
-                        card.top + (card.height - editIcon.intrinsicHeight) / 2,
-                        card.right - (card.height - editIcon.intrinsicHeight) / 4,
-                        card.top + editIcon.intrinsicHeight + (card.height -
-                                editIcon.intrinsicHeight) / 2
-                    )
-                    editIcon.bounds = rect
-                    //c.drawColor(Color.BLUE)
-                    editIcon.draw(c)
+                                override fun onDismissed(
+                                    transientBottomBar: Snackbar?,
+                                    event: Int
+                                ) {
+                                    Timber.d("dismissed")
+                                    if (event != DISMISS_EVENT_ACTION) {
+                                        viewModel.deleteSingleItem(item.id)
+                                        Timber.d("delete")
+                                    }
+                                    viewDataBinding?.fabAdditem?.show()
+                                    super.onDismissed(transientBottomBar, event)
+                                }
+                            })
+                            viewDataBinding?.fabAdditem?.hide()
+                            snackbar.show()
+                        }
                 }
-                super.onChildDraw(
-                    c, recyclerView, viewHolder, dX, dY, actionState,
-                    isCurrentlyActive
-                )
-            }
-        })
+
+                override fun onChildDraw(
+                    c: Canvas,
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    dX: Float,
+                    dY: Float,
+                    actionState: Int,
+                    isCurrentlyActive: Boolean
+                ) {
+                    val card = (viewHolder as ItemsAdapter.ItemViewHolder).recyclerViewItemBinding
+                        .card
+                    c.clipRect(
+                        card.right + dX,
+                        card.top.toFloat(),
+                        card.right.toFloat(),
+                        card.bottom.toFloat()
+                    )
+                    val editIcon = getDrawable(
+                        resources,
+                        R.drawable.ic_baseline_delete_24,
+                        requireActivity().theme
+                    )
+                    if (editIcon != null) {
+                        editIcon.setTint(requireContext().themeColor(R.attr.colorOnBackground))
+                        val rect = Rect(
+                            card.right - editIcon.intrinsicWidth - (
+                                card.height - editIcon
+                                    .intrinsicHeight
+                                ) / 4,
+                            card.top + (card.height - editIcon.intrinsicHeight) / 2,
+                            card.right - (card.height - editIcon.intrinsicHeight) / 4,
+                            card.top + editIcon.intrinsicHeight + (
+                                card.height -
+                                    editIcon.intrinsicHeight
+                                ) / 2
+                        )
+                        editIcon.bounds = rect
+                        // c.drawColor(Color.BLUE)
+                        editIcon.draw(c)
+                    }
+                    super.onChildDraw(
+                        c, recyclerView, viewHolder, dX, dY, actionState,
+                        isCurrentlyActive
+                    )
+                }
+            })
     }
 
     private fun setItemTouchHelperEnabled(isEnabled: Boolean) {
@@ -469,12 +485,14 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver { recyclerItemPosition ->
+        viewModel.openItemEvent.observe(
+            viewLifecycleOwner,
+            EventObserver { recyclerItemPosition ->
                 exitTransition = MaterialElevationScale(false)
                 reenterTransition = MaterialElevationScale(true)
                 val viewHolder = viewDataBinding!!.recyclerViewItems
                     .findViewHolderForAdapterPosition(recyclerItemPosition)
-                        as ItemsAdapter.ItemViewHolder
+                    as ItemsAdapter.ItemViewHolder
                 val itemId = viewHolder.recyclerViewItemBinding.item!!.id
                 val extras = FragmentNavigatorExtras(
                     viewHolder.recyclerViewItemBinding.card to
@@ -485,7 +503,9 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.addItemEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.addItemEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialElevationScale(false)
                 reenterTransition = MaterialElevationScale(true)
                 val action = MainNavDirections.actionGlobalAddItemFragment(null)
@@ -499,14 +519,18 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.confirmDeleteEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.confirmDeleteEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToConfirmRemoveDialogFragment2(it.toTypedArray())
                 navigate(action)
             }
         )
 
-        viewModel.editItemEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.editItemEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToEditItemFragment(it)
@@ -515,20 +539,26 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.updateErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.updateErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = ItemsFragmentDirections.actionItemsFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
         )
 
-        viewModel.deleteGroupEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.deleteGroupEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToConfirmDeleteGroupDialogFrag(it)
                 navigate(action)
             }
         )
 
-        viewModel.addToGroupEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.addToGroupEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 closeActionModeLater = true
                 val action = ItemsFragmentDirections
                     .actionItemsFragmentToGroupPickerDialogFragment(it.toTypedArray())
@@ -536,7 +566,9 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.signInEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.signInEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToSignInFragment()
@@ -544,7 +576,9 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.changeThemeEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.changeThemeEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = ItemsFragmentDirections.actionItemsFragmentToThemeSelectorFragment()
@@ -552,16 +586,22 @@ class ItemsFragment : Fragment() {
             }
         )
 
-        viewModel.renameCurrentGroupEvent.observe(viewLifecycleOwner, EventObserver {
-            val action = ItemsFragmentDirections
-                .actionItemsFragmentToNewGroupDialogFragment(null, true)
-            navigate(action)
-        })
+        viewModel.renameCurrentGroupEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                val action = ItemsFragmentDirections
+                    .actionItemsFragmentToNewGroupDialogFragment(null, true)
+                navigate(action)
+            }
+        )
 
-        viewModel.showContactsEvent.observe(viewLifecycleOwner, EventObserver {
-            val action = ItemsFragmentDirections.actionItemsFragmentToContactsDialogFragment()
-            navigate(action)
-        })
+        viewModel.showContactsEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                val action = ItemsFragmentDirections.actionItemsFragmentToContactsDialogFragment()
+                navigate(action)
+            }
+        )
     }
 
     private fun setupSearchView() {

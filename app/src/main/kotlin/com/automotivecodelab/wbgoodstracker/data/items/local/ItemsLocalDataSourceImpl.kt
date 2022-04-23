@@ -4,13 +4,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.room.RoomDatabase
 import androidx.room.withTransaction
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
-import javax.inject.Inject
 
 class ItemsLocalDataSourceImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
@@ -59,48 +57,47 @@ class ItemsLocalDataSourceImpl @Inject constructor(
                 }
             }.awaitAll()
         }
-
     }
 
     override suspend fun updateItem(vararg item: ItemWithSizesDBModel) {
-            appDatabase.withTransaction {
-                withContext(Dispatchers.IO) {
-                    appDatabase.itemDao().update(*item.map { it.item }.toTypedArray())
-                    item.map { updatedItem ->
-                        async {
-                            val localItemSizes = appDatabase.itemDao()
-                                .getById(updatedItem.item.id).sizes
-                            val localItemSizeNames = localItemSizes.map { it.sizeName }
-                            val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
-                            val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)
-                            val sizesToDelete = localItemSizeNames.minus(updatedItemSizeNames)
-                            val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd)
-                                .minus(sizesToDelete)
-                            sizesToAdd.map { sizeName ->
-                                updatedItem.sizes.find { sizeDBModel ->
-                                    sizeDBModel.sizeName == sizeName
-                                }!!
-                            }.also { list ->
-                                appDatabase.sizeDao().insert(*list.toTypedArray())
-                            }
-                            sizesToDelete.map { sizeName ->
-                                localItemSizes.find { sizeDBModel ->
-                                    sizeDBModel.sizeName == sizeName
-                                }!!
-                            }.also { list ->
-                                appDatabase.sizeDao().delete(*list.toTypedArray())
-                            }
-                            sizesToUpdate.map { sizeName ->
-                                updatedItem.sizes.find { sizeDBModel ->
-                                    sizeDBModel.sizeName == sizeName
-                                }!!
-                            }.also { list ->
-                                appDatabase.sizeDao().update(*list.toTypedArray())
-                            }
+        appDatabase.withTransaction {
+            withContext(Dispatchers.IO) {
+                appDatabase.itemDao().update(*item.map { it.item }.toTypedArray())
+                item.map { updatedItem ->
+                    async {
+                        val localItemSizes = appDatabase.itemDao()
+                            .getById(updatedItem.item.id).sizes
+                        val localItemSizeNames = localItemSizes.map { it.sizeName }
+                        val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
+                        val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)
+                        val sizesToDelete = localItemSizeNames.minus(updatedItemSizeNames)
+                        val sizesToUpdate = updatedItemSizeNames.minus(sizesToAdd)
+                            .minus(sizesToDelete)
+                        sizesToAdd.map { sizeName ->
+                            updatedItem.sizes.find { sizeDBModel ->
+                                sizeDBModel.sizeName == sizeName
+                            }!!
+                        }.also { list ->
+                            appDatabase.sizeDao().insert(*list.toTypedArray())
                         }
-                    }.awaitAll()
-                }
+                        sizesToDelete.map { sizeName ->
+                            localItemSizes.find { sizeDBModel ->
+                                sizeDBModel.sizeName == sizeName
+                            }!!
+                        }.also { list ->
+                            appDatabase.sizeDao().delete(*list.toTypedArray())
+                        }
+                        sizesToUpdate.map { sizeName ->
+                            updatedItem.sizes.find { sizeDBModel ->
+                                sizeDBModel.sizeName == sizeName
+                            }!!
+                        }.also { list ->
+                            appDatabase.sizeDao().update(*list.toTypedArray())
+                        }
+                    }
+                }.awaitAll()
             }
+        }
     }
 
     override fun observeCurrentGroup(): Flow<String?> {

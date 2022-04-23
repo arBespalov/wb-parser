@@ -25,10 +25,11 @@ fun ItemRemoteModel.toDBModel(
     val feedbacksDelta = feedbacks - previousFeedbacks
 
     val lastChangesTimestamp = if (totalQuantityDelta == 0 &&
-            ordersCountDelta == 0 &&
-            averagePriceDelta == 0 &&
-            quantityDelta.all { (_, delta) -> delta == 0 } &&
-            feedbacksDelta == 0)
+        ordersCountDelta == 0 &&
+        averagePriceDelta == 0 &&
+        quantityDelta.all { (_, delta) -> delta == 0 } &&
+        feedbacksDelta == 0
+    )
         previousLastChangesTimestamp
     else
         Date().time

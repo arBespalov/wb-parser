@@ -14,7 +14,7 @@ interface ItemsRemoteDataSource {
 
 class ItemsRemoteDataSourceImpl @Inject constructor(
     private val api: ServerApi
-): ItemsRemoteDataSource {
+) : ItemsRemoteDataSource {
     override suspend fun addItem(url: String, idToken: String?): ItemRemoteModel {
         return api.addItem(url, idToken)
     }

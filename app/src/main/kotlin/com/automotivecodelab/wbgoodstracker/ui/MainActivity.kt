@@ -7,12 +7,10 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.R
-import com.automotivecodelab.wbgoodstracker.themeColor
+import com.automotivecodelab.wbgoodstracker.appComponent
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), KeyboardToggle {

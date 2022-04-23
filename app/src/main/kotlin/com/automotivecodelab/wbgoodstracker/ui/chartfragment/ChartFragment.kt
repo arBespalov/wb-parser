@@ -95,7 +95,9 @@ class ChartFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.networkErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.networkErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = ChartFragmentDirections.actionChartFragmentToErrorDialogFragment(it)
                 navigate(action)
             }

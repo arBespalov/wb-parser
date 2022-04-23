@@ -5,13 +5,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UsageStatisticsRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 class UsageStatisticsRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
-): UsageStatisticsRepository {
+) : UsageStatisticsRepository {
 
     val updateAllItemsActionCountKey = intPreferencesKey("updateAllItemsActionCountKey")
 

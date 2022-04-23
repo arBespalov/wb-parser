@@ -7,10 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.GetUserUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignInUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignOutUseCase
-import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,

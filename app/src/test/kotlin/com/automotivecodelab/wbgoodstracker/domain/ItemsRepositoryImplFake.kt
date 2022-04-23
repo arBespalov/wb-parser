@@ -85,5 +85,4 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
     override fun observeCurrentGroup(): Flow<String?> {
         TODO("Not yet implemented")
     }
-
 }

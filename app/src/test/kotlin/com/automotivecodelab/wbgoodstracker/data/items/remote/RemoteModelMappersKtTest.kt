@@ -1,9 +1,8 @@
 package com.automotivecodelab.wbgoodstracker.data.items.remote
 
+import java.util.*
 import org.junit.Assert.*
 import org.junit.Test
-import java.time.Instant.now
-import java.util.*
 
 class RemoteModelMappersKtTest {
     @Test
@@ -74,19 +73,19 @@ class RemoteModelMappersKtTest {
         )
         assert(
             dbModel.item.ordersCountDelta == itemRemoteModel.info[0].ordersCount -
-                    previousOrdersCount &&
-                    dbModel.item.averagePriceDelta == itemRemoteModel.averagePrice -
-                    previousAveragePrice &&
-                    dbModel.item.lastUpdateTimestamp != previousLastChangesTimestamp &&
-                    dbModel.sizes.all { sizeDBModel ->
-                        sizeDBModel.quantityDelta ==
-                                itemRemoteModel.info[0].sizes
-                                    .find { it.sizeName == sizeDBModel.sizeName }!!.quantity -
-                                previousSizeQuantity[sizeDBModel.sizeName]!!
-                    } &&
-                    dbModel.item.totalQuantityDelta == itemRemoteModel.totalQuantity -
-                    previousTotalQuantity &&
-                    dbModel.item.feedbacksDelta == itemRemoteModel.feedbacks - previousFeedbacks
+                previousOrdersCount &&
+                dbModel.item.averagePriceDelta == itemRemoteModel.averagePrice -
+                previousAveragePrice &&
+                dbModel.item.lastUpdateTimestamp != previousLastChangesTimestamp &&
+                dbModel.sizes.all { sizeDBModel ->
+                    sizeDBModel.quantityDelta ==
+                        itemRemoteModel.info[0].sizes
+                        .find { it.sizeName == sizeDBModel.sizeName }!!.quantity -
+                        previousSizeQuantity[sizeDBModel.sizeName]!!
+                } &&
+                dbModel.item.totalQuantityDelta == itemRemoteModel.totalQuantity -
+                previousTotalQuantity &&
+                dbModel.item.feedbacksDelta == itemRemoteModel.feedbacks - previousFeedbacks
         )
     }
 }

@@ -11,7 +11,6 @@ import androidx.core.view.doOnPreDraw
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,10 +18,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.CardSizeLayoutBinding
 import com.automotivecodelab.wbgoodstracker.databinding.DetailFragmentBinding
-import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
-import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialSharedAxis
@@ -147,7 +144,7 @@ class DetailFragment : Fragment() {
             icon.setImageResource(R.drawable.ic_baseline_content_copy_24)
             root.setOnClickListener {
                 val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as?
-                        ClipboardManager
+                    ClipboardManager
                 clipboard?.setPrimaryClip(ClipData.newPlainText("id", args.itemid))
                 Snackbar.make(requireView(), R.string.id_copied, Snackbar.LENGTH_SHORT).show()
             }
@@ -177,14 +174,18 @@ class DetailFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        viewModel.confirmDeleteEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.confirmDeleteEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = DetailFragmentDirections
                     .actionDetailFragmentToConfirmRemoveDialogFragment2(arrayOf(it))
                 navigate(action)
             }
         )
 
-        viewModel.editItemEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.editItemEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = DetailFragmentDirections.actionDetailFragmentToEditItemFragment(it)
@@ -192,13 +193,17 @@ class DetailFragment : Fragment() {
             }
         )
 
-        viewModel.updateErrorEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.updateErrorEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 val action = DetailFragmentDirections.actionDetailFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
         )
 
-        viewModel.showOrdersChartEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.showOrdersChartEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = DetailFragmentDirections.actionDetailFragmentToChartFragment(it)
@@ -206,7 +211,9 @@ class DetailFragment : Fragment() {
             }
         )
 
-        viewModel.closeScreenEvent.observe(viewLifecycleOwner, EventObserver {
+        viewModel.closeScreenEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
                 findNavController().navigateUp()
             }
         )

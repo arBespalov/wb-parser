@@ -20,8 +20,7 @@ interface ServerApi {
     suspend fun updateItems(@Body itemIds: List<Int>): List<ItemRemoteModel>
 
     @GET("wbparserapi/update_items")
-    suspend fun getItemsForUserId(@Query("id_token") idToken: String)
-    : List<ItemRemoteModel>
+    suspend fun getItemsForUserId(@Query("id_token") idToken: String): List<ItemRemoteModel>
 
     @POST("wbparserapi/merge_items")
     suspend fun mergeItems(

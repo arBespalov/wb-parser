@@ -4,8 +4,8 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveGroupsUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class GroupPickerDialogViewModel @Inject constructor(
     observeGroupsUseCase: ObserveGroupsUseCase,

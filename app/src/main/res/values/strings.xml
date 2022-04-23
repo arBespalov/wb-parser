@@ -3,16 +3,11 @@
     <string name="save">Save</string>
     <string name="add_item">Add Item</string>
     <string name="add_item_input">URL or vendor code</string>
-    <string name="http" translatable="false">http://</string>
     <string name="delete">Delete</string>
     <string name="delete_question">Delete?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="edit">Edit</string>
-    <string name="clear_selection">Clear selection</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
-    <string name="details">Details</string>
     <string name="add">Add SKU</string>
     <string name="sort">Sort</string>
     <string name="by_name_asc">Name &#9650;</string>
@@ -26,7 +21,6 @@
     <string name="by_orders_count">By orders count</string>
     <string name="by_orders_count_per_day">By orders count per day</string>
     <string name="price">Price</string>
-    <string name="error">Error</string>
     <string name="error_body">Error. Please try again later</string>
     <string name="ok" translatable="false">OK</string>
     <string name="invalid_url">Invalid URL</string>
@@ -42,7 +36,6 @@
     <string name="delete_group">Delete group</string>
     <string name="add_to_group">Add to group</string>
     <string name="backup_and_sync">Backup and sync</string>
-    <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="sign_in_hint">Sign in to enable sync and auto-backup features</string>
     <string name="sign_out_hint">You`re signed in as %1$s</string>

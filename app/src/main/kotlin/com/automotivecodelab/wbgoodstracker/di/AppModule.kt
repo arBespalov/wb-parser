@@ -44,6 +44,6 @@ interface AppModule {
     fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 
     @Binds
-    fun bindUsageStatisticsRepository(impl: UsageStatisticsRepositoryImpl)
-            : UsageStatisticsRepository
+    fun bindUsageStatisticsRepository(impl: UsageStatisticsRepositoryImpl):
+        UsageStatisticsRepository
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.automotivecodelab.wbgoodstracker.domain.models.Item
 
 @Database(
     entities = [ItemDBModel::class, SizeDBModel::class],
@@ -34,7 +33,8 @@ abstract class AppDatabase : RoomDatabase() {
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE item_new ( " +
+        database.execSQL(
+            "CREATE TABLE item_new ( " +
                 "id TEXT NOT NULL, " +
                 "name TEXT NOT NULL, " +
                 "url TEXT NOT NULL, " +
@@ -59,7 +59,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "updateError INTEGER, " +
                 "PRIMARY KEY (id))"
         )
-        database.execSQL("INSERT INTO item_new (" +
+        database.execSQL(
+            "INSERT INTO item_new (" +
                 "id, " +
                 "name, " +
                 "url, " +
@@ -71,17 +72,17 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 "averagePrice, " +
                 "totalQuantity, " +
                 "creationTimestamp, " +
-                //"ordersCountDelta, " +
+                // "ordersCountDelta, " +
                 "localName, " +
-                //"averagePriceDelta, " +
+                // "averagePriceDelta, " +
                 "groupName) " +
-                //"totalQuantityDelta, " +
-                //"lastUpdateTimestamp, " +
-                //"lastChangesTimestamp, " +
-                //"ordersCount, " +
-                //"feedbacks, " +
-                //"feedbacksDelta, " +
-                //"updateError, " +
+                // "totalQuantityDelta, " +
+                // "lastUpdateTimestamp, " +
+                // "lastChangesTimestamp, " +
+                // "ordersCount, " +
+                // "feedbacks, " +
+                // "feedbacksDelta, " +
+                // "updateError, " +
                 "SELECT " +
                 "_id, " +
                 "name, " +
@@ -100,7 +101,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         )
         database.execSQL("DROP TABLE item")
         database.execSQL("ALTER TABLE item_new RENAME TO item")
-        database.execSQL("CREATE TABLE size (" +
+        database.execSQL(
+            "CREATE TABLE size (" +
                 "itemId TEXT NOT NULL, " +
                 "sizeName TEXT NOT NULL, " +
                 "quantity INTEGER NOT NULL, " +

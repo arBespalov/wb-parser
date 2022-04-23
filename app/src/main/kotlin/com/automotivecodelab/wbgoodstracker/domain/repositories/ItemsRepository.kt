@@ -2,9 +2,7 @@ package com.automotivecodelab.wbgoodstracker.domain.repositories
 
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.flow.Flow
-import java.util.Comparator
 
 interface ItemsRepository {
     fun observeItems(): Flow<Pair<List<Item>, String?>>

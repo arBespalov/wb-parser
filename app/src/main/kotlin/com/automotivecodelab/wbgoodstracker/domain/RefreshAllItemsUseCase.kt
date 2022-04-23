@@ -31,7 +31,8 @@ class RefreshAllItemsUseCase @Inject constructor(
         }
         if (result.isSuccess) usageStatisticsRepository.incrementUpdateAllItemsAction()
         if (usageStatisticsRepository.getCountOfUpdateAllItemsAction() ==
-            REFRESHES_COUNT_WHEN_ASK_FOR_REVIEW)
+            REFRESHES_COUNT_WHEN_ASK_FOR_REVIEW
+        )
             askUserForReviewCallback()
         return result
     }

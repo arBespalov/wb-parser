@@ -30,16 +30,21 @@ class ConfirmRemoveDialogFragment : BottomSheetDialogFragment() {
             }
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-        viewModel.authorizationErrorEvent.observe(this, EventObserver {
-            parentFragment?.view?.syncErrorSnackbar()
-        })
+        viewModel.authorizationErrorEvent.observe(
+            this,
+            EventObserver {
+                parentFragment?.view?.syncErrorSnackbar()
+            }
+        )
         setupNavigation()
         return bottomSheetDialog
     }
 
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog won't be initialized
-        viewModel.taskCompletedEvent.observe(this, EventObserver {
+        viewModel.taskCompletedEvent.observe(
+            this,
+            EventObserver {
                 dismiss()
             }
         )

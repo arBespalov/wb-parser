@@ -1,6 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.data.items.remote
 
-
 data class ItemRemoteModel(
     val _id: String,
     val name: String,

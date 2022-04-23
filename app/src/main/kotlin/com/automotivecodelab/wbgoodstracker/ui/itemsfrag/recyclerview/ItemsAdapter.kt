@@ -3,18 +3,14 @@ package com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
-import android.content.res.Configuration
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.automotivecodelab.wbgoodstracker.R
@@ -101,7 +97,8 @@ class ItemsAdapter(
                 return comparator?.compare(o1, o2) ?: 0
             }
             override fun areContentsTheSame(oldItem: Item?, newItem: Item?): Boolean {
-                return (oldItem != null && newItem != null &&
+                return (
+                    oldItem != null && newItem != null &&
                         oldItem.localName == newItem.localName &&
                         oldItem.name == newItem.name &&
                         oldItem.averagePrice == newItem.averagePrice &&
@@ -111,7 +108,8 @@ class ItemsAdapter(
                         oldItem.averageOrdersCountPerDay == newItem.averageOrdersCountPerDay &&
                         oldItem.totalQuantity == newItem.totalQuantity &&
                         oldItem.totalQuantityDelta == newItem.totalQuantityDelta &&
-                        isUpdateIndicatorVisible(oldItem) == isUpdateIndicatorVisible(newItem))
+                        isUpdateIndicatorVisible(oldItem) == isUpdateIndicatorVisible(newItem)
+                    )
             }
         }
     )
@@ -203,7 +201,6 @@ class ItemsAdapter(
                             }
                             start()
                         }
-
                     } else {
                         holder.recyclerViewItemBinding.item = item
                     }
@@ -231,7 +228,7 @@ class ItemsAdapter(
         }
         loadImage()
         holder.recyclerViewItemBinding.imageView.addOnLayoutChangeListener {
-                view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             val height = bottom - top
             val oldHeight = oldBottom - oldTop
             if (oldHeight != 0 && height != oldHeight && position < sortedList.size()) {
@@ -243,7 +240,7 @@ class ItemsAdapter(
             val backgroundColor = if (selectionTracker.isSelected(item.id))
                 context.themeColor(R.attr.colorSecondary)
             else
-                // colorSurfaceVariant - default material3 card background
+            // colorSurfaceVariant - default material3 card background
                 context.themeColor(R.attr.colorSurfaceVariant)
             holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
 
@@ -268,7 +265,8 @@ class ItemsAdapter(
                         view.setTextColor(context.themeColor(R.attr.colorOnSecondary))
                     } else {
                         val colorStateList = defaultTextViewColors[
-                                context.resources.getResourceEntryName(view.id)]
+                            context.resources.getResourceEntryName(view.id)
+                        ]
                         if (colorStateList != null) {
                             view.setTextColor(colorStateList)
                         }
@@ -280,5 +278,5 @@ class ItemsAdapter(
 
     private fun isUpdateIndicatorVisible(item: Item) =
         (item.totalQuantityDelta == 0 && item.sizes.any { it.quantityDelta != 0 }) ||
-                item.feedbacksDelta != 0
+            item.feedbacksDelta != 0
 }

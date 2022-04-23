@@ -1,8 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
-import androidx.lifecycle.LiveData
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
-import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import kotlinx.coroutines.flow.Flow
 
 interface ItemsLocalDataSource {

@@ -6,12 +6,12 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import java.util.*
+import javax.inject.Inject
+import kotlin.Comparator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import java.util.*
-import kotlin.Comparator
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ItemsViewModel @Inject constructor(
     observeItemsByGroupUseCase: ObserveItemsWithGroupUseCase,
@@ -118,7 +118,6 @@ class ItemsViewModel @Inject constructor(
             val itemId = selectedItemIds.value?.elementAt(0)
             if (itemId != null) _editItemEvent.value = Event(itemId)
         }
-
     }
 
     fun deleteGroup() {

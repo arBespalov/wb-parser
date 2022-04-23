@@ -8,9 +8,9 @@ import com.automotivecodelab.wbgoodstracker.domain.AddItemsToGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.ObserveCurrentGroupUseCase
 import com.automotivecodelab.wbgoodstracker.domain.RenameCurrentGroupUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class NewGroupDialogViewModel @Inject constructor(
     private val addItemsToGroupUseCase: AddItemsToGroupUseCase,

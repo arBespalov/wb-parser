@@ -3,11 +3,10 @@ package com.automotivecodelab.wbgoodstracker.ui.confirmdeletegroupdialogfrag
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.R
+import com.automotivecodelab.wbgoodstracker.appComponent
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,7 +36,9 @@ class ConfirmDeleteGroupDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // won't be initialized
-        viewModel.taskCompletedEvent.observe(this, EventObserver {
+        viewModel.taskCompletedEvent.observe(
+            this,
+            EventObserver {
                 dismiss()
             }
         )

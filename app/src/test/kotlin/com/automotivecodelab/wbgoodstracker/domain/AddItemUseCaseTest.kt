@@ -1,7 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.domain
 
 import kotlinx.coroutines.runBlocking
-
 import org.junit.Test
 
 class AddItemUseCaseTest {
@@ -42,4 +41,3 @@ class AddItemUseCaseTest {
         }
     }
 }
-

@@ -17,11 +17,10 @@ import com.automotivecodelab.wbgoodstracker.ui.MainActivity
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapter
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.textfield.TextInputLayout
-import junit.framework.AssertionFailedError
+import java.util.concurrent.TimeoutException
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 // selection mode is not covered here

@@ -9,7 +9,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onErrorResume
 
 class DetailViewModel @AssistedInject constructor(
     private val refreshSingleItemUseCase: RefreshSingleItemUseCase,

@@ -6,10 +6,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.automotivecodelab.wbgoodstracker.domain.models.User
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-
 
 class UserRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,

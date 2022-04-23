@@ -1,7 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.domain.models
 
-import android.text.BoringLayout
-
 data class Item(
     val id: String,
     val name: String,

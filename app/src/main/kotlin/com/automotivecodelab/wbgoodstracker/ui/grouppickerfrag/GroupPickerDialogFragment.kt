@@ -3,7 +3,6 @@ package com.automotivecodelab.wbgoodstracker.ui.grouppickerfrag
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.FrameLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
@@ -66,14 +65,20 @@ class GroupPickerDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // 't be initialized
-        viewModel.closeDialogEvent.observe(this, EventObserver {
-            dismiss()
-        })
+        viewModel.closeDialogEvent.observe(
+            this,
+            EventObserver {
+                dismiss()
+            }
+        )
 
-        viewModel.newGroupEvent.observe(this, EventObserver{
-            val action = GroupPickerDialogFragmentDirections
-                .actionGroupPickerDialogFragmentToNewGroupDialogFragment(args.itemsId, false)
-            navigate(action)
-        })
+        viewModel.newGroupEvent.observe(
+            this,
+            EventObserver {
+                val action = GroupPickerDialogFragmentDirections
+                    .actionGroupPickerDialogFragmentToNewGroupDialogFragment(args.itemsId, false)
+                navigate(action)
+            }
+        )
     }
 }

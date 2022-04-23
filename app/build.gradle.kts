@@ -22,7 +22,7 @@ android {
         minSdk = 21
         targetSdk = 31
         versionCode = 3
-        versionName = "1.2"
+        versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField(
             "String", "SERVER_URL",
@@ -37,6 +37,17 @@ android {
                 arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
             }
         }
+        // uncomment to run ktlint. It also shows kotlin packages as java ones
+//        sourceSets {
+//            val kotlinAdditionalSourceSets = project.file("src/main/kotlin")
+//            val kotlinAdditionalSourceSetsTest = project.file("src/test/kotlin")
+//            val kotlinAdditionalSourceSetsAndroidTest = project.file("src/androidTest/kotlin")
+//            findByName("main")?.java?.srcDirs(
+//                kotlinAdditionalSourceSets,
+//                kotlinAdditionalSourceSetsTest,
+//                kotlinAdditionalSourceSetsAndroidTest
+//            )
+//        }
     }
 
     buildTypes {

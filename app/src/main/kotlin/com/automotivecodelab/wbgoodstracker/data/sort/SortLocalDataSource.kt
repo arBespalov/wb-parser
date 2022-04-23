@@ -5,10 +5,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 interface SortLocalDataSource {
     fun getSortingMode(): Flow<SortingMode>
@@ -23,8 +23,10 @@ class SortLocalDataSourceImpl @Inject constructor(
     override fun getSortingMode(): Flow<SortingMode> {
         return dataStore.data
             .map { prefs ->
-                SortingMode.values()[prefs[SAVED_SORTING_MODE]
-                    ?: SortingMode.BY_LAST_CHANGES.ordinal]
+                SortingMode.values()[
+                    prefs[SAVED_SORTING_MODE]
+                        ?: SortingMode.BY_LAST_CHANGES.ordinal
+                ]
             }
             .distinctUntilChanged()
     }

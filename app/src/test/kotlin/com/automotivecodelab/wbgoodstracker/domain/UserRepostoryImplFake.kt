@@ -19,5 +19,4 @@ class UserRepostoryImplFake : UserRepository {
     override suspend fun getUser(): Result<User> {
         TODO("Not yet implemented")
     }
-
 }

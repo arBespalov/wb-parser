@@ -14,13 +14,12 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemInfoRemoteMode
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.SizeRemoteModel
+import java.util.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 class ItemsRepositoryImplTest {
 
@@ -34,7 +33,7 @@ class ItemsRepositoryImplTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         testDataStore = PreferenceDataStoreFactory.create(
             // without random filename test crashes when running whole class
-            produceFile = { context.preferencesDataStoreFile (UUID.randomUUID().toString()) }
+            produceFile = { context.preferencesDataStoreFile(UUID.randomUUID().toString()) }
         )
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(testDataStore, db)
@@ -50,7 +49,6 @@ class ItemsRepositoryImplTest {
                 it.clear()
             }
         }
-
     }
 
     @Test
@@ -88,8 +86,8 @@ class ItemsRepositoryImplTest {
             val (items, _) = itemsRepositoryImpl.observeItems().first()
             assert(
                 items.size == 2 &&
-                        items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
-                        items.any { it.id == ItemsRemoteDataSourceFake.ID2 }
+                    items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
+                    items.any { it.id == ItemsRemoteDataSourceFake.ID2 }
             )
         }
     }
@@ -109,19 +107,19 @@ class ItemsRepositoryImplTest {
             assert(items.size == 3)
             assert(
                 items.size == 3 &&
-                        items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
-                        items.any { it.id == ItemsRemoteDataSourceFake.ID2 } &&
-                        items.any { it.id == existingItemId }
+                    items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
+                    items.any { it.id == ItemsRemoteDataSourceFake.ID2 } &&
+                    items.any { it.id == existingItemId }
             )
         }
     }
 }
 
-class ItemsRemoteDataSourceFake: ItemsRemoteDataSource {
+class ItemsRemoteDataSourceFake : ItemsRemoteDataSource {
 
     companion object {
-        val ID1 = "123"
-        val ID2 = "456"
+        const val ID1 = "123"
+        const val ID2 = "456"
     }
 
     private val itemRemoteModelFake = ItemRemoteModel(
@@ -200,5 +198,4 @@ class ItemsRemoteDataSourceFake: ItemsRemoteDataSource {
     override suspend fun getItemWithFullData(itemId: String): ItemRemoteModel {
         TODO("Not yet implemented")
     }
-
 }

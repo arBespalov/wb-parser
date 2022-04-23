@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.DeleteItemsUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlinx.coroutines.*
 
 class ConfirmRemoveDialogViewModel @Inject constructor(
     private val deleteItemsUseCase: DeleteItemsUseCase

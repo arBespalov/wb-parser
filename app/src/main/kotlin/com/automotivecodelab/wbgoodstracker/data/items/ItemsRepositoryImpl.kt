@@ -8,11 +8,11 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import javax.inject.Inject
 
 class ItemsRepositoryImpl @Inject constructor(
     private val localDataSource: ItemsLocalDataSource,
@@ -103,22 +103,25 @@ class ItemsRepositoryImpl @Inject constructor(
                 val currentGroup = currentGroupDeferred.await()
 
                 localItems.find {
-                        itemWithSizes -> newItem._id == itemWithSizes.item.id
+                    itemWithSizes ->
+                    newItem._id == itemWithSizes.item.id
                 }?.let { dbModel ->
-                    localDataSource.updateItem(newItem.toDBModel(
-                        creationTimestamp = dbModel.item.creationTimestamp,
-                        previousOrdersCount = dbModel.item.ordersCount,
-                        previousAveragePrice = dbModel.item.averagePrice,
-                        previousTotalQuantity = dbModel.item.totalQuantity,
-                        localName = dbModel.item.localName,
-                        groupName = dbModel.item.groupName,
-                        previousLastChangesTimestamp =
+                    localDataSource.updateItem(
+                        newItem.toDBModel(
+                            creationTimestamp = dbModel.item.creationTimestamp,
+                            previousOrdersCount = dbModel.item.ordersCount,
+                            previousAveragePrice = dbModel.item.averagePrice,
+                            previousTotalQuantity = dbModel.item.totalQuantity,
+                            localName = dbModel.item.localName,
+                            groupName = dbModel.item.groupName,
+                            previousLastChangesTimestamp =
                             dbModel.item.lastChangesTimestamp,
-                        previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
-                            sizeDBModel.sizeName to sizeDBModel.quantity
-                        },
-                        previousFeedbacks = dbModel.item.feedbacks
-                    ))
+                            previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
+                                sizeDBModel.sizeName to sizeDBModel.quantity
+                            },
+                            previousFeedbacks = dbModel.item.feedbacks
+                        )
+                    )
                     return@withContext
                 }
 
@@ -197,7 +200,7 @@ class ItemsRepositoryImpl @Inject constructor(
                         localName = localItem.item.localName,
                         groupName = localItem.item.groupName,
                         previousLastChangesTimestamp =
-                            localItem.item.lastChangesTimestamp,
+                        localItem.item.lastChangesTimestamp,
                         previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                             sizeDBModel.sizeName to sizeDBModel.quantity
                         },
@@ -224,7 +227,7 @@ class ItemsRepositoryImpl @Inject constructor(
                     localName = localItem.item.localName,
                     groupName = localItem.item.groupName,
                     previousLastChangesTimestamp =
-                        localItem.item.lastChangesTimestamp,
+                    localItem.item.lastChangesTimestamp,
                     previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
                         sizeDBModel.sizeName to sizeDBModel.quantity
                     },
@@ -267,20 +270,22 @@ class ItemsRepositoryImpl @Inject constructor(
             itemIdsToUpdate.forEach { id ->
                 val updatedItem = mergedItems.find { remoteItem -> remoteItem._id == id }!!
                 localItems.find { localItem -> localItem.item.id == id }?.also { localItem ->
-                    localDataSource.updateItem(updatedItem.toDBModel(
-                        creationTimestamp = localItem.item.creationTimestamp,
-                        previousOrdersCount = localItem.item.ordersCount,
-                        previousAveragePrice = localItem.item.averagePrice,
-                        previousTotalQuantity = localItem.item.totalQuantity,
-                        localName = localItem.item.localName,
-                        groupName = localItem.item.groupName,
-                        previousLastChangesTimestamp =
+                    localDataSource.updateItem(
+                        updatedItem.toDBModel(
+                            creationTimestamp = localItem.item.creationTimestamp,
+                            previousOrdersCount = localItem.item.ordersCount,
+                            previousAveragePrice = localItem.item.averagePrice,
+                            previousTotalQuantity = localItem.item.totalQuantity,
+                            localName = localItem.item.localName,
+                            groupName = localItem.item.groupName,
+                            previousLastChangesTimestamp =
                             localItem.item.lastChangesTimestamp,
-                        previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
-                            sizeDBModel.sizeName to sizeDBModel.quantity
-                        },
-                        previousFeedbacks = localItem.item.feedbacks
-                    ))
+                            previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                                sizeDBModel.sizeName to sizeDBModel.quantity
+                            },
+                            previousFeedbacks = localItem.item.feedbacks
+                        )
+                    )
                 }
             }
         }
@@ -311,11 +316,13 @@ class ItemsRepositoryImpl @Inject constructor(
         items: List<ItemWithSizesDBModel>,
         groupName: String?
     ) {
-        localDataSource.updateItem(*items.map { item ->
-            item.copy(
-                item = item.item.copy(groupName = groupName)
-            )
-        }.toTypedArray())
+        localDataSource.updateItem(
+            *items.map { item ->
+                item.copy(
+                    item = item.item.copy(groupName = groupName)
+                )
+            }.toTypedArray()
+        )
     }
 
     override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {

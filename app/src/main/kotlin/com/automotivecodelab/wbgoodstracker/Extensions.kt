@@ -59,7 +59,8 @@ fun View.syncErrorSnackbar() {
     val snackbar = Snackbar.make(
         this,
         R.string.snackbar_account_error_text,
-        Snackbar.LENGTH_LONG)
+        Snackbar.LENGTH_LONG
+    )
     snackbar.show()
 }
 

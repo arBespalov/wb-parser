@@ -3,15 +3,15 @@ package com.automotivecodelab.wbgoodstracker.data.sort
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.domain.repositories.SortRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 class SortRepositoryImpl @Inject constructor(
     private val localDataSource: SortLocalDataSource
-): SortRepository {
+) : SortRepository {
     override fun observeSortingModeWithComparator():
-            Flow<Pair<SortingMode, Comparator<Item>>> {
+        Flow<Pair<SortingMode, Comparator<Item>>> {
         return localDataSource.getSortingMode()
             .map { sortingMode ->
                 sortingMode to Comparator { o1, o2 ->
@@ -28,7 +28,8 @@ class SortRepositoryImpl @Inject constructor(
                             o2.ordersCount.compareTo(o1.ordersCount)
                         SortingMode.BY_ORDERS_COUNT_PER_DAY ->
                             o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
-                        SortingMode.BY_LAST_CHANGES -> o2.lastChangesTimestamp
+                        SortingMode.BY_LAST_CHANGES ->
+                            o2.lastChangesTimestamp
                                 .compareTo(o1.lastChangesTimestamp)
                     }
                     if (comp == 0)

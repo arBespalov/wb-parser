@@ -3,8 +3,6 @@ package com.automotivecodelab.wbgoodstracker.data.user
 import android.content.Context
 import com.automotivecodelab.wbgoodstracker.BuildConfig
 import com.automotivecodelab.wbgoodstracker.domain.models.User
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.DeleteGroupUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class ConfirmDeleteGroupDialogViewModel @Inject constructor(
     private val deleteGroupUseCase: DeleteGroupUseCase

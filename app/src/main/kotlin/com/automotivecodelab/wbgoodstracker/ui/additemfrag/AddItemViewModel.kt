@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 class AddItemViewModel @Inject constructor(
     private val addItemUseCase: AddItemUseCase
@@ -35,22 +35,24 @@ class AddItemViewModel @Inject constructor(
             _dataLoading.value = true
             addItemUseCase(
                 input = input,
-                onAuthenticationFailureCallback =  {
+                onAuthenticationFailureCallback = {
                     _authorizationErrorEvent.value = Event(Unit)
                 }
             )
                 .onFailure {
                     when (it) {
-                        is InvalidUrlException -> _inputState.value =
-                            UserInputState.INVALID_URL
-                        is InvalidVendorCodeException -> _inputState.value =
-                            UserInputState.INVALID_VENDOR_CODE
+                        is InvalidUrlException ->
+                            _inputState.value =
+                                UserInputState.INVALID_URL
+                        is InvalidVendorCodeException ->
+                            _inputState.value =
+                                UserInputState.INVALID_VENDOR_CODE
                         is ItemsQuotaExceededException ->
                             _errorEvent.value = Event(it)
                         else ->
                             _errorEvent.value = Event(it)
+                    }
                 }
-            }
                 .onSuccess {
                     _saveSuccessfulEvent.value = Event(Unit)
                 }

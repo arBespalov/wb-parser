@@ -2,11 +2,9 @@ package com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -53,7 +51,6 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
                             viewModel.renameGroup(newGroupName)
                         else if (args.itemIds != null)
                             viewModel.addGroup(args.itemIds!!.toList(), newGroupName)
-
                     }
                     true
                 }
@@ -68,8 +65,11 @@ class NewGroupDialogFragment : BottomSheetDialogFragment() {
     private fun setupNavigation() {
         // "this" instead of viewLifeCycleOwner because viewLifeCycleOwner for dialog
         // won't be initialized
-        viewModel.closeDialogEvent.observe(this, EventObserver {
-            findNavController().navigateUp()
-        })
+        viewModel.closeDialogEvent.observe(
+            this,
+            EventObserver {
+                findNavController().navigateUp()
+            }
+        )
     }
 }
