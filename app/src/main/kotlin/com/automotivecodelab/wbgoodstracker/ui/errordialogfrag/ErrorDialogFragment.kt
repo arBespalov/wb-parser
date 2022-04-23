@@ -24,7 +24,7 @@ class ErrorDialogFragment : BottomSheetDialogFragment() {
             args.throwable is NoInternetConnectionException -> getString(R.string.no_connection)
             args.throwable is ItemsQuotaExceededException -> getString(
                 R.string.items_count_quota,
-                AddItemUseCase.itemsCountLimit.toString()
+                AddItemUseCase.ITEMS_COUNT_LIMIT.toString()
             )
             else -> getString(R.string.error_body)
         }

@@ -6,6 +6,8 @@ plugins {
     id("kotlin-kapt")
     id("androidx.navigation.safeargs")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 ktlint {
@@ -128,4 +130,9 @@ dependencies {
     // ===for in-app-review===
     implementation("com.google.android.play:core:1.10.3")
     implementation("com.google.android.play:core-ktx:1.8.1")
+
+    // ===crashlytics===
+    implementation(platform("com.google.firebase:firebase-bom:29.3.1"))
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 }

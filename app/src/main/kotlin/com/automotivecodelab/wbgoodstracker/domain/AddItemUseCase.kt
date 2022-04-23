@@ -12,7 +12,7 @@ class AddItemUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val itemsCountLimit = 1000
+        const val ITEMS_COUNT_LIMIT = 1000
     }
 
     suspend operator fun invoke(
@@ -42,7 +42,7 @@ class AddItemUseCase @Inject constructor(
         }
 
         val totalItemsCount = itemsRepository.observeGroups().first().totalItemsQuantity
-        if (totalItemsCount > itemsCountLimit) return Result.failure(ItemsQuotaExceededException())
+        if (totalItemsCount > ITEMS_COUNT_LIMIT) return Result.failure(ItemsQuotaExceededException())
 
         return if (userRepository.isUserAuthenticated()) {
             val user = userRepository.getUser()

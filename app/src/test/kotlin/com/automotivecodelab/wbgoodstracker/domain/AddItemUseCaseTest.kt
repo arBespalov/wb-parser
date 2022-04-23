@@ -8,7 +8,7 @@ class AddItemUseCaseTest {
     @Test
     fun testWrongUrl() {
         val addItemUseCase = AddItemUseCase(
-            ItemsRepositoryImplFake(AddItemUseCase.itemsCountLimit - 1),
+            ItemsRepositoryImplFake(AddItemUseCase.ITEMS_COUNT_LIMIT - 1),
             UserRepostoryImplFake()
         )
         runBlocking {
@@ -20,7 +20,7 @@ class AddItemUseCaseTest {
     @Test
     fun testWrongVendorCode() {
         val addItemUseCase = AddItemUseCase(
-            ItemsRepositoryImplFake(AddItemUseCase.itemsCountLimit - 1),
+            ItemsRepositoryImplFake(AddItemUseCase.ITEMS_COUNT_LIMIT - 1),
             UserRepostoryImplFake()
         )
         runBlocking {
@@ -32,7 +32,7 @@ class AddItemUseCaseTest {
     @Test
     fun testItemsLimitExceeded() {
         val addItemUseCase = AddItemUseCase(
-            ItemsRepositoryImplFake(AddItemUseCase.itemsCountLimit + 1),
+            ItemsRepositoryImplFake(AddItemUseCase.ITEMS_COUNT_LIMIT + 1),
             UserRepostoryImplFake()
         )
         runBlocking {
