@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.map
 class SortRepositoryImpl @Inject constructor(
     private val localDataSource: SortLocalDataSource
 ) : SortRepository {
-    override fun observeSortingModeWithComparator():
-        Flow<Pair<SortingMode, Comparator<Item>>> {
+    override fun observeSortingModeWithComparator(): Flow<Pair<SortingMode, Comparator<Item>>> {
         return localDataSource.getSortingMode()
             .map { sortingMode ->
                 sortingMode to Comparator { o1, o2 ->

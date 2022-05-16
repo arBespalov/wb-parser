@@ -490,9 +490,9 @@ class ItemsFragment : Fragment() {
             EventObserver { recyclerItemPosition ->
                 exitTransition = MaterialElevationScale(false)
                 reenterTransition = MaterialElevationScale(true)
-                val viewHolder = viewDataBinding!!.recyclerViewItems
-                    .findViewHolderForAdapterPosition(recyclerItemPosition)
-                    as ItemsAdapter.ItemViewHolder
+                val viewHolder = viewDataBinding?.recyclerViewItems
+                    ?.findViewHolderForAdapterPosition(recyclerItemPosition)
+                        as? ItemsAdapter.ItemViewHolder ?: return@EventObserver
                 val itemId = viewHolder.recyclerViewItemBinding.item!!.id
                 val extras = FragmentNavigatorExtras(
                     viewHolder.recyclerViewItemBinding.card to

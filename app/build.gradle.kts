@@ -60,6 +60,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // offline release build
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                this.mappingFileUploadEnabled = false
+            }
         }
     }
     compileOptions {
@@ -94,7 +98,6 @@ dependencies {
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // ===retrofit===
     val retrofitVersion = "2.9.0"

@@ -41,15 +41,18 @@ class ItemsLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getItem(id: String): ItemWithSizesDBModel {
-        return appDatabase.itemDao().getById(id)
+        return appDatabase.itemDao().getById(id) ?: throw IllegalArgumentException("item id: $id")
     }
 
     override fun observeItem(id: String): Flow<ItemWithSizesDBModel> {
         return appDatabase.itemDao().observeById(id)
+            .map {
+                it ?: throw IllegalArgumentException("item id: $id")
+            }
     }
 
     override suspend fun deleteItems(itemsId: List<String>) {
-        withContext(Dispatchers.IO) {
+        coroutineScope {
             itemsId.map {
                 async {
                     val item = getItem(it)
@@ -61,12 +64,12 @@ class ItemsLocalDataSourceImpl @Inject constructor(
 
     override suspend fun updateItem(vararg item: ItemWithSizesDBModel) {
         appDatabase.withTransaction {
-            withContext(Dispatchers.IO) {
+            // db calls will switch to io dispatcher by themselves
+            withContext(Dispatchers.Default) {
                 appDatabase.itemDao().update(*item.map { it.item }.toTypedArray())
                 item.map { updatedItem ->
                     async {
-                        val localItemSizes = appDatabase.itemDao()
-                            .getById(updatedItem.item.id).sizes
+                        val localItemSizes = getItem(updatedItem.item.id).sizes
                         val localItemSizeNames = localItemSizes.map { it.sizeName }
                         val updatedItemSizeNames = updatedItem.sizes.map { it.sizeName }
                         val sizesToAdd = updatedItemSizeNames.minus(localItemSizeNames)

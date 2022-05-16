@@ -15,11 +15,11 @@ interface ItemDao {
 
     @Transaction
     @Query("SELECT * FROM item WHERE id IN (:id)")
-    suspend fun getById(id: String): ItemWithSizesDBModel
+    suspend fun getById(id: String): ItemWithSizesDBModel?
 
     @Transaction
     @Query("SELECT * FROM item WHERE id IN (:id)")
-    fun observeById(id: String): Flow<ItemWithSizesDBModel>
+    fun observeById(id: String): Flow<ItemWithSizesDBModel?>
 
     @Transaction
     @Query("SELECT * FROM item WHERE groupName IN (:group)")
