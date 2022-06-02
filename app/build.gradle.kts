@@ -17,7 +17,6 @@ ktlint {
 
 android {
     compileSdk = 31
-    buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.automotivecodelab.wbgoodstracker"
@@ -61,9 +60,9 @@ android {
                 "proguard-rules.pro"
             )
             // offline release build
-            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
-                this.mappingFileUploadEnabled = false
-            }
+//            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+//                mappingFileUploadEnabled = false
+//            }
         }
     }
     compileOptions {

@@ -21,7 +21,7 @@ class AddItemUseCase @Inject constructor(
     ): Result<Unit> {
         val url = when {
             // isDigitsOnly() is in androidx library, so unit test fails and clean arch rule
-            // violates
+            // violated
             input.all { it.isDigit() } -> {
                 if (input.length < 6 || input.length > 9)
                     return Result.failure(InvalidVendorCodeException())

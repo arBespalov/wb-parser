@@ -18,6 +18,7 @@ import com.automotivecodelab.wbgoodstracker.domain.repositories.UsageStatisticsR
 import com.automotivecodelab.wbgoodstracker.domain.repositories.UserRepository
 import dagger.Binds
 import dagger.Module
+import javax.inject.Singleton
 
 @Module
 interface AppModule {
@@ -34,15 +35,19 @@ interface AppModule {
     fun bindAuthenticationService(impl: AuthenticationServiceImpl): AuthenticationService
 
     // repositories
+    @Singleton
     @Binds
     fun bindItemsRepository(impl: ItemsRepositoryImpl): ItemsRepository
 
+    @Singleton
     @Binds
     fun bindSortRepository(impl: SortRepositoryImpl): SortRepository
 
+    @Singleton
     @Binds
     fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 
+    @Singleton
     @Binds
     fun bindUsageStatisticsRepository(impl: UsageStatisticsRepositoryImpl):
         UsageStatisticsRepository
