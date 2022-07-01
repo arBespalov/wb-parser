@@ -351,6 +351,17 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>> {
+        return runCatching {
+            val item = remoteDataSource.getItemWithFullData(itemId)
+            item.info.map {
+                it.timeOfCreationInMs to it.sizes.sumOf { sizeRemoteModel ->
+                    sizeRemoteModel.quantity
+                }
+            }
+        }
+    }
+
     override suspend fun deleteGroup(groupName: String) {
         val items = localDataSource.getByGroup(groupName)
         setGroupNameToItemsList(items, null)

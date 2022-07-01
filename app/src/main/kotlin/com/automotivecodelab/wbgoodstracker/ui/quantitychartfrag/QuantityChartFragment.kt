@@ -1,4 +1,4 @@
-package com.automotivecodelab.wbgoodstracker.ui.chartfragment
+package com.automotivecodelab.wbgoodstracker.ui.quantitychartfrag
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,29 +12,30 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
-import com.automotivecodelab.wbgoodstracker.databinding.ChartFragmentBinding
+import com.automotivecodelab.wbgoodstracker.databinding.FragmentQuantityChartBinding
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
+import com.automotivecodelab.wbgoodstracker.ui.chartfragment.ChartFragmentDirections
 import com.automotivecodelab.wbgoodstracker.ui.init
 import com.automotivecodelab.wbgoodstracker.ui.updateData
 import com.google.android.material.transition.MaterialSharedAxis
 
-class ChartFragment : Fragment() {
-    private val args: ChartFragmentArgs by navArgs()
-    private val viewModel: ChartViewModel by viewModels {
+class QuantityChartFragment : Fragment() {
+    private val args: QuantityChartFragmentArgs by navArgs()
+    private val viewModel: QuantityChartViewModel by viewModels {
         ViewModelFactory(
-            requireContext().appComponent.chartViewModelFactory().create(args.itemId)
+            requireContext().appComponent.quantityChartViewModelFactory().create(args.itemId)
         )
     }
-    private var viewDataBinding: ChartFragmentBinding? = null
+    private var viewDataBinding: FragmentQuantityChartBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.chart_fragment, container, false)
-        viewDataBinding = ChartFragmentBinding.bind(view).apply {
+        val view = inflater.inflate(R.layout.fragment_quantity_chart, container, false)
+        viewDataBinding = FragmentQuantityChartBinding.bind(view).apply {
             lifecycleOwner = viewLifecycleOwner
         }
         postponeEnterTransition()
@@ -57,7 +58,6 @@ class ChartFragment : Fragment() {
             viewModel.dataLoading.observe(viewLifecycleOwner) {
                 swipeRefresh.isRefreshing = it
             }
-
             chart.init(R.string.please_wait)
             viewModel.chartData.observe(viewLifecycleOwner) { list ->
                 chart.updateData(list)

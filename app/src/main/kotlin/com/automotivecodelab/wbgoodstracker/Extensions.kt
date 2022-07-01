@@ -1,6 +1,7 @@
 package com.automotivecodelab.wbgoodstracker
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.view.View
 import androidx.annotation.AttrRes
@@ -69,3 +70,6 @@ fun Int.toStringWithSign() = when {
     this < 0 -> "$this"
     else -> null
 }
+
+val Int.dp
+    get() = this * Resources.getSystem().displayMetrics.density

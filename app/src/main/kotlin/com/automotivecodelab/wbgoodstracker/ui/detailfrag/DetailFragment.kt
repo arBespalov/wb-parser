@@ -94,11 +94,11 @@ class DetailFragment : Fragment() {
 
             viewDataBinding?.daysObserving?.count?.text =
                 item.observingTimeInMs.millisToDays().toString()
-            val updatingTime = SimpleDateFormat(
+            val updateTime = SimpleDateFormat(
                 "dd.MM HH:mm",
                 Locale("en")
             ).format(item.lastUpdateTimestamp)
-            viewDataBinding?.updatingTime?.count?.text = updatingTime
+            viewDataBinding?.updatingTime?.count?.text = updateTime
             viewDataBinding?.sizesLayout?.removeAllViews()
             item.sizes.forEach { size ->
                 val cardSizeLayoutBinding = DataBindingUtil.inflate<CardSizeLayoutBinding>(
@@ -119,7 +119,7 @@ class DetailFragment : Fragment() {
 
             if (item.updateError == true) {
                 viewDataBinding?.error?.apply {
-                    text = getString(R.string.update_error, updatingTime)
+                    text = getString(R.string.update_error, updateTime)
                     visibility = View.VISIBLE
                 }
             } else {
@@ -138,6 +138,11 @@ class DetailFragment : Fragment() {
         viewDataBinding?.ordersCount?.apply {
             icon.setImageResource(R.drawable.ic_baseline_bar_chart_24)
             root.setOnClickListener { viewModel.showOrdersChart() }
+        }
+
+        viewDataBinding?.totalQuantity?.apply {
+            icon.setImageResource(R.drawable.ic_baseline_bar_chart_24)
+            root.setOnClickListener { viewModel.showQuantityChart() }
         }
 
         viewDataBinding?.skuId?.apply {
@@ -207,6 +212,17 @@ class DetailFragment : Fragment() {
                 exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
                 reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
                 val action = DetailFragmentDirections.actionDetailFragmentToChartFragment(it)
+                navigate(action)
+            }
+        )
+
+        viewModel.showQuantityChartEvent.observe(
+            viewLifecycleOwner,
+            EventObserver {
+                exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+                reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+                val action = DetailFragmentDirections
+                    .actionDetailFragmentToQuantityChartFragment(it)
                 navigate(action)
             }
         )

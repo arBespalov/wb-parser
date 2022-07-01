@@ -34,6 +34,9 @@ class DetailViewModel @AssistedInject constructor(
     private val _showOrdersChartEvent = MutableLiveData<Event<String>>()
     val showOrdersChartEvent: LiveData<Event<String>> = _showOrdersChartEvent
 
+    private val _showQuantityChartEvent = MutableLiveData<Event<String>>()
+    val showQuantityChartEvent: LiveData<Event<String>> = _showQuantityChartEvent
+
     private val _closeScreenEvent = MutableLiveData<Event<Unit>>()
     val closeScreenEvent: LiveData<Event<Unit>> = _closeScreenEvent
 
@@ -56,5 +59,9 @@ class DetailViewModel @AssistedInject constructor(
 
     fun showOrdersChart() {
         _showOrdersChartEvent.value = Event(itemId)
+    }
+
+    fun showQuantityChart() {
+        _showQuantityChartEvent.value = Event(itemId)
     }
 }

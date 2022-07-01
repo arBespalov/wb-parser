@@ -62,6 +62,9 @@ only way i found is to change default app theme in manifest-->
         <action
             android:id="@+id/action_detailFragment_to_chartFragment"
             app:destination="@id/chartFragment" />
+        <action
+            android:id="@+id/action_detailFragment_to_quantityChartFragment"
+            app:destination="@id/quantityChartFragment" />
     </fragment>
     <fragment
         android:id="@+id/addItemFragment"
@@ -174,4 +177,16 @@ only way i found is to change default app theme in manifest-->
         android:name="com.automotivecodelab.wbgoodstracker.ui.contactsdialog.ContactsDialogFragment"
         android:label="ContactsDialogFragment"
         tools:layout="@layout/contacts_dialog_layout"/>
+    <fragment
+        android:id="@+id/quantityChartFragment"
+        android:name="com.automotivecodelab.wbgoodstracker.ui.quantitychartfrag.QuantityChartFragment"
+        android:label="@string/quantity_in_warehouse"
+        tools:layout="@layout/fragment_quantity_chart">
+        <action
+            android:id="@+id/action_quantityChartFragment_to_errorDialogFragment"
+            app:destination="@id/errorDialogFragment" />
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+    </fragment>
 </navigation>

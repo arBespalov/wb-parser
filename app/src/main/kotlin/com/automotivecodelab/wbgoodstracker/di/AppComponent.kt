@@ -1,7 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.di
 
 import android.content.Context
-import com.automotivecodelab.wbgoodstracker.data.items.local.*
 import com.automotivecodelab.wbgoodstracker.ui.AppThemeSource
 import com.automotivecodelab.wbgoodstracker.ui.additemfrag.AddItemViewModel
 import com.automotivecodelab.wbgoodstracker.ui.chartfragment.ChartViewModel
@@ -12,6 +11,7 @@ import com.automotivecodelab.wbgoodstracker.ui.edititemfrag.EditItemViewModel
 import com.automotivecodelab.wbgoodstracker.ui.grouppickerfrag.GroupPickerDialogViewModel
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.ItemsViewModel
 import com.automotivecodelab.wbgoodstracker.ui.newgroupdialogfrag.NewGroupDialogViewModel
+import com.automotivecodelab.wbgoodstracker.ui.quantitychartfrag.QuantityChartViewModel
 import com.automotivecodelab.wbgoodstracker.ui.signinfrag.SignInViewModel
 import dagger.*
 import dagger.assisted.AssistedFactory
@@ -60,4 +60,10 @@ interface AppComponent {
     fun itemsViewModel(): ItemsViewModel
     fun newGroupDialogViewModel(): NewGroupDialogViewModel
     fun signInViewModel(): SignInViewModel
+
+    @AssistedFactory
+    interface QuantityChartViewModelAssistedFactory {
+        fun create(itemId: String): QuantityChartViewModel
+    }
+    fun quantityChartViewModelFactory(): QuantityChartViewModelAssistedFactory
 }
