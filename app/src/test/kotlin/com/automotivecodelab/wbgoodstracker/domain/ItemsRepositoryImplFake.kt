@@ -85,4 +85,8 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
     override fun observeCurrentGroup(): Flow<String?> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>> {
+        TODO("Not yet implemented")
+    }
 }

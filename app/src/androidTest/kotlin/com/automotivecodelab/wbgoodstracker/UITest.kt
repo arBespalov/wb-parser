@@ -281,37 +281,6 @@ class UITest {
             .check(matches(withText(R.string.all_items)))
     }
 
-//    @Test
-//    fun sortingMode() {
-//        Thread.sleep(1500) // wait for db to fill up the recycler
-//        onView(withId(R.id.menu_sort))
-//            .perform(click())
-//        onView(withText(R.string.by_date_desc))
-//            .perform(click())
-//        onView(withId(R.id.recycler_view_items))
-//            .perform(
-//                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
-//                    10,
-//                    click()
-//                )
-//            )
-//        var itemName = ""
-//        onView(withId(R.id.collapsing_toolbar))
-//            .check { view, _ -> itemName = (view as CollapsingToolbarLayout).title.toString() }
-//            .perform(androidx.test.espresso.action.ViewActions.pressBack())
-//        onView(withId(R.id.recycler_view_items))
-//            .perform(
-//                RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
-//                    10,
-//                    click()
-//                )
-//            )
-//        onView(withId(R.id.collapsing_toolbar))
-//            .check { view, _ ->
-//                assert((view as CollapsingToolbarLayout).title.toString() == itemName)
-//            }
-//    }
-
     @Test
     fun searchViewWithRotation() {
         // wait for db to fill up the recycler
