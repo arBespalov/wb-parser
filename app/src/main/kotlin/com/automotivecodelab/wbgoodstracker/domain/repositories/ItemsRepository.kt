@@ -24,4 +24,5 @@ interface ItemsRepository {
     suspend fun renameCurrentGroup(newGroupName: String)
     fun observeCurrentGroup(): Flow<String?>
     suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>>
+    suspend fun mergeItemsDebug(userId: String): Result<Unit>
 }

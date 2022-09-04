@@ -3,6 +3,7 @@ package com.automotivecodelab.wbgoodstracker.data.items
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.local.toDomainModel
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
@@ -250,61 +251,78 @@ class ItemsRepositoryImpl @Inject constructor(
 
     override suspend fun mergeItems(token: String): Result<Unit> {
         return runCatching {
-            // network and db calls will switch to io dispatcher by themselves
-            withContext(Dispatchers.Default) {
-                val localItems = localDataSource.getAll()
-                val mergedItems = remoteDataSource.mergeItems(
-                    localItems.map { localItem -> localItem.item.id.toInt() },
-                    token
-                )
-                val localItemIds = localItems.map { localItem -> localItem.item.id }
-                val mergedItemIds = mergedItems.map { remoteItem -> remoteItem._id }
-                val itemIdsToAdd = mergedItemIds.minus(localItemIds)
-                val itemIdsToUpdate = mergedItemIds.minus(itemIdsToAdd)
-                Timber.d("items to add: ${itemIdsToAdd.size}")
-                val addingJobDeferred = itemIdsToAdd.map { id ->
-                    async {
-                        val item = mergedItems.find { remoteItem -> remoteItem._id == id }!!
-                        localDataSource.addItem(
-                            item.toDBModel(
-                                creationTimestamp = Date().time,
-                                previousOrdersCount = item.info[0].ordersCount,
-                                previousAveragePrice = item.averagePrice,
-                                previousTotalQuantity = item.totalQuantity,
-                                localName = null,
-                                groupName = null,
-                                previousLastChangesTimestamp = 0,
-                                previousSizeQuantity = null,
-                                previousFeedbacks = item.feedbacks
-                            )
+            val localItems = localDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItems(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                token
+            )
+            saveMergedItems(localItems, mergedItems)
+        }
+    }
+
+    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
+        return runCatching {
+            val localItems = localDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItemsDebug(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                userId
+            )
+            saveMergedItems(localItems, mergedItems)
+        }.onFailure { Timber.e(it) }
+    }
+
+    private suspend fun saveMergedItems(
+        localItems: List<ItemWithSizesDBModel>,
+        mergedItems: List<ItemRemoteModel>
+    ) {
+        withContext(Dispatchers.Default) {
+            val localItemIds = localItems.map { localItem -> localItem.item.id }
+            val mergedItemIds = mergedItems.map { remoteItem -> remoteItem._id }
+            val itemIdsToAdd = mergedItemIds.minus(localItemIds)
+            val itemIdsToUpdate = mergedItemIds.minus(itemIdsToAdd)
+            Timber.d("items to add: ${itemIdsToAdd.size}")
+            val addingJobDeferred = itemIdsToAdd.map { id ->
+                async {
+                    val item = mergedItems.find { remoteItem -> remoteItem._id == id }!!
+                    localDataSource.addItem(
+                        item.toDBModel(
+                            creationTimestamp = Date().time,
+                            previousOrdersCount = item.info[0].ordersCount,
+                            previousAveragePrice = item.averagePrice,
+                            previousTotalQuantity = item.totalQuantity,
+                            localName = null,
+                            groupName = null,
+                            previousLastChangesTimestamp = 0,
+                            previousSizeQuantity = null,
+                            previousFeedbacks = item.feedbacks
+                        )
+                    )
+                }
+            }
+            itemIdsToUpdate.map { id ->
+                async {
+                    val updatedItem = mergedItems.find { remoteItem -> remoteItem._id == id }!!
+                    localItems.find { localItem -> localItem.item.id == id }!!.also {
+                            localItem ->
+                        updatedItem.toDBModel(
+                            creationTimestamp = localItem.item.creationTimestamp,
+                            previousOrdersCount = localItem.item.ordersCount,
+                            previousAveragePrice = localItem.item.averagePrice,
+                            previousTotalQuantity = localItem.item.totalQuantity,
+                            localName = localItem.item.localName,
+                            groupName = localItem.item.groupName,
+                            previousLastChangesTimestamp =
+                            localItem.item.lastChangesTimestamp,
+                            previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                                sizeDBModel.sizeName to sizeDBModel.quantity },
+                            previousFeedbacks = localItem.item.feedbacks
                         )
                     }
                 }
-                itemIdsToUpdate.map { id ->
-                    async {
-                        val updatedItem = mergedItems.find { remoteItem -> remoteItem._id == id }!!
-                        localItems.find { localItem -> localItem.item.id == id }!!.also {
-                            localItem ->
-                            updatedItem.toDBModel(
-                                creationTimestamp = localItem.item.creationTimestamp,
-                                previousOrdersCount = localItem.item.ordersCount,
-                                previousAveragePrice = localItem.item.averagePrice,
-                                previousTotalQuantity = localItem.item.totalQuantity,
-                                localName = localItem.item.localName,
-                                groupName = localItem.item.groupName,
-                                previousLastChangesTimestamp =
-                                localItem.item.lastChangesTimestamp,
-                                previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
-                                    sizeDBModel.sizeName to sizeDBModel.quantity },
-                                previousFeedbacks = localItem.item.feedbacks
-                            )
-                        }
-                    }
-                }
-                    .awaitAll()
-                    .also { localDataSource.updateItem(*it.toTypedArray()) }
-                addingJobDeferred.awaitAll()
             }
+                .awaitAll()
+                .also { localDataSource.updateItem(*it.toTypedArray()) }
+            addingJobDeferred.awaitAll()
         }
     }
 

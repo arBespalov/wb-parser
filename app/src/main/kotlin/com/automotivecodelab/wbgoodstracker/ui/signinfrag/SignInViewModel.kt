@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.GetUserUseCase
+import com.automotivecodelab.wbgoodstracker.domain.SignInDebugUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignInUseCase
 import com.automotivecodelab.wbgoodstracker.domain.SignOutUseCase
 import com.automotivecodelab.wbgoodstracker.ui.Event
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class SignInViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
+    private val signInDebugUseCase: SignInDebugUseCase,
     getUserUseCase: GetUserUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
@@ -53,6 +55,17 @@ class SignInViewModel @Inject constructor(
                 .onSuccess {
                     _viewState.value = SignInViewState.SignedInState(null)
                 }
+        }
+    }
+
+    fun signInDebug(userId: String) {
+        viewModelScope.launch {
+            _viewState.value = SignInViewState.LoadingState
+            signInDebugUseCase(userId)
+                .onFailure {
+                    _networkErrorEvent.value = Event(it)
+                }
+            _viewState.value = SignInViewState.SignedOutState
         }
     }
 

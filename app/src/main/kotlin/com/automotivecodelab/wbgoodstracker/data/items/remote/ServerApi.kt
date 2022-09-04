@@ -30,4 +30,10 @@ interface ServerApi {
 
     @POST("wbparserapi/get_full_data_item")
     suspend fun getItemWithFullData(@Query("id") itemId: String): ItemRemoteModel
+
+    @POST("wbparserapi/merge_items_debug")
+    suspend fun mergeItemsDebug(
+        @Body itemIds: List<Int>,
+        @Query("user_id") userId: String
+    ): List<ItemRemoteModel>
 }

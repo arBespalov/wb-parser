@@ -198,4 +198,11 @@ class ItemsRemoteDataSourceFake : ItemsRemoteDataSource {
     override suspend fun getItemWithFullData(itemId: String): ItemRemoteModel {
         TODO("Not yet implemented")
     }
+
+    override suspend fun mergeItemsDebug(
+        itemsId: List<Int>,
+        userId: String
+    ): List<ItemRemoteModel> {
+        TODO("Not yet implemented")
+    }
 }

@@ -10,6 +10,7 @@ interface ItemsRemoteDataSource {
     suspend fun updateItems(itemsId: List<Int>): List<ItemRemoteModel>
     suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<ItemRemoteModel>
     suspend fun getItemWithFullData(itemId: String): ItemRemoteModel
+    suspend fun mergeItemsDebug(itemsId: List<Int>, userId: String): List<ItemRemoteModel>
 }
 
 class ItemsRemoteDataSourceImpl @Inject constructor(
@@ -33,5 +34,9 @@ class ItemsRemoteDataSourceImpl @Inject constructor(
     }
     override suspend fun getItemWithFullData(itemId: String): ItemRemoteModel {
         return api.getItemWithFullData(itemId)
+    }
+
+    override suspend fun mergeItemsDebug(itemsId: List<Int>, userId: String): List<ItemRemoteModel> {
+        return api.mergeItemsDebug(itemsId, userId)
     }
 }

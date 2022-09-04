@@ -33,6 +33,10 @@ android {
             "String", "SERVER_CLIENT_ID",
             gradleLocalProperties(rootDir).getProperty("SERVER_CLIENT_ID")
         )
+        buildConfigField(
+            "String", "USER_ID_FOR_DEBUG",
+            gradleLocalProperties(rootDir).getProperty("USER_ID_FOR_DEBUG")
+        )
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")

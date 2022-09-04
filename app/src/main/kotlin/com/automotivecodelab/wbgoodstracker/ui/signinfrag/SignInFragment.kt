@@ -118,7 +118,12 @@ class SignInFragment : Fragment() {
             hint.text = getString(R.string.sign_in_hint)
             signInButton.apply {
                 visibility = View.VISIBLE
-                setOnClickListener { beginAuthenticationFlow(signUp = false) }
+                setOnClickListener {
+                    if (BuildConfig.DEBUG)
+                        viewModel.signInDebug(BuildConfig.USER_ID_FOR_DEBUG)
+                    else
+                        beginAuthenticationFlow(signUp = false)
+                }
             }
             signOutButton.visibility = View.INVISIBLE
             swipeRefresh.isRefreshing = false
