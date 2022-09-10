@@ -59,7 +59,8 @@
                     android:background="@android:color/transparent"
                     android:id="@+id/toolbar"
                     app:layout_collapseMode="pin"
-                    app:menu="@menu/detail_fragment_menu" />
+                    app:menu="@menu/detail_fragment_menu"
+                    app:navigationIcon="@drawable/ic_baseline_arrow_back_24"/>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>

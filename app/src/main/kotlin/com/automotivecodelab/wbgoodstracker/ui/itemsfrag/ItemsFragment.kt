@@ -69,10 +69,6 @@ class ItemsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        viewDataBinding?.toolbar?.setupWithNavController(navController, appBarConfiguration)
-
         setupRecycler()
         setupSpinner()
         setupSearchView()

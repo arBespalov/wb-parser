@@ -13,8 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.CardSizeLayoutBinding
 import com.automotivecodelab.wbgoodstracker.databinding.DetailFragmentBinding
@@ -60,14 +58,9 @@ class DetailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        viewDataBinding?.collapsingToolbar?.setupWithNavController(
-            viewDataBinding!!.toolbar,
-            navController,
-            appBarConfiguration
-        )
-
+        viewDataBinding?.toolbar?.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
         // https://github.com/material-components/material-components-android/issues/617
         val isDarkTheme = requireContext().resources.configuration.uiMode and
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
