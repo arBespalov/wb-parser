@@ -6,10 +6,8 @@ import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.Event
-import java.util.*
 import javax.inject.Inject
 import kotlin.Comparator
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -19,6 +17,7 @@ class ItemsViewModel @Inject constructor(
     private val setSortingModeUseCase: SetSortingModeUseCase,
     private val refreshAllItemsUseCase: RefreshAllItemsUseCase,
     observeGroupsUseCase: ObserveGroupsUseCase,
+    observeAdUseCase: ObserveAdUseCase,
     private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
     private val deleteItemsUseCase: DeleteItemsUseCase
 ) : ViewModel() {
@@ -30,26 +29,23 @@ class ItemsViewModel @Inject constructor(
 
     private val searchQuery = MutableStateFlow("")
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> = observeItemsByGroupUseCase()
-        .flatMapLatest { (items, group) ->
-            searchQuery.mapLatest { query ->
-                items.filter { item ->
-                    val byName = (item.localName ?: item.name)
-                        .lowercase()
-                        .contains(query.lowercase())
-                    val byId = item.id.contains(query.lowercase())
-                    byName || byId
-                } to group
+    val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> =
+        combine(
+            observeItemsByGroupUseCase(), searchQuery) { (items, group), query ->
+            val itemsFilteredBySearchQuery = items.filter { item ->
+                val byName = (item.localName ?: item.name)
+                    .lowercase()
+                    .contains(query.lowercase())
+                val byId = item.id.contains(query.lowercase())
+                byName || byId
             }
-        }
-        .asLiveData()
+            itemsFilteredBySearchQuery to group
+        }.asLiveData()
+
+    val ad = observeAdUseCase().asLiveData()
 
     private val _selectedItemIds = MutableLiveData<Set<String>>(emptySet())
     val selectedItemIds: LiveData<Set<String>> = _selectedItemIds
-
-    private val _openItemEvent = MutableLiveData<Event<Int>>()
-    val openItemEvent: LiveData<Event<Int>> = _openItemEvent
 
     private val _addItemEvent = MutableLiveData<Event<Unit>>()
     val addItemEvent: LiveData<Event<Unit>> = _addItemEvent
@@ -89,10 +85,6 @@ class ItemsViewModel @Inject constructor(
 
     private val _showContactsEvent = MutableLiveData<Event<Unit>>()
     val showContactsEvent: LiveData<Event<Unit>> = _showContactsEvent
-
-    fun openItem(recyclerItemPosition: Int) {
-        _openItemEvent.value = Event(recyclerItemPosition)
-    }
 
     fun addItem() {
         _addItemEvent.value = Event(Unit)

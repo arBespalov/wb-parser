@@ -24,7 +24,7 @@ import timber.log.Timber
 
 class ItemsAdapter(
     private var comparator: Comparator<Item>?,
-    private val onOpenItemDetails: (recyclerItemPosition: Int) -> Unit,
+    private val onOpenItemDetails: (viewHolder: ItemsAdapter.ItemViewHolder) -> Unit,
 ) : RecyclerView.Adapter<ItemsAdapter.ItemViewHolder>() {
 
     private val ITEM_CONTENT_CHANGED_PAYLOAD = "itemContentChangedPayload"
@@ -36,11 +36,11 @@ class ItemsAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         tracker = SelectionTracker.Builder(
-            "id",
-            recyclerView,
-            MyItemKeyProvider(sortedList),
-            MyItemDetailsLookup(recyclerView),
-            StorageStrategy.createStringStorage()
+            /* selectionId = */ "id",
+            /* recyclerView = */ recyclerView,
+            /* keyProvider = */ MyItemKeyProvider(sortedList, recyclerView),
+            /* detailsLookup = */ MyItemDetailsLookup(recyclerView),
+            /* storage = */ StorageStrategy.createStringStorage()
         ).build()
     }
 
@@ -118,10 +118,6 @@ class ItemsAdapter(
         sortedList.add(item)
     }
 
-    fun add(items: List<Item>) {
-        sortedList.addAll(items)
-    }
-
     fun remove(item: Item) {
         sortedList.remove(item)
     }
@@ -158,12 +154,12 @@ class ItemsAdapter(
         RecyclerView.ViewHolder(recyclerViewItemBinding.root), ViewHolderWithDetails<String> {
         init {
             recyclerViewItemBinding.card.setOnClickListener {
-                onOpenItemDetails(bindingAdapterPosition)
+                onOpenItemDetails(this)
             }
         }
         override fun getItemDetail() = MyItemDetails(
-            bindingAdapterPosition,
-            sortedList.get(bindingAdapterPosition).id
+            adapterPosition = absoluteAdapterPosition,
+            selectedKey = sortedList.get(bindingAdapterPosition).id
         )
     }
 

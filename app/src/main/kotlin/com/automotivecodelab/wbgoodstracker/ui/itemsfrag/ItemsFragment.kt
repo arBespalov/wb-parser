@@ -14,18 +14,18 @@ import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.ItemsFragmentBinding
+import com.automotivecodelab.wbgoodstracker.domain.models.Ad
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
+import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.HeaderAdapter
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
@@ -348,20 +348,28 @@ class ItemsFragment : Fragment() {
     private fun setupRecycler() {
         adapter = ItemsAdapter(
             comparator = null,
-            onOpenItemDetails = viewModel::openItem
+            onOpenItemDetails = ::openItem
         )
         adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy
             .PREVENT_WHEN_EMPTY
+
+        val headerAdapter = HeaderAdapter()
         viewDataBinding?.recyclerViewItems?.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            adapter = this@ItemsFragment.adapter
+            adapter = ConcatAdapter(headerAdapter, this@ItemsFragment.adapter)
         }
 
         setupItemTouchHelper()
         setupActionMode()
         setItemTouchHelperEnabled(true)
 
+        viewModel.ad.observe(viewLifecycleOwner) { ad: Ad? ->
+            if (ad != null)
+                headerAdapter.setAd(ad)
+            else
+                headerAdapter.removeAd()
+        }
         viewModel.currentSortingModeWithItemsComparator.observe(
             viewLifecycleOwner
         ) { (_, comparator) ->
@@ -378,98 +386,109 @@ class ItemsFragment : Fragment() {
             0,
             ItemTouchHelper.LEFT
         ) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ) = false
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
-                        ?.let { item ->
-                            val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
-                            val snackbar = Snackbar.make(
-                                viewDataBinding?.fabAdditem ?: requireView(),
-                                R.string.item_deleted,
-                                Snackbar.LENGTH_LONG
-                            )
-                            snackbar.setAction(R.string.undo) {
-                                Timber.d("undo")
-                                adapter?.add(item)
-                                if (isItemInFirstPosition)
-                                    viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                            }
-                            snackbar.addCallback(object : Snackbar.Callback() {
-                                // for correct behavior when swiping cards fastly
-                                override fun onShown(sb: Snackbar?) {
-                                    Timber.d("remove")
-                                    adapter?.remove(item)
-                                    super.onShown(sb)
-                                }
-                                override fun onDismissed(
-                                    transientBottomBar: Snackbar?,
-                                    event: Int
-                                ) {
-                                    Timber.d("dismissed")
-                                    if (event != DISMISS_EVENT_ACTION) {
-                                        viewModel.deleteSingleItem(item.id)
-                                        Timber.d("delete")
-                                    }
-                                    viewDataBinding?.fabAdditem?.show()
-                                    super.onDismissed(transientBottomBar, event)
-                                }
-                            })
-                            viewDataBinding?.fabAdditem?.hide()
-                            snackbar.show()
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                return if (viewHolder is ItemsAdapter.ItemViewHolder)
+                    return super.getSwipeDirs(recyclerView, viewHolder)
+                else
+                    0
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
+                    ?.let { item ->
+                        val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
+                        val snackbar = Snackbar.make(
+                            viewDataBinding?.fabAdditem ?: requireView(),
+                            R.string.item_deleted,
+                            Snackbar.LENGTH_LONG
+                        )
+                        snackbar.setAction(R.string.undo) {
+                            Timber.d("undo")
+                            adapter?.add(item)
+                            if (isItemInFirstPosition)
+                                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
                         }
-                }
+                        snackbar.addCallback(object : Snackbar.Callback() {
+                            // for correct behavior when swiping cards fastly
+                            override fun onShown(sb: Snackbar?) {
+                                Timber.d("remove")
+                                adapter?.remove(item)
+                                super.onShown(sb)
+                            }
+                            override fun onDismissed(
+                                transientBottomBar: Snackbar?,
+                                event: Int
+                            ) {
+                                Timber.d("dismissed")
+                                if (event != DISMISS_EVENT_ACTION) {
+                                    viewModel.deleteSingleItem(item.id)
+                                    Timber.d("delete")
+                                }
+                                viewDataBinding?.fabAdditem?.show()
+                                super.onDismissed(transientBottomBar, event)
+                            }
+                        })
+                        viewDataBinding?.fabAdditem?.hide()
+                        snackbar.show()
+                    }
+            }
 
-                override fun onChildDraw(
-                    c: Canvas,
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    dX: Float,
-                    dY: Float,
-                    actionState: Int,
-                    isCurrentlyActive: Boolean
-                ) {
-                    val card = (viewHolder as ItemsAdapter.ItemViewHolder).recyclerViewItemBinding
-                        .card
-                    c.clipRect(
-                        card.right + dX,
-                        card.top.toFloat(),
-                        card.right.toFloat(),
-                        card.bottom.toFloat()
-                    )
-                    val editIcon = getDrawable(
-                        resources,
-                        R.drawable.ic_baseline_delete_24,
-                        requireActivity().theme
-                    )
-                    if (editIcon != null) {
-                        editIcon.setTint(requireContext().themeColor(R.attr.colorOnBackground))
-                        val rect = Rect(
-                            card.right - editIcon.intrinsicWidth - (
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val card = (viewHolder as ItemsAdapter.ItemViewHolder).recyclerViewItemBinding
+                    .card
+                c.clipRect(
+                    card.right + dX,
+                    card.top.toFloat(),
+                    card.right.toFloat(),
+                    card.bottom.toFloat()
+                )
+                val editIcon = getDrawable(
+                    resources,
+                    R.drawable.ic_baseline_delete_24,
+                    requireActivity().theme
+                )
+                if (editIcon != null) {
+                    editIcon.setTint(requireContext().themeColor(R.attr.colorOnBackground))
+                    val rect = Rect(
+                        card.right - editIcon.intrinsicWidth - (
                                 card.height - editIcon
                                     .intrinsicHeight
                                 ) / 4,
-                            card.top + (card.height - editIcon.intrinsicHeight) / 2,
-                            card.right - (card.height - editIcon.intrinsicHeight) / 4,
-                            card.top + editIcon.intrinsicHeight + (
+                        card.top + (card.height - editIcon.intrinsicHeight) / 2,
+                        card.right - (card.height - editIcon.intrinsicHeight) / 4,
+                        card.top + editIcon.intrinsicHeight + (
                                 card.height -
-                                    editIcon.intrinsicHeight
+                                        editIcon.intrinsicHeight
                                 ) / 2
-                        )
-                        editIcon.bounds = rect
-                        // c.drawColor(Color.BLUE)
-                        editIcon.draw(c)
-                    }
-                    super.onChildDraw(
-                        c, recyclerView, viewHolder, dX, dY, actionState,
-                        isCurrentlyActive
                     )
+                    editIcon.bounds = rect
+                    // c.drawColor(Color.BLUE)
+                    editIcon.draw(c)
                 }
-            })
+                super.onChildDraw(
+                    c, recyclerView, viewHolder, dX, dY, actionState,
+                    isCurrentlyActive
+                )
+            }
+        })
     }
 
     private fun setItemTouchHelperEnabled(isEnabled: Boolean) {
@@ -480,25 +499,19 @@ class ItemsFragment : Fragment() {
         }
     }
 
-    private fun setupNavigation() {
-        viewModel.openItemEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { recyclerItemPosition ->
-                exitTransition = MaterialElevationScale(false)
-                reenterTransition = MaterialElevationScale(true)
-                val viewHolder = viewDataBinding?.recyclerViewItems
-                    ?.findViewHolderForAdapterPosition(recyclerItemPosition)
-                        as? ItemsAdapter.ItemViewHolder ?: return@EventObserver
-                val itemId = viewHolder.recyclerViewItemBinding.item!!.id
-                val extras = FragmentNavigatorExtras(
-                    viewHolder.recyclerViewItemBinding.card to
-                        getString(R.string.shared_element_container_detail_fragment)
-                )
-                val action = ItemsFragmentDirections.actionItemsFragmentToDetailFragment(itemId)
-                navigate(action, extras)
-            }
+    private fun openItem(vh: ItemsAdapter.ItemViewHolder) {
+        exitTransition = MaterialElevationScale(false)
+        reenterTransition = MaterialElevationScale(true)
+        val itemId = vh.recyclerViewItemBinding.item!!.id
+        val extras = FragmentNavigatorExtras(
+            vh.recyclerViewItemBinding.card to
+                    getString(R.string.shared_element_container_detail_fragment)
         )
+        val action = ItemsFragmentDirections.actionItemsFragmentToDetailFragment(itemId)
+        navigate(action, extras)
+    }
 
+    private fun setupNavigation() {
         viewModel.addItemEvent.observe(
             viewLifecycleOwner,
             EventObserver {
