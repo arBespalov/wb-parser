@@ -1,5 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -48,8 +50,11 @@ class HeaderAdapter: RecyclerView.Adapter<HeaderAdapter.AdViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: AdViewHolder, position: Int) {
-        holder.binding.root.setOnClickListener {
-
+        holder.binding.root.setOnClickListener { view ->
+            val url = ad!!.url
+            val webpage= Uri.parse(url)
+            val intent = Intent(Intent.ACTION_VIEW, webpage)
+            view.context.startActivity(intent)
         }
         Picasso.get()
             .load(ad!!.imgUrl)
