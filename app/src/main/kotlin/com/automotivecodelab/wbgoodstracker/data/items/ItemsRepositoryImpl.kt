@@ -70,7 +70,7 @@ class ItemsRepositoryImpl @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
-        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).size == 1) {
+        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).size == itemsId.size) {
             setCurrentGroup(null)
         }
         itemsLocalDataSource.deleteItems(itemsId)
