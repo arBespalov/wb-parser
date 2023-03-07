@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.fragment.NavHostFragment
 import com.automotivecodelab.wbgoodstracker.MainNavDirections
 import com.automotivecodelab.wbgoodstracker.R
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity(), KeyboardToggle {
         runBlocking {
             appThemeSource.saveAndSetupAppTheme(appThemeSource.getAppTheme())
         }
-        setTheme(R.style.Theme_WBParser)
+        installSplashScreen()
         setContentView(R.layout.activity_main)
         handleIntentAndNavigateToAddItemFragment(intent)
     }
