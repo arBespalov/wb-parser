@@ -1,7 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.ui.itemsfrag
 
-import android.graphics.Canvas
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -27,7 +25,6 @@ import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.HeaderAdapter
 import com.automotivecodelab.wbgoodstracker.ui.itemsfrag.recyclerview.ItemsAdapter
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialElevationScale
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -249,7 +246,7 @@ class ItemsFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
                 return when (item?.itemId) {
                     R.id.menu_delete -> {
-                        viewModel.confirmDelete()
+                        viewModel.confirmDeleteSelected()
                         true
                     }
                     R.id.menu_add_to_group -> {
@@ -382,111 +379,11 @@ class ItemsFragment : Fragment() {
     }
 
     private fun setupItemTouchHelper() {
-        itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            0,
-            ItemTouchHelper.LEFT
-        ) {
-
-            override fun getSwipeDirs(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ): Int {
-                return if (viewHolder is ItemsAdapter.ItemViewHolder)
-                    return super.getSwipeDirs(recyclerView, viewHolder)
-                else
-                    0
-            }
-
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ) = false
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                (viewHolder as? ItemsAdapter.ItemViewHolder)?.recyclerViewItemBinding?.item
-                    ?.let { item ->
-                        val isItemInFirstPosition = viewHolder.bindingAdapterPosition == 0
-                        val snackbar = Snackbar.make(
-                            viewDataBinding?.fabAdditem ?: requireView(),
-                            R.string.item_deleted,
-                            Snackbar.LENGTH_LONG
-                        )
-                        snackbar.setAction(R.string.undo) {
-                            Timber.d("undo")
-                            adapter?.add(item)
-                            if (isItemInFirstPosition)
-                                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
-                        }
-                        snackbar.addCallback(object : Snackbar.Callback() {
-                            // for correct behavior when swiping cards fastly
-                            override fun onShown(sb: Snackbar?) {
-                                Timber.d("remove")
-                                adapter?.remove(item)
-                                super.onShown(sb)
-                            }
-                            override fun onDismissed(
-                                transientBottomBar: Snackbar?,
-                                event: Int
-                            ) {
-                                Timber.d("dismissed")
-                                if (event != DISMISS_EVENT_ACTION) {
-                                    viewModel.deleteSingleItem(item.id)
-                                    Timber.d("delete")
-                                }
-                                viewDataBinding?.fabAdditem?.show()
-                                super.onDismissed(transientBottomBar, event)
-                            }
-                        })
-                        viewDataBinding?.fabAdditem?.hide()
-                        snackbar.show()
-                    }
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                val card = (viewHolder as ItemsAdapter.ItemViewHolder).recyclerViewItemBinding
-                    .card
-                c.clipRect(
-                    card.right + dX,
-                    card.top.toFloat(),
-                    card.right.toFloat(),
-                    card.bottom.toFloat()
-                )
-                val editIcon = getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_delete_24,
-                    requireActivity().theme
-                )
-                if (editIcon != null) {
-                    editIcon.setTint(requireContext().themeColor(R.attr.colorOnBackground))
-                    val rect = Rect(
-                        card.right - editIcon.intrinsicWidth - (
-                                card.height - editIcon
-                                    .intrinsicHeight
-                                ) / 4,
-                        card.top + (card.height - editIcon.intrinsicHeight) / 2,
-                        card.right - (card.height - editIcon.intrinsicHeight) / 4,
-                        card.top + editIcon.intrinsicHeight + (
-                                card.height -
-                                        editIcon.intrinsicHeight
-                                ) / 2
-                    )
-                    editIcon.bounds = rect
-                    // c.drawColor(Color.BLUE)
-                    editIcon.draw(c)
-                }
-                super.onChildDraw(
-                    c, recyclerView, viewHolder, dX, dY, actionState,
-                    isCurrentlyActive
-                )
+        itemTouchHelper = ItemTouchHelper(object : PartialSwipeCallback() {
+            override fun onSwipe(viewHolder: RecyclerView.ViewHolder) {
+                val itemId = (viewHolder as ItemsAdapter.ItemViewHolder)
+                    .recyclerViewItemBinding.item!!.id
+                viewModel.confirmDelete(itemId)
             }
         })
     }

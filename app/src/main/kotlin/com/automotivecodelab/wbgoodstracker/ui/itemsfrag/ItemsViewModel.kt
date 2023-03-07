@@ -90,10 +90,14 @@ class ItemsViewModel @Inject constructor(
         _addItemEvent.value = Event(Unit)
     }
 
-    fun confirmDelete() {
+    fun confirmDeleteSelected() {
         selectedItemIds.value?.let {
             _confirmDeleteEvent.value = Event(it.toList())
         }
+    }
+
+    fun confirmDelete(itemId: String) {
+        _confirmDeleteEvent.value = Event(listOf(itemId))
     }
 
     fun deleteSingleItem(itemId: String) {
