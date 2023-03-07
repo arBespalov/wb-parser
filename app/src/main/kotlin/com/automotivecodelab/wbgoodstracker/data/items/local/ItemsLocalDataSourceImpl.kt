@@ -1,9 +1,5 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.room.withTransaction
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import javax.inject.Inject
@@ -11,11 +7,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class ItemsLocalDataSourceImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
     private val appDatabase: AppDatabase
 ) : ItemsLocalDataSource {
-
-    private val CURRENT_GROUP = stringPreferencesKey("current_group")
 
     override fun observeAll(): Flow<List<ItemWithSizesDBModel>> {
         return appDatabase.itemDao().observeAll()
@@ -99,24 +92,6 @@ class ItemsLocalDataSourceImpl @Inject constructor(
                         }
                     }
                 }.awaitAll()
-            }
-        }
-    }
-
-    override fun observeCurrentGroup(): Flow<String?> {
-        return dataStore.data
-            .map { prefs ->
-                prefs[CURRENT_GROUP]
-            }
-            .distinctUntilChanged()
-    }
-
-    override suspend fun setCurrentGroup(groupName: String?) {
-        dataStore.edit { prefs ->
-            if (groupName == null) {
-                prefs.remove(CURRENT_GROUP)
-            } else {
-                prefs[CURRENT_GROUP] = groupName
             }
         }
     }

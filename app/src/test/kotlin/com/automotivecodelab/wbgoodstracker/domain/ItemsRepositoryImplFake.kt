@@ -89,4 +89,8 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
     override suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
+        TODO("Not yet implemented")
+    }
 }

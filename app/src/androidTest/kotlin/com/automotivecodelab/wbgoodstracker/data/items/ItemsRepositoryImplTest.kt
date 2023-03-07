@@ -9,11 +9,13 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.automotivecodelab.wbgoodstracker.data.items.local.AppDatabase
+import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemInfoRemoteModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.SizeRemoteModel
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -36,9 +38,14 @@ class ItemsRepositoryImplTest {
             produceFile = { context.preferencesDataStoreFile(UUID.randomUUID().toString()) }
         )
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(testDataStore, db)
+        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(db)
         val itemsRemoteDataSource = ItemsRemoteDataSourceFake()
-        itemsRepositoryImpl = ItemsRepositoryImpl(itemsLocalDataSourceImpl, itemsRemoteDataSource)
+        val currentGroupLocalDataSource = CurrentGroupLocalDataSourceFake()
+        itemsRepositoryImpl = ItemsRepositoryImpl(
+            itemsLocalDataSourceImpl,
+            itemsRemoteDataSource,
+            currentGroupLocalDataSource
+        )
     }
 
     @After
@@ -102,7 +109,7 @@ class ItemsRepositoryImplTest {
             itemsLocalDataSourceImpl.addItem(
                 itemWithSizesDbModel(ItemsRemoteDataSourceFake.ID1)
             )
-            val result = itemsRepositoryImpl.mergeItems("token")
+            itemsRepositoryImpl.mergeItems("token")
             val (items, _) = itemsRepositoryImpl.observeItems().first()
             assert(items.size == 3)
             assert(
@@ -206,3 +213,14 @@ class ItemsRemoteDataSourceFake : ItemsRemoteDataSource {
         TODO("Not yet implemented")
     }
 }
+
+class CurrentGroupLocalDataSourceFake: CurrentGroupLocalDataSource {
+    override fun observeCurrentGroup(): Flow<String?> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setCurrentGroup(groupName: String?) {
+        TODO("Not yet implemented")
+    }
+}
+

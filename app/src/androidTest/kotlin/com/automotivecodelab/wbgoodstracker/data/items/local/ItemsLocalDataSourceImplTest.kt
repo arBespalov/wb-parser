@@ -1,45 +1,29 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.automotivecodelab.wbgoodstracker.data.items.itemWithSizesDbModel
 import com.automotivecodelab.wbgoodstracker.data.items.sizeDBModel
-import java.util.*
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
 class ItemsLocalDataSourceImplTest {
     lateinit var db: AppDatabase
     lateinit var itemsLocalDataSourceImpl: ItemsLocalDataSourceImpl
-    lateinit var testDataStore: DataStore<Preferences>
 
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        testDataStore = PreferenceDataStoreFactory.create(
-            produceFile = { context.preferencesDataStoreFile(UUID.randomUUID().toString()) }
-        )
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(testDataStore, db)
+        itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(db)
     }
 
     @After
     fun tearDown() {
         db.close()
-        runBlocking {
-            testDataStore.edit {
-                it.clear()
-            }
-        }
     }
 
     @Test
