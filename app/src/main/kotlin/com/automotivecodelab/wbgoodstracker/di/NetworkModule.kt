@@ -33,7 +33,7 @@ class NetworkModule {
                 if (!networkStatusListener.isNetworkAvailable) throw NoInternetConnectionException()
                 chain.proceed(chain.request())
             }
-            .readTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(40, TimeUnit.SECONDS)
             .build()
     }
 }
