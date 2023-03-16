@@ -67,84 +67,12 @@ class ItemsRepositoryImpl @Inject constructor(
         )
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
-        val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
-        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).size == itemsId.size) {
-            setCurrentGroup(null)
-        }
-        itemsLocalDataSource.deleteItems(itemsId)
-        if (token != null) {
-            GlobalScope.launch {
-                runCatching {
-                    remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
-                }.onFailure { Timber.d(it) }
-            }
-        }
-    }
-
     override suspend fun addItem(url: String): Result<Unit> {
         return addItemWithNullableToken(url, null)
     }
 
     override suspend fun addItem(url: String, token: String): Result<Unit> {
         return addItemWithNullableToken(url, token)
-    }
-
-    private suspend fun addItemWithNullableToken(
-        url: String,
-        token: String?
-    ): Result<Unit> {
-        return runCatching {
-            coroutineScope {
-                val newItemDeferred = async { remoteDataSource.addItem(url, token) }
-                val localItemsDeferred = async { itemsLocalDataSource.getAll() }
-                val currentGroupDeferred = async {
-                    currentGroupLocalDataSource.observeCurrentGroup().first()
-                }
-
-                val newItem = newItemDeferred.await()
-                val localItems = localItemsDeferred.await()
-                val currentGroup = currentGroupDeferred.await()
-
-                localItems.find {
-                    itemWithSizes ->
-                    newItem._id == itemWithSizes.item.id
-                }?.let { dbModel ->
-                    itemsLocalDataSource.updateItem(
-                        newItem.toDBModel(
-                            creationTimestamp = dbModel.item.creationTimestamp,
-                            previousOrdersCount = dbModel.item.ordersCount,
-                            previousAveragePrice = dbModel.item.averagePrice,
-                            previousTotalQuantity = dbModel.item.totalQuantity,
-                            localName = dbModel.item.localName,
-                            groupName = dbModel.item.groupName,
-                            previousLastChangesTimestamp =
-                            dbModel.item.lastChangesTimestamp,
-                            previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
-                                sizeDBModel.sizeName to sizeDBModel.quantity
-                            },
-                            previousFeedbacks = dbModel.item.feedbacks
-                        )
-                    )
-                    return@coroutineScope
-                }
-
-                itemsLocalDataSource.addItem(
-                    newItem.toDBModel(
-                        creationTimestamp = Date().time,
-                        previousOrdersCount = newItem.info[0].ordersCount,
-                        previousAveragePrice = newItem.averagePrice,
-                        previousTotalQuantity = newItem.totalQuantity,
-                        localName = null,
-                        groupName = currentGroup,
-                        previousLastChangesTimestamp = 0,
-                        previousSizeQuantity = null,
-                        previousFeedbacks = newItem.feedbacks
-                    )
-                )
-            }
-        }
     }
 
     override suspend fun refreshSingleItem(itemId: String): Result<Unit> {
@@ -223,6 +151,152 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun mergeItems(token: String): Result<Unit> {
+        return runCatching {
+            val localItems = itemsLocalDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItems(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                token
+            )
+            saveMergedItems(localItems, mergedItems)
+        }
+    }
+
+    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
+        return runCatching {
+            val localItems = itemsLocalDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItemsDebug(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                userId
+            )
+            saveMergedItems(localItems, mergedItems)
+        }.onFailure { Timber.e(it) }
+    }
+
+    override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
+        setGroupNameToItemsList(itemIds.map { itemsLocalDataSource.getItem(it) }, groupName)
+        val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
+        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).isEmpty()) {
+            setCurrentGroup(null)
+        }
+    }
+
+    override suspend fun renameCurrentGroup(newGroupName: String) {
+        val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
+        if (currentGroup != null) {
+            val items = itemsLocalDataSource.getByGroup(currentGroup)
+            setGroupNameToItemsList(items, newGroupName)
+            setCurrentGroup(newGroupName)
+        }
+    }
+
+    override fun observeCurrentGroup(): Flow<String?> {
+        return currentGroupLocalDataSource.observeCurrentGroup()
+    }
+
+    override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {
+        return runCatching {
+            val item = remoteDataSource.getItemWithFullData(itemId)
+            item.info.map {
+                it.timeOfCreationInMs to it.ordersCount
+            }
+        }
+    }
+
+    override suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>> {
+        return runCatching {
+            val item = remoteDataSource.getItemWithFullData(itemId)
+            item.info.map {
+                it.timeOfCreationInMs to it.sizes.sumOf { sizeRemoteModel ->
+                    sizeRemoteModel.quantity
+                }
+            }
+        }
+    }
+
+    override suspend fun deleteGroup(groupName: String) {
+        val items = itemsLocalDataSource.getByGroup(groupName)
+        setGroupNameToItemsList(items, null)
+        setCurrentGroup(null)
+    }
+
+    override fun observeGroups(): Flow<ItemGroups> {
+        return itemsLocalDataSource.observeItemGroups()
+    }
+
+    override suspend fun setCurrentGroup(groupName: String?) {
+        currentGroupLocalDataSource.setCurrentGroup(groupName)
+    }
+
+    private suspend fun setGroupNameToItemsList(
+        items: List<ItemWithSizesDBModel>,
+        groupName: String?
+    ) {
+        itemsLocalDataSource.updateItem(
+            *items.map { item ->
+                item.copy(
+                    item = item.item.copy(groupName = groupName)
+                )
+            }.toTypedArray()
+        )
+    }
+
+    private suspend fun addItemWithNullableToken(
+        url: String,
+        token: String?
+    ): Result<Unit> {
+        return runCatching {
+            coroutineScope {
+                val newItemDeferred = async { remoteDataSource.addItem(url, token) }
+                val localItemsDeferred = async { itemsLocalDataSource.getAll() }
+                val currentGroupDeferred = async {
+                    currentGroupLocalDataSource.observeCurrentGroup().first()
+                }
+
+                val newItem = newItemDeferred.await()
+                val localItems = localItemsDeferred.await()
+                val currentGroup = currentGroupDeferred.await()
+
+                localItems.find {
+                        itemWithSizes ->
+                    newItem._id == itemWithSizes.item.id
+                }?.let { dbModel ->
+                    itemsLocalDataSource.updateItem(
+                        newItem.toDBModel(
+                            creationTimestamp = dbModel.item.creationTimestamp,
+                            previousOrdersCount = dbModel.item.ordersCount,
+                            previousAveragePrice = dbModel.item.averagePrice,
+                            previousTotalQuantity = dbModel.item.totalQuantity,
+                            localName = dbModel.item.localName,
+                            groupName = dbModel.item.groupName,
+                            previousLastChangesTimestamp =
+                            dbModel.item.lastChangesTimestamp,
+                            previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
+                                sizeDBModel.sizeName to sizeDBModel.quantity
+                            },
+                            previousFeedbacks = dbModel.item.feedbacks
+                        )
+                    )
+                    return@coroutineScope
+                }
+
+                itemsLocalDataSource.addItem(
+                    newItem.toDBModel(
+                        creationTimestamp = Date().time,
+                        previousOrdersCount = newItem.info[0].ordersCount,
+                        previousAveragePrice = newItem.averagePrice,
+                        previousTotalQuantity = newItem.totalQuantity,
+                        localName = null,
+                        groupName = currentGroup,
+                        previousLastChangesTimestamp = 0,
+                        previousSizeQuantity = null,
+                        previousFeedbacks = newItem.feedbacks
+                    )
+                )
+            }
+        }
+    }
+
     private suspend fun refreshItems(itemIds: List<String>): Result<Unit> {
         return runCatching {
             withContext(Dispatchers.Default) {
@@ -251,28 +325,6 @@ class ItemsRepositoryImpl @Inject constructor(
                     .also { itemsLocalDataSource.updateItem(*it.toTypedArray()) }
             }
         }
-    }
-
-    override suspend fun mergeItems(token: String): Result<Unit> {
-        return runCatching {
-            val localItems = itemsLocalDataSource.getAll()
-            val mergedItems = remoteDataSource.mergeItems(
-                localItems.map { localItem -> localItem.item.id.toInt() },
-                token
-            )
-            saveMergedItems(localItems, mergedItems)
-        }
-    }
-
-    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
-        return runCatching {
-            val localItems = itemsLocalDataSource.getAll()
-            val mergedItems = remoteDataSource.mergeItemsDebug(
-                localItems.map { localItem -> localItem.item.id.toInt() },
-                userId
-            )
-            saveMergedItems(localItems, mergedItems)
-        }.onFailure { Timber.e(it) }
     }
 
     private suspend fun saveMergedItems(
@@ -330,71 +382,19 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
-        setGroupNameToItemsList(itemIds.map { itemsLocalDataSource.getItem(it) }, groupName)
+    @OptIn(DelicateCoroutinesApi::class)
+    private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
-        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).isEmpty()) {
+        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).size == itemsId.size) {
             setCurrentGroup(null)
         }
-    }
-
-    override suspend fun renameCurrentGroup(newGroupName: String) {
-        val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
-        if (currentGroup != null) {
-            val items = itemsLocalDataSource.getByGroup(currentGroup)
-            setGroupNameToItemsList(items, newGroupName)
-            setCurrentGroup(newGroupName)
-        }
-    }
-
-    override fun observeCurrentGroup(): Flow<String?> {
-        return currentGroupLocalDataSource.observeCurrentGroup()
-    }
-
-    private suspend fun setGroupNameToItemsList(
-        items: List<ItemWithSizesDBModel>,
-        groupName: String?
-    ) {
-        itemsLocalDataSource.updateItem(
-            *items.map { item ->
-                item.copy(
-                    item = item.item.copy(groupName = groupName)
-                )
-            }.toTypedArray()
-        )
-    }
-
-    override suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>> {
-        return runCatching {
-            val item = remoteDataSource.getItemWithFullData(itemId)
-            item.info.map {
-                it.timeOfCreationInMs to it.ordersCount
+        itemsLocalDataSource.deleteItems(itemsId)
+        if (token != null) {
+            GlobalScope.launch {
+                runCatching {
+                    remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
+                }.onFailure { Timber.d(it) }
             }
         }
-    }
-
-    override suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>> {
-        return runCatching {
-            val item = remoteDataSource.getItemWithFullData(itemId)
-            item.info.map {
-                it.timeOfCreationInMs to it.sizes.sumOf { sizeRemoteModel ->
-                    sizeRemoteModel.quantity
-                }
-            }
-        }
-    }
-
-    override suspend fun deleteGroup(groupName: String) {
-        val items = itemsLocalDataSource.getByGroup(groupName)
-        setGroupNameToItemsList(items, null)
-        setCurrentGroup(null)
-    }
-
-    override fun observeGroups(): Flow<ItemGroups> {
-        return itemsLocalDataSource.observeItemGroups()
-    }
-
-    override suspend fun setCurrentGroup(groupName: String?) {
-        currentGroupLocalDataSource.setCurrentGroup(groupName)
     }
 }
