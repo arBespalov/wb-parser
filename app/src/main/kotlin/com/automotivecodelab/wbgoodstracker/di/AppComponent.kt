@@ -23,7 +23,8 @@ import javax.inject.Singleton
         AppModule::class,
         RoomModule::class,
         DataStoreModule::class,
-        NetworkModule::class
+        NetworkModule::class,
+        CoroutinesSupervisorScopesModule::class
     ]
 )
 interface AppComponent {

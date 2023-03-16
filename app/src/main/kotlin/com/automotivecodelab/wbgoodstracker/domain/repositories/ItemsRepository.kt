@@ -5,6 +5,7 @@ import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import kotlinx.coroutines.flow.Flow
 
 interface ItemsRepository {
+    val isMergingInProgress: Flow<Boolean>
     fun observeItems(): Flow<Pair<List<Item>, String?>>
     fun observeSingleItem(id: String): Flow<Item>
     suspend fun deleteItems(itemsId: List<String>)

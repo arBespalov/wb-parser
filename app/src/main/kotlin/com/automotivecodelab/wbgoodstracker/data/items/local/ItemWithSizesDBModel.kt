@@ -1,7 +1,7 @@
 package com.automotivecodelab.wbgoodstracker.data.items.local
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.Companion.CASCADE
 
 @Entity(tableName = "item")
 data class ItemDBModel(

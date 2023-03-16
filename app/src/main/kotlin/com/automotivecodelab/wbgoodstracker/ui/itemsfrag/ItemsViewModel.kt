@@ -19,7 +19,8 @@ class ItemsViewModel @Inject constructor(
     observeGroupsUseCase: ObserveGroupsUseCase,
     observeAdUseCase: ObserveAdUseCase,
     private val setCurrentGroupUseCase: SetCurrentGroupUseCase,
-    private val deleteItemsUseCase: DeleteItemsUseCase
+    private val deleteItemsUseCase: DeleteItemsUseCase,
+    observeMergeLoadingState: ObserveMergeLoadingState
 ) : ViewModel() {
 
     val itemGroups: LiveData<ItemGroups> = observeGroupsUseCase().asLiveData()
@@ -85,6 +86,14 @@ class ItemsViewModel @Inject constructor(
 
     private val _showContactsEvent = MutableLiveData<Event<Unit>>()
     val showContactsEvent: LiveData<Event<Unit>> = _showContactsEvent
+
+    init {
+        observeMergeLoadingState()
+            .onEach { isLoading ->
+                _dataLoading.value = isLoading
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun addItem() {
         _addItemEvent.value = Event(Unit)

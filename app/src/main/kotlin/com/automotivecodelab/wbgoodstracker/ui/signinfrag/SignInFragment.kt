@@ -31,8 +31,7 @@ class SignInFragment : Fragment() {
 
     private val oneTapClient: SignInClient by lazy { Identity.getSignInClient(requireContext()) }
     private val getUserCredentials = registerForActivityResult(
-        ActivityResultContracts
-            .StartIntentSenderForResult()
+        ActivityResultContracts.StartIntentSenderForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             try {
@@ -84,7 +83,7 @@ class SignInFragment : Fragment() {
         }
 
         setupNavigation()
-        viewModel.viewState.observe(viewLifecycleOwner) {
+        viewModel.viewState.collectSafely(viewLifecycleOwner) {
             when (it) {
                 is SignInViewState.SignedOutState -> setSignedOutState()
                 is SignInViewState.SignedInState -> setSignedInState(it.email)

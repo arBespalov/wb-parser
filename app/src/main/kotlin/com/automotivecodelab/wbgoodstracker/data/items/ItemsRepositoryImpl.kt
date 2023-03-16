@@ -10,17 +10,21 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
-import java.util.*
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
+import java.util.*
+import javax.inject.Inject
 
 class ItemsRepositoryImpl @Inject constructor(
     private val itemsLocalDataSource: ItemsLocalDataSource,
     private val remoteDataSource: ItemsRemoteDataSource,
-    private val currentGroupLocalDataSource: CurrentGroupLocalDataSource
+    private val currentGroupLocalDataSource: CurrentGroupLocalDataSource,
+    private val scope: CoroutineScope
 ) : ItemsRepository {
+
+    private val _isMergingInProgress = MutableStateFlow(false)
+    override val isMergingInProgress = _isMergingInProgress.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeItems(): Flow<Pair<List<Item>, String?>> {
@@ -152,25 +156,41 @@ class ItemsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun mergeItems(token: String): Result<Unit> {
-        return runCatching {
-            val localItems = itemsLocalDataSource.getAll()
-            val mergedItems = remoteDataSource.mergeItems(
-                localItems.map { localItem -> localItem.item.id.toInt() },
-                token
-            )
-            saveMergedItems(localItems, mergedItems)
+        if (isMergingInProgress.value) return Result.failure(
+            IllegalStateException("trying to start merge while is is already started")
+        )
+        return withContext(scope.coroutineContext) {
+            _isMergingInProgress.value = true
+            val result = runCatching {
+                val localItems = itemsLocalDataSource.getAll()
+                val mergedItems = remoteDataSource.mergeItems(
+                    localItems.map { localItem -> localItem.item.id.toInt() },
+                    token
+                )
+                saveMergedItems(localItems, mergedItems)
+            }
+            _isMergingInProgress.value = false
+            result
         }
     }
 
     override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
-        return runCatching {
-            val localItems = itemsLocalDataSource.getAll()
-            val mergedItems = remoteDataSource.mergeItemsDebug(
-                localItems.map { localItem -> localItem.item.id.toInt() },
-                userId
-            )
-            saveMergedItems(localItems, mergedItems)
-        }.onFailure { Timber.e(it) }
+        if (isMergingInProgress.value) return Result.failure(
+            IllegalStateException("trying to start merge while is is already started")
+        )
+        return withContext(scope.coroutineContext) {
+            _isMergingInProgress.value = true
+            val result = runCatching {
+                val localItems = itemsLocalDataSource.getAll()
+                val mergedItems = remoteDataSource.mergeItemsDebug(
+                    localItems.map { localItem -> localItem.item.id.toInt() },
+                    userId
+                )
+                saveMergedItems(localItems, mergedItems)
+            }.onFailure { Timber.e(it) }
+            _isMergingInProgress.value = false
+            result
+        }
     }
 
     override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
@@ -382,15 +402,16 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private suspend fun deleteItemsWithNullableToken(itemsId: List<String>, token: String?) {
         val currentGroup = currentGroupLocalDataSource.observeCurrentGroup().first()
-        if (currentGroup != null && itemsLocalDataSource.getByGroup(currentGroup).size == itemsId.size) {
+        if (currentGroup != null &&
+            itemsLocalDataSource.getByGroup(currentGroup).size == itemsId.size
+        ) {
             setCurrentGroup(null)
         }
         itemsLocalDataSource.deleteItems(itemsId)
         if (token != null) {
-            GlobalScope.launch {
+            scope.launch {
                 runCatching {
                     remoteDataSource.deleteItems(itemsId.map { id -> id.toInt() }, token)
                 }.onFailure { Timber.d(it) }

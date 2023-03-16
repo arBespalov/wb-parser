@@ -529,7 +529,7 @@ class ItemsFragment : Fragment() {
                 }
             }
             setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                     viewDataBinding?.toolbar?.menu?.forEach { menuItem ->
                         if (menuItem.itemId != R.id.menu_search) {
                             menuItem.isVisible = false
@@ -541,7 +541,7 @@ class ItemsFragment : Fragment() {
                     return true
                 }
 
-                override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     viewDataBinding?.toolbar?.menu?.forEach { menuItem ->
                         if (menuItem.itemId != R.id.menu_search) {
                             menuItem.isVisible = true

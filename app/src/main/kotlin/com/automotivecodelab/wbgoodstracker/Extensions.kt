@@ -8,11 +8,17 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 fun String.httpToHttps(): String {
@@ -69,6 +75,20 @@ fun Int.toStringWithSign() = when {
     this > 0 -> "+$this"
     this < 0 -> "$this"
     else -> null
+}
+
+/**
+ * Removes boilerplate when collecting viewmodel` state flow from fragment/activity
+ */
+fun <T> StateFlow<T>.collectSafely(
+    lifecycleOwner: LifecycleOwner,
+    onCollect: (value: T) -> Unit
+) {
+    lifecycleOwner.lifecycleScope.launch {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            this@collectSafely.collect(onCollect)
+        }
+    }
 }
 
 val Int.dp
