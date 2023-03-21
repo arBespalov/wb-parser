@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.automotivecodelab.wbgoodstracker.domain.*
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
+import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
 import com.automotivecodelab.wbgoodstracker.domain.models.SortingMode
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import javax.inject.Inject
@@ -32,7 +33,9 @@ class ItemsViewModel @Inject constructor(
 
     val itemsWithCurrentGroup: LiveData<Pair<List<Item>, String?>> =
         combine(
-            observeItemsByGroupUseCase(), searchQuery) { (items, group), query ->
+            observeItemsByGroupUseCase(),
+            searchQuery
+        ) { (items, group), query ->
             val itemsFilteredBySearchQuery = items.filter { item ->
                 val byName = (item.localName ?: item.name)
                     .lowercase()
@@ -89,8 +92,8 @@ class ItemsViewModel @Inject constructor(
 
     init {
         observeMergeLoadingState()
-            .onEach { isLoading ->
-                _dataLoading.value = isLoading
+            .onEach { status ->
+                _dataLoading.value = status is MergeStatus.InProgress
             }
             .launchIn(viewModelScope)
     }

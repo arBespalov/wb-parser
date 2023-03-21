@@ -53,6 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
+                    android:layout_marginHorizontal="10dp"
                     android:gravity="center"
                     app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
                     tools:layout_editor_absoluteX="0dp"

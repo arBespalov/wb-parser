@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.automotivecodelab.wbgoodstracker.domain.*
+import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
 import com.automotivecodelab.wbgoodstracker.ui.Event
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -25,18 +26,26 @@ class SignInViewModel @Inject constructor(
     val networkErrorEvent: LiveData<Event<Throwable>> = _networkErrorEvent
 
     init {
-        viewModelScope.launch {
-            getUserUseCase()
-                .onFailure {
-                    _viewState.value = SignInViewState.SignedOutState
-                }
-                .onSuccess { user ->
-                    _viewState.value = SignInViewState.SignedInState(user.email)
-                }
-        }
         observeMergeLoadingState()
-            .onEach { isLoading ->
-                if (isLoading) _viewState.value = SignInViewState.LoadingState
+            .onEach { status ->
+                when (status) {
+                    MergeStatus.Idle, MergeStatus.Success -> {
+                        getUserUseCase()
+                            .onFailure {
+                                _viewState.value = SignInViewState.SignedOutState
+                            }
+                            .onSuccess { user ->
+                                _viewState.value = SignInViewState.SignedInState(user.email)
+                            }
+                    }
+                    MergeStatus.InProgress -> {
+                        _viewState.value = SignInViewState.LoadingState
+                    }
+                    is MergeStatus.Error -> {
+                        _viewState.value = SignInViewState.SignedOutState
+                        _networkErrorEvent.value = Event(status.t)
+                    }
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -51,23 +60,12 @@ class SignInViewModel @Inject constructor(
     fun signIn(idToken: String) {
         viewModelScope.launch {
             signInUseCase(idToken)
-                .onFailure {
-                    _viewState.value = SignInViewState.SignedOutState
-                    _networkErrorEvent.value = Event(it)
-                }
-                .onSuccess {
-                    _viewState.value = SignInViewState.SignedInState(null)
-                }
         }
     }
 
     fun signInDebug(userId: String) {
         viewModelScope.launch {
             signInDebugUseCase(userId)
-                .onFailure {
-                    _networkErrorEvent.value = Event(it)
-                }
-            _viewState.value = SignInViewState.SignedOutState
         }
     }
 

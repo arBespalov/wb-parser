@@ -6,7 +6,7 @@ import javax.inject.Inject
 class SignInDebugUseCase @Inject constructor(
     private val itemsRepository: ItemsRepository
 ) {
-    suspend operator fun invoke(userId: String): Result<Unit> {
+    suspend operator fun invoke(userId: String) {
         return itemsRepository.mergeItemsDebug(userId)
     }
 }

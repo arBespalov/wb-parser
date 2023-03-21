@@ -2,10 +2,11 @@ package com.automotivecodelab.wbgoodstracker.domain.repositories
 
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
+import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
 import kotlinx.coroutines.flow.Flow
 
 interface ItemsRepository {
-    val isMergingInProgress: Flow<Boolean>
+    val mergeStatus: Flow<MergeStatus>
     fun observeItems(): Flow<Pair<List<Item>, String?>>
     fun observeSingleItem(id: String): Flow<Item>
     suspend fun deleteItems(itemsId: List<String>)
@@ -16,7 +17,7 @@ interface ItemsRepository {
     suspend fun refreshSingleItem(itemId: String): Result<Unit>
     suspend fun refreshAllItems(): Result<Unit>
     suspend fun syncItems(token: String): Result<Unit>
-    suspend fun mergeItems(token: String): Result<Unit>
+    suspend fun mergeItems(token: String)
     suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?)
     suspend fun getOrdersChartData(itemId: String): Result<List<Pair<Long, Int>>>
     suspend fun deleteGroup(groupName: String)
@@ -25,5 +26,5 @@ interface ItemsRepository {
     suspend fun renameCurrentGroup(newGroupName: String)
     fun observeCurrentGroup(): Flow<String?>
     suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>>
-    suspend fun mergeItemsDebug(userId: String): Result<Unit>
+    suspend fun mergeItemsDebug(userId: String)
 }

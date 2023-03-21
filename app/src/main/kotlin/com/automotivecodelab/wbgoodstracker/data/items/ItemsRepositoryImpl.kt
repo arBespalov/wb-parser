@@ -9,6 +9,7 @@ import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSou
 import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
+import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -23,8 +24,8 @@ class ItemsRepositoryImpl @Inject constructor(
     private val scope: CoroutineScope
 ) : ItemsRepository {
 
-    private val _isMergingInProgress = MutableStateFlow(false)
-    override val isMergingInProgress = _isMergingInProgress.asStateFlow()
+    private val _mergeStatus = MutableStateFlow<MergeStatus>(MergeStatus.Idle)
+    override val mergeStatus: Flow<MergeStatus> = _mergeStatus
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeItems(): Flow<Pair<List<Item>, String?>> {
@@ -155,13 +156,13 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun mergeItems(token: String): Result<Unit> {
-        if (isMergingInProgress.value) return Result.failure(
-            IllegalStateException("trying to start merge while is is already started")
-        )
+    override suspend fun mergeItems(token: String) {
+        if (_mergeStatus.value == MergeStatus.InProgress)
+            error("trying to start merge while it is already started")
+
         return withContext(scope.coroutineContext) {
-            _isMergingInProgress.value = true
-            val result = runCatching {
+            _mergeStatus.value = MergeStatus.InProgress
+            runCatching {
                 val localItems = itemsLocalDataSource.getAll()
                 val mergedItems = remoteDataSource.mergeItems(
                     localItems.map { localItem -> localItem.item.id.toInt() },
@@ -169,27 +170,27 @@ class ItemsRepositoryImpl @Inject constructor(
                 )
                 saveMergedItems(localItems, mergedItems)
             }
-            _isMergingInProgress.value = false
-            result
+                .onSuccess { _mergeStatus.value = MergeStatus.Success }
+                .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
         }
     }
 
-    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
-        if (isMergingInProgress.value) return Result.failure(
-            IllegalStateException("trying to start merge while is is already started")
-        )
+    override suspend fun mergeItemsDebug(userId: String) {
+        if (_mergeStatus.value == MergeStatus.InProgress)
+            error("trying to start merge while it is already started")
+
         return withContext(scope.coroutineContext) {
-            _isMergingInProgress.value = true
-            val result = runCatching {
+            _mergeStatus.value = MergeStatus.InProgress
+            runCatching {
                 val localItems = itemsLocalDataSource.getAll()
                 val mergedItems = remoteDataSource.mergeItemsDebug(
                     localItems.map { localItem -> localItem.item.id.toInt() },
                     userId
                 )
                 saveMergedItems(localItems, mergedItems)
-            }.onFailure { Timber.e(it) }
-            _isMergingInProgress.value = false
-            result
+            }
+                .onSuccess { _mergeStatus.value = MergeStatus.Success }
+                .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
         }
     }
 
