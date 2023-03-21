@@ -379,22 +379,20 @@ class ItemsRepositoryImpl @Inject constructor(
             itemIdsToUpdate.map { id ->
                 async {
                     val updatedItem = mergedItems.find { remoteItem -> remoteItem._id == id }!!
-                    localItems.find { localItem -> localItem.item.id == id }!!.also {
-                            localItem ->
-                        updatedItem.toDBModel(
-                            creationTimestamp = localItem.item.creationTimestamp,
-                            previousOrdersCount = localItem.item.ordersCount,
-                            previousAveragePrice = localItem.item.averagePrice,
-                            previousTotalQuantity = localItem.item.totalQuantity,
-                            localName = localItem.item.localName,
-                            groupName = localItem.item.groupName,
-                            previousLastChangesTimestamp =
-                            localItem.item.lastChangesTimestamp,
-                            previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
-                                sizeDBModel.sizeName to sizeDBModel.quantity },
-                            previousFeedbacks = localItem.item.feedbacks
-                        )
-                    }
+                    val localItem = localItems.find { localItem -> localItem.item.id == id }!!
+                    updatedItem.toDBModel(
+                        creationTimestamp = localItem.item.creationTimestamp,
+                        previousOrdersCount = localItem.item.ordersCount,
+                        previousAveragePrice = localItem.item.averagePrice,
+                        previousTotalQuantity = localItem.item.totalQuantity,
+                        localName = localItem.item.localName,
+                        groupName = localItem.item.groupName,
+                        previousLastChangesTimestamp =
+                        localItem.item.lastChangesTimestamp,
+                        previousSizeQuantity = localItem.sizes.associate { sizeDBModel ->
+                            sizeDBModel.sizeName to sizeDBModel.quantity },
+                        previousFeedbacks = localItem.item.feedbacks
+                    )
                 }
             }
                 .awaitAll()
