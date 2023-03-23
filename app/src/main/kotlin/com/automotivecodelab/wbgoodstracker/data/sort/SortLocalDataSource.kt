@@ -23,10 +23,9 @@ class SortLocalDataSourceImpl @Inject constructor(
     override fun getSortingMode(): Flow<SortingMode> {
         return dataStore.data
             .map { prefs ->
-                SortingMode.values()[
-                    prefs[SAVED_SORTING_MODE]
-                        ?: SortingMode.BY_LAST_CHANGES.ordinal
-                ]
+                SortingMode.values().getOrNull(
+                    prefs[SAVED_SORTING_MODE] ?: SortingMode.BY_LAST_CHANGES.ordinal
+                ) ?: SortingMode.BY_LAST_CHANGES
             }
             .distinctUntilChanged()
     }

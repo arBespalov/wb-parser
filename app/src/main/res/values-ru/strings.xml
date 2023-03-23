@@ -20,6 +20,7 @@
     <string name="orders_count">Выкупы</string>
     <string name="by_orders_count">По выкупам</string>
     <string name="by_orders_count_per_day">По выкупам в день</string>
+    <string name="by_total_quantity">По остаткам</string>
     <string name="price">Цена</string>
     <string name="error_body">Ошибка. Попробуйте позже</string>
     <string name="invalid_url">Неверный URL</string>

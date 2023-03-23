@@ -20,6 +20,7 @@
     <string name="orders_count">Orders count</string>
     <string name="by_orders_count">By orders count</string>
     <string name="by_orders_count_per_day">By orders count per day</string>
+    <string name="by_total_quantity">By total quantity</string>
     <string name="price">Price</string>
     <string name="error_body">Error. Please try again later</string>
     <string name="ok" translatable="false">OK</string>

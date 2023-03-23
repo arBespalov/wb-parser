@@ -27,9 +27,10 @@ class SortRepositoryImpl @Inject constructor(
                             o2.ordersCount.compareTo(o1.ordersCount)
                         SortingMode.BY_ORDERS_COUNT_PER_DAY ->
                             o2.averageOrdersCountPerDay.compareTo(o1.averageOrdersCountPerDay)
+                        SortingMode.BY_TOTAL_QUANTITY ->
+                            o2.totalQuantity.compareTo(o1.totalQuantity)
                         SortingMode.BY_LAST_CHANGES ->
-                            o2.lastChangesTimestamp
-                                .compareTo(o1.lastChangesTimestamp)
+                            o2.lastChangesTimestamp.compareTo(o1.lastChangesTimestamp)
                     }
                     if (comp == 0)
                         o2.id.compareTo(o1.id)

@@ -201,6 +201,7 @@ class ItemsFragment : Fragment() {
                 SortingMode.BY_ORDERS_COUNT -> R.string.by_orders_count
                 SortingMode.BY_ORDERS_COUNT_PER_DAY ->
                     R.string.by_orders_count_per_day
+                SortingMode.BY_TOTAL_QUANTITY -> R.string.by_total_quantity
                 SortingMode.BY_LAST_CHANGES -> R.string.by_last_changes
             }
             popup.menu.add(
