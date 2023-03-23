@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.StrictMode
 import com.automotivecodelab.wbgoodstracker.di.AppComponent
 import com.automotivecodelab.wbgoodstracker.di.DaggerAppComponent
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 class MyApplication : Application() {
@@ -28,6 +29,7 @@ class MyApplication : Application() {
                     .penaltyLog()
                     .build()
             )
+            Picasso.get().setIndicatorsEnabled(true)
         }
         appComponent = DaggerAppComponent
             .factory()
