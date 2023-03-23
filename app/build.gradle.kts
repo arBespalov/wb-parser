@@ -79,11 +79,12 @@ android {
         }
     }
     dataBinding {
-        isEnabled = true
+        enable = true
     }
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
+    namespace = "com.automotivecodelab.wbgoodstracker"
 }
 
 dependencies {
@@ -115,7 +116,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.5.0")
 
     // ===navigation===
-    val navigationVersion = "2.4.1"
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
 
