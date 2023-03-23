@@ -16,11 +16,11 @@ interface ServerApi {
         @Query("id_token") idToken: String
     ): Response<Unit>
 
-    @POST("wbparserapi/update_items")
-    suspend fun updateItems(@Body itemIds: List<Int>): List<ItemRemoteModel>
+    @POST("wbparserapi/update_items_and_ad")
+    suspend fun updateItems(@Body itemIds: List<Int>): UpdateItemResponse
 
-    @GET("wbparserapi/update_items")
-    suspend fun getItemsForUserId(@Query("id_token") idToken: String): List<ItemRemoteModel>
+    @GET("wbparserapi/update_items_and_ad")
+    suspend fun getItemsForUserId(@Query("id_token") idToken: String): UpdateItemResponse
 
     @POST("wbparserapi/merge_items")
     suspend fun mergeItems(

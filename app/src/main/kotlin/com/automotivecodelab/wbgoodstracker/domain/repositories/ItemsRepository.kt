@@ -1,5 +1,6 @@
 package com.automotivecodelab.wbgoodstracker.domain.repositories
 
+import com.automotivecodelab.wbgoodstracker.domain.models.Ad
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
@@ -27,4 +28,5 @@ interface ItemsRepository {
     fun observeCurrentGroup(): Flow<String?>
     suspend fun getQuantityChartData(itemId: String): Result<List<Pair<Long, Int>>>
     suspend fun mergeItemsDebug(userId: String)
+    fun observeAd(): Flow<Ad?>
 }

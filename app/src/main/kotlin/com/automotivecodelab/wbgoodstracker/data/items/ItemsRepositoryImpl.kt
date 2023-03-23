@@ -1,12 +1,11 @@
 package com.automotivecodelab.wbgoodstracker.data.items
 
-import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
-import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.toDomainModel
+import com.automotivecodelab.wbgoodstracker.data.items.local.*
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsAndAdRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.toDBModel
+import com.automotivecodelab.wbgoodstracker.data.items.remote.toDomainModel
+import com.automotivecodelab.wbgoodstracker.domain.models.Ad
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
 import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
@@ -19,8 +18,9 @@ import javax.inject.Inject
 
 class ItemsRepositoryImpl @Inject constructor(
     private val itemsLocalDataSource: ItemsLocalDataSource,
-    private val remoteDataSource: ItemsRemoteDataSource,
+    private val remoteDataSource: ItemsAndAdRemoteDataSource,
     private val currentGroupLocalDataSource: CurrentGroupLocalDataSource,
+    private val adLocalDataSource: AdLocalDataSource,
     private val scope: CoroutineScope
 ) : ItemsRepository {
 
@@ -64,9 +64,11 @@ class ItemsRepositoryImpl @Inject constructor(
     override suspend fun setItemLocalName(itemId: String, localName: String?) {
         val itemDbModel = itemsLocalDataSource.getItem(itemId)
         itemsLocalDataSource.updateItem(
-            itemDbModel.copy(
-                item = itemDbModel.item.copy(
-                    localName = localName
+            listOf(
+                itemDbModel.copy(
+                    item = itemDbModel.item.copy(
+                        localName = localName
+                    )
                 )
             )
         )
@@ -92,11 +94,14 @@ class ItemsRepositoryImpl @Inject constructor(
         return runCatching {
             // network and db calls will switch to io dispatcher by themselves
             withContext(Dispatchers.Default) {
-                val serverItemsDeferred = async { remoteDataSource.getItemsForUserId(token) }
+                val serverResponseDeferred = async { remoteDataSource.getItemsAndAdForUserId(token) }
                 val localItemsDeferred = async { itemsLocalDataSource.getAll() }
 
-                val serverItems = serverItemsDeferred.await()
+                val serverResponse = serverResponseDeferred.await()
                 val localItems = localItemsDeferred.await()
+
+                val serverItems = serverResponse.items
+                adLocalDataSource.setAd(serverResponse.ad?.toDomainModel())
 
                 val serverItemIds = serverItems.map { it._id }
                 val localItemIds = localItems.map { it.item.id }
@@ -151,7 +156,7 @@ class ItemsRepositoryImpl @Inject constructor(
                     }
                 }
                     .awaitAll()
-                    .also { itemsLocalDataSource.updateItem(*it.toTypedArray()) }
+                    .also { itemsLocalDataSource.updateItem(it) }
             }
         }
     }
@@ -192,6 +197,10 @@ class ItemsRepositoryImpl @Inject constructor(
                 .onSuccess { _mergeStatus.value = MergeStatus.Success }
                 .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
         }
+    }
+
+    override fun observeAd(): Flow<Ad?> {
+        return adLocalDataSource.observeAd()
     }
 
     override suspend fun addItemsToGroup(itemIds: List<String>, groupName: String?) {
@@ -254,11 +263,11 @@ class ItemsRepositoryImpl @Inject constructor(
         groupName: String?
     ) {
         itemsLocalDataSource.updateItem(
-            *items.map { item ->
+            items.map { item ->
                 item.copy(
                     item = item.item.copy(groupName = groupName)
                 )
-            }.toTypedArray()
+            }
         )
     }
 
@@ -283,19 +292,21 @@ class ItemsRepositoryImpl @Inject constructor(
                     newItem._id == itemWithSizes.item.id
                 }?.let { dbModel ->
                     itemsLocalDataSource.updateItem(
-                        newItem.toDBModel(
-                            creationTimestamp = dbModel.item.creationTimestamp,
-                            previousOrdersCount = dbModel.item.ordersCount,
-                            previousAveragePrice = dbModel.item.averagePrice,
-                            previousTotalQuantity = dbModel.item.totalQuantity,
-                            localName = dbModel.item.localName,
-                            groupName = dbModel.item.groupName,
-                            previousLastChangesTimestamp =
-                            dbModel.item.lastChangesTimestamp,
-                            previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
-                                sizeDBModel.sizeName to sizeDBModel.quantity
-                            },
-                            previousFeedbacks = dbModel.item.feedbacks
+                        listOf(
+                            newItem.toDBModel(
+                                creationTimestamp = dbModel.item.creationTimestamp,
+                                previousOrdersCount = dbModel.item.ordersCount,
+                                previousAveragePrice = dbModel.item.averagePrice,
+                                previousTotalQuantity = dbModel.item.totalQuantity,
+                                localName = dbModel.item.localName,
+                                groupName = dbModel.item.groupName,
+                                previousLastChangesTimestamp =
+                                dbModel.item.lastChangesTimestamp,
+                                previousSizeQuantity = dbModel.sizes.associate { sizeDBModel ->
+                                    sizeDBModel.sizeName to sizeDBModel.quantity
+                                },
+                                previousFeedbacks = dbModel.item.feedbacks
+                            )
                         )
                     )
                     return@coroutineScope
@@ -322,8 +333,9 @@ class ItemsRepositoryImpl @Inject constructor(
         return runCatching {
             withContext(Dispatchers.Default) {
                 val intItemIds = itemIds.map { it.toInt() }
-                val updatedItems = remoteDataSource.updateItems(intItemIds)
-                updatedItems.map { updatedItem ->
+                val response = remoteDataSource.updateItemsAndAd(intItemIds)
+                adLocalDataSource.setAd(response.ad?.toDomainModel())
+                response.items.map { updatedItem ->
                     async {
                         val localItem = itemsLocalDataSource.getItem(updatedItem._id)
                         updatedItem.toDBModel(
@@ -343,7 +355,7 @@ class ItemsRepositoryImpl @Inject constructor(
                     }
                 }
                     .awaitAll()
-                    .also { itemsLocalDataSource.updateItem(*it.toTypedArray()) }
+                    .also { itemsLocalDataSource.updateItem(it) }
             }
         }
     }
@@ -396,7 +408,7 @@ class ItemsRepositoryImpl @Inject constructor(
                 }
             }
                 .awaitAll()
-                .also { itemsLocalDataSource.updateItem(*it.toTypedArray()) }
+                .also { itemsLocalDataSource.updateItem(it) }
             addingJobDeferred.awaitAll()
         }
     }

@@ -3,19 +3,19 @@ package com.automotivecodelab.wbgoodstracker.data.items.remote
 import java.io.IOException
 import javax.inject.Inject
 
-interface ItemsRemoteDataSource {
+interface ItemsAndAdRemoteDataSource {
     suspend fun addItem(url: String, idToken: String?): ItemRemoteModel
     suspend fun deleteItems(itemsId: List<Int>, idToken: String)
-    suspend fun getItemsForUserId(idToken: String): List<ItemRemoteModel>
-    suspend fun updateItems(itemsId: List<Int>): List<ItemRemoteModel>
+    suspend fun getItemsAndAdForUserId(idToken: String): UpdateItemResponse
+    suspend fun updateItemsAndAd(itemsId: List<Int>): UpdateItemResponse
     suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<ItemRemoteModel>
     suspend fun getItemWithFullData(itemId: String): ItemRemoteModel
     suspend fun mergeItemsDebug(itemsId: List<Int>, userId: String): List<ItemRemoteModel>
 }
 
-class ItemsRemoteDataSourceImpl @Inject constructor(
+class ItemsAndAdAndAdRemoteDataSourceImpl @Inject constructor(
     private val api: ServerApi
-) : ItemsRemoteDataSource {
+): ItemsAndAdRemoteDataSource {
     override suspend fun addItem(url: String, idToken: String?): ItemRemoteModel {
         return api.addItem(url, idToken)
     }
@@ -23,10 +23,10 @@ class ItemsRemoteDataSourceImpl @Inject constructor(
         val response = api.deleteItems(itemsId, idToken)
         if (!response.isSuccessful) throw IOException()
     }
-    override suspend fun getItemsForUserId(idToken: String): List<ItemRemoteModel> {
+    override suspend fun getItemsAndAdForUserId(idToken: String): UpdateItemResponse {
         return api.getItemsForUserId(idToken)
     }
-    override suspend fun updateItems(itemsId: List<Int>): List<ItemRemoteModel> {
+    override suspend fun updateItemsAndAd(itemsId: List<Int>): UpdateItemResponse {
         return api.updateItems(itemsId)
     }
     override suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<ItemRemoteModel> {

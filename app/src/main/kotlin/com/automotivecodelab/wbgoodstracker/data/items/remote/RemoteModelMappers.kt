@@ -3,6 +3,7 @@ package com.automotivecodelab.wbgoodstracker.data.items.remote
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel
 import com.automotivecodelab.wbgoodstracker.data.items.local.SizeDBModel
+import com.automotivecodelab.wbgoodstracker.domain.models.Ad
 import java.util.*
 
 fun ItemRemoteModel.toDBModel(
@@ -71,3 +72,8 @@ fun ItemRemoteModel.toDBModel(
         }
     )
 }
+
+fun AdRemoteModel.toDomainModel() = Ad(
+    imgUrl = imgUrl,
+    url = url
+)

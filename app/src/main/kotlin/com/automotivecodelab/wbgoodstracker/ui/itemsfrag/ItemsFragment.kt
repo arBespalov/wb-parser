@@ -366,6 +366,10 @@ class ItemsFragment : Fragment() {
                 headerAdapter.setAd(ad)
             else
                 headerAdapter.removeAd()
+            if (scrollToStartOnUpdate) {
+                viewDataBinding?.recyclerViewItems?.scrollToPosition(0)
+                scrollToStartOnUpdate = false
+            }
         }
         viewModel.currentSortingModeWithItemsComparator.observe(
             viewLifecycleOwner

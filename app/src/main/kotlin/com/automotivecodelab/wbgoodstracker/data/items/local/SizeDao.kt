@@ -11,5 +11,5 @@ interface SizeDao {
     suspend fun delete(vararg size: SizeDBModel)
 
     @Update
-    suspend fun update(vararg size: SizeDBModel): Int
+    suspend fun update(sizes: List<SizeDBModel>): Int
 }

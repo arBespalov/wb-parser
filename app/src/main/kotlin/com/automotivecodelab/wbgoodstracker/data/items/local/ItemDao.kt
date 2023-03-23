@@ -39,5 +39,5 @@ interface ItemDao {
     suspend fun delete(vararg item: ItemDBModel)
 
     @Update
-    suspend fun update(vararg item: ItemDBModel): Int
+    suspend fun update(items: List<ItemDBModel>): Int
 }

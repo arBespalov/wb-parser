@@ -55,12 +55,12 @@ class ItemsLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateItem(vararg item: ItemWithSizesDBModel) {
+    override suspend fun updateItem(items: List<ItemWithSizesDBModel>) {
         appDatabase.withTransaction {
             // db calls will switch to io dispatcher by themselves
             withContext(Dispatchers.Default) {
-                appDatabase.itemDao().update(*item.map { it.item }.toTypedArray())
-                item.map { updatedItem ->
+                appDatabase.itemDao().update(items.map { it.item })
+                items.map { updatedItem ->
                     async {
                         val localItemSizes = getItem(updatedItem.item.id).sizes
                         val localItemSizeNames = localItemSizes.map { it.sizeName }
@@ -88,7 +88,7 @@ class ItemsLocalDataSourceImpl @Inject constructor(
                                 sizeDBModel.sizeName == sizeName
                             }!!
                         }.also { list ->
-                            appDatabase.sizeDao().update(*list.toTypedArray())
+                            appDatabase.sizeDao().update(list)
                         }
                     }
                 }.awaitAll()

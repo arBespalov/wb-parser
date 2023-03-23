@@ -1,12 +1,9 @@
 package com.automotivecodelab.wbgoodstracker.di
 
 import com.automotivecodelab.wbgoodstracker.data.items.ItemsRepositoryImpl
-import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDataSourceImpl
-import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSourceImpl
+import com.automotivecodelab.wbgoodstracker.data.items.local.*
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsAndAdRemoteDataSource
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsAndAdAndAdRemoteDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.sort.SortLocalDataSource
 import com.automotivecodelab.wbgoodstracker.data.sort.SortLocalDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.sort.SortRepositoryImpl
@@ -28,12 +25,15 @@ interface AppModule {
     fun bindItemsLocalDataSource(impl: ItemsLocalDataSourceImpl): ItemsLocalDataSource
 
     @Binds
-    fun bindItemsRemoteDataSource(impl: ItemsRemoteDataSourceImpl): ItemsRemoteDataSource
+    fun bindItemsRemoteDataSource(impl: ItemsAndAdAndAdRemoteDataSourceImpl): ItemsAndAdRemoteDataSource
 
     @Binds
     fun bindCurrentGroupLocalDataSource(
         impl: CurrentGroupLocalDataSourceImpl
     ): CurrentGroupLocalDataSource
+
+    @Binds
+    fun bindAdLocalDataSource(impl: AdLocalDataSourceImpl): AdLocalDataSource
 
     @Binds
     fun bindSortLocalDataSource(impl: SortLocalDataSourceImpl): SortLocalDataSource

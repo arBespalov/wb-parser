@@ -13,7 +13,7 @@ import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDa
 import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemInfoRemoteModel
 import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsRemoteDataSource
+import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsAndAdRemoteDataSource
 import com.automotivecodelab.wbgoodstracker.data.items.remote.SizeRemoteModel
 import kotlinx.coroutines.flow.Flow
 import java.util.*
@@ -39,7 +39,7 @@ class ItemsRepositoryImplTest {
         )
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(db)
-        val itemsRemoteDataSource = ItemsRemoteDataSourceFake()
+        val itemsRemoteDataSource = ItemsAndAdRemoteDataSourceFake()
         val currentGroupLocalDataSource = CurrentGroupLocalDataSourceFake()
         itemsRepositoryImpl = ItemsRepositoryImpl(
             itemsLocalDataSourceImpl,
@@ -87,14 +87,14 @@ class ItemsRepositoryImplTest {
                 itemWithSizesDbModel(itemIdToDelete)
             )
             itemsLocalDataSourceImpl.addItem(
-                itemWithSizesDbModel(ItemsRemoteDataSourceFake.ID1)
+                itemWithSizesDbModel(ItemsAndAdRemoteDataSourceFake.ID1)
             )
             itemsRepositoryImpl.syncItems("token")
             val (items, _) = itemsRepositoryImpl.observeItems().first()
             assert(
                 items.size == 2 &&
-                    items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
-                    items.any { it.id == ItemsRemoteDataSourceFake.ID2 }
+                    items.any { it.id == ItemsAndAdRemoteDataSourceFake.ID1 } &&
+                    items.any { it.id == ItemsAndAdRemoteDataSourceFake.ID2 }
             )
         }
     }
@@ -107,22 +107,22 @@ class ItemsRepositoryImplTest {
                 itemWithSizesDbModel(existingItemId)
             )
             itemsLocalDataSourceImpl.addItem(
-                itemWithSizesDbModel(ItemsRemoteDataSourceFake.ID1)
+                itemWithSizesDbModel(ItemsAndAdRemoteDataSourceFake.ID1)
             )
             itemsRepositoryImpl.mergeItems("token")
             val (items, _) = itemsRepositoryImpl.observeItems().first()
             assert(items.size == 3)
             assert(
                 items.size == 3 &&
-                    items.any { it.id == ItemsRemoteDataSourceFake.ID1 } &&
-                    items.any { it.id == ItemsRemoteDataSourceFake.ID2 } &&
+                    items.any { it.id == ItemsAndAdRemoteDataSourceFake.ID1 } &&
+                    items.any { it.id == ItemsAndAdRemoteDataSourceFake.ID2 } &&
                     items.any { it.id == existingItemId }
             )
         }
     }
 }
 
-class ItemsRemoteDataSourceFake : ItemsRemoteDataSource {
+class ItemsAndAdRemoteDataSourceFake : ItemsAndAdRemoteDataSource {
 
     companion object {
         const val ID1 = "123"
@@ -181,14 +181,14 @@ class ItemsRemoteDataSourceFake : ItemsRemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getItemsForUserId(idToken: String): List<ItemRemoteModel> {
+    override suspend fun getItemsAndAdForUserId(idToken: String): List<ItemRemoteModel> {
         return listOf(
             itemRemoteModelFake.copy(_id = ID1),
             itemRemoteModelFake.copy(_id = ID2)
         )
     }
 
-    override suspend fun updateItems(itemsId: List<Int>): List<ItemRemoteModel> {
+    override suspend fun updateItemsAndAd(itemsId: List<Int>): List<ItemRemoteModel> {
         return itemsId.map { id ->
             itemRemoteModelFake.copy(_id = id.toString())
         }
