@@ -15,7 +15,6 @@ import com.automotivecodelab.wbgoodstracker.*
 import com.automotivecodelab.wbgoodstracker.databinding.FragmentQuantityChartBinding
 import com.automotivecodelab.wbgoodstracker.ui.EventObserver
 import com.automotivecodelab.wbgoodstracker.ui.ViewModelFactory
-import com.automotivecodelab.wbgoodstracker.ui.chartfragment.ChartFragmentDirections
 import com.automotivecodelab.wbgoodstracker.ui.init
 import com.automotivecodelab.wbgoodstracker.ui.updateData
 import com.google.android.material.transition.MaterialSharedAxis
@@ -71,7 +70,8 @@ class QuantityChartFragment : Fragment() {
         viewModel.networkErrorEvent.observe(
             viewLifecycleOwner,
             EventObserver {
-                val action = ChartFragmentDirections.actionChartFragmentToErrorDialogFragment(it)
+                val action = QuantityChartFragmentDirections
+                    .actionQuantityChartFragmentToErrorDialogFragment(it)
                 navigate(action)
             }
         )
