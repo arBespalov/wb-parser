@@ -26,3 +26,5 @@
 -keep class com.automotivecodelab.wbgoodstracker.data.items.local.ItemDBModel {*;}
 -keep class com.automotivecodelab.wbgoodstracker.data.items.local.SizeDBModel {*;}
 -keep class com.automotivecodelab.wbgoodstracker.data.items.local.ItemWithSizesDBModel {*;}
+-keep class com.automotivecodelab.wbgoodstracker.data.items.remote.AdRemoteModel {*;}
+-keep class com.automotivecodelab.wbgoodstracker.data.items.remote.UpdateItemResponse {*;}
