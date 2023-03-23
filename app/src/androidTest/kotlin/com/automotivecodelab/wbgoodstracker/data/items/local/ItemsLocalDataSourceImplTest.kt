@@ -36,8 +36,10 @@ class ItemsLocalDataSourceImplTest {
                 sizeDBModel(itemId).copy(sizeName = "l")
             )
             itemsLocalDataSourceImpl.updateItem(
-                itemWithSizesDbModel(itemId).copy(
-                    sizes = newSizes
+                listOf(
+                    itemWithSizesDbModel(itemId).copy(
+                        sizes = newSizes
+                    )
                 )
             )
             assert(

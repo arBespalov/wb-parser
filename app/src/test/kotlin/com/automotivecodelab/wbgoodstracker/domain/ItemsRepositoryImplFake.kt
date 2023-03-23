@@ -1,12 +1,17 @@
 package com.automotivecodelab.wbgoodstracker.domain
 
+import com.automotivecodelab.wbgoodstracker.domain.models.Ad
 import com.automotivecodelab.wbgoodstracker.domain.models.Item
 import com.automotivecodelab.wbgoodstracker.domain.models.ItemGroups
+import com.automotivecodelab.wbgoodstracker.domain.models.MergeStatus
 import com.automotivecodelab.wbgoodstracker.domain.repositories.ItemsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
+    override val mergeStatus: Flow<MergeStatus>
+        get() = TODO("Not yet implemented")
+
     override fun observeItems(): Flow<Pair<List<Item>, String?>> {
         TODO("Not yet implemented")
     }
@@ -47,7 +52,7 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun mergeItems(token: String): Result<Unit> {
+    override suspend fun mergeItems(token: String) {
         TODO("Not yet implemented")
     }
 
@@ -90,7 +95,11 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
+    override suspend fun mergeItemsDebug(userId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun observeAd(): Flow<Ad?> {
         TODO("Not yet implemented")
     }
 }

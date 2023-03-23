@@ -171,8 +171,8 @@ class UITest {
         onView(withId(R.id.group_name))
             .perform(typeText(exampleGroupName), pressImeActionButton())
         // fill the inputs in edit screen
+        Thread.sleep(1500)
         onView(withId(R.id.name))
-            .waitUntilVisible(5000)
             .perform(replaceText(stringToBeTyped))
         onView(withId(R.id.auto_complete_text_view))
             .perform(click())
@@ -230,8 +230,8 @@ class UITest {
         onView(withId(R.id.group_name))
             .perform(typeText(exampleGroupName), pressImeActionButton())
         // fill the inputs in edit screen
+        Thread.sleep(1500)
         onView(withId(R.id.name))
-            .waitUntilVisible(5000)
             .perform(replaceText(stringToBeTyped))
         onView(withId(R.id.auto_complete_text_view))
             .perform(click())

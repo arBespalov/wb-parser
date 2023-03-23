@@ -8,14 +8,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.automotivecodelab.wbgoodstracker.data.items.local.AppDatabase
-import com.automotivecodelab.wbgoodstracker.data.items.local.CurrentGroupLocalDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.local.ItemsLocalDataSourceImpl
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemInfoRemoteModel
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemRemoteModel
-import com.automotivecodelab.wbgoodstracker.data.items.remote.ItemsAndAdRemoteDataSource
-import com.automotivecodelab.wbgoodstracker.data.items.remote.SizeRemoteModel
-import kotlinx.coroutines.flow.Flow
+import com.automotivecodelab.wbgoodstracker.data.items.local.*
+import com.automotivecodelab.wbgoodstracker.data.items.remote.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.util.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -40,11 +37,14 @@ class ItemsRepositoryImplTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         itemsLocalDataSourceImpl = ItemsLocalDataSourceImpl(db)
         val itemsRemoteDataSource = ItemsAndAdRemoteDataSourceFake()
-        val currentGroupLocalDataSource = CurrentGroupLocalDataSourceFake()
+        val currentGroupLocalDataSource = CurrentGroupLocalDataSourceImpl(testDataStore)
+        val adLocalDataSource = AdLocalDataSourceImpl(testDataStore)
         itemsRepositoryImpl = ItemsRepositoryImpl(
             itemsLocalDataSourceImpl,
             itemsRemoteDataSource,
-            currentGroupLocalDataSource
+            currentGroupLocalDataSource,
+            adLocalDataSource,
+            scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
         )
     }
 
@@ -181,17 +181,23 @@ class ItemsAndAdRemoteDataSourceFake : ItemsAndAdRemoteDataSource {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getItemsAndAdForUserId(idToken: String): List<ItemRemoteModel> {
-        return listOf(
-            itemRemoteModelFake.copy(_id = ID1),
-            itemRemoteModelFake.copy(_id = ID2)
+    override suspend fun getItemsAndAdForUserId(idToken: String): UpdateItemResponse {
+        return UpdateItemResponse(
+            items = listOf(
+                itemRemoteModelFake.copy(_id = ID1),
+                itemRemoteModelFake.copy(_id = ID2)
+            ),
+            ad = null
         )
     }
 
-    override suspend fun updateItemsAndAd(itemsId: List<Int>): List<ItemRemoteModel> {
-        return itemsId.map { id ->
-            itemRemoteModelFake.copy(_id = id.toString())
-        }
+    override suspend fun updateItemsAndAd(itemsId: List<Int>): UpdateItemResponse {
+        return UpdateItemResponse(
+            items = itemsId.map { id ->
+                itemRemoteModelFake.copy(_id = id.toString())
+            },
+            ad = null
+        )
     }
 
     override suspend fun mergeItems(itemsId: List<Int>, idToken: String): List<ItemRemoteModel> {
@@ -210,16 +216,6 @@ class ItemsAndAdRemoteDataSourceFake : ItemsAndAdRemoteDataSource {
         itemsId: List<Int>,
         userId: String
     ): List<ItemRemoteModel> {
-        TODO("Not yet implemented")
-    }
-}
-
-class CurrentGroupLocalDataSourceFake: CurrentGroupLocalDataSource {
-    override fun observeCurrentGroup(): Flow<String?> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setCurrentGroup(groupName: String?) {
         TODO("Not yet implemented")
     }
 }
