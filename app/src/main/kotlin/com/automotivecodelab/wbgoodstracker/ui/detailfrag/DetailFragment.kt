@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.core.view.doOnPreDraw
@@ -144,7 +145,10 @@ class DetailFragment : Fragment() {
                 val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as?
                     ClipboardManager
                 clipboard?.setPrimaryClip(ClipData.newPlainText("id", args.itemid))
-                Snackbar.make(requireView(), R.string.id_copied, Snackbar.LENGTH_SHORT).show()
+                // https://developer.android.com/develop/ui/views/touch-and-input/copy-paste#duplicate-notifications
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    Snackbar.make(requireView(), R.string.id_copied, Snackbar.LENGTH_SHORT).show()
+                }
             }
         }
 
