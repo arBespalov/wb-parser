@@ -15,12 +15,17 @@ class SignInUseCase @Inject constructor(
 ) {
     operator fun invoke(idToken: String) {
         scope.launch {
+            if (itemsRepository.mergeStatus.first() == MergeStatus.InProgress)
+                error("trying to start merge while it is already started")
+            itemsRepository.setMergeStatus(MergeStatus.InProgress)
             itemsRepository.mergeItems(idToken)
-            val result = itemsRepository.mergeStatus.first { mergeStatus ->
-                mergeStatus is MergeStatus.Success || mergeStatus is MergeStatus.Error
-            }
-            if (result is MergeStatus.Success)
-                userRepository.signIn()
+                .onSuccess {
+                    userRepository.signIn()
+                    itemsRepository.setMergeStatus(MergeStatus.Success)
+                }
+                .onFailure {
+                    itemsRepository.setMergeStatus(MergeStatus.Error(it))
+                }
         }
     }
 }

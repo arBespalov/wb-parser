@@ -161,12 +161,8 @@ class ItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun mergeItems(token: String) {
-        if (_mergeStatus.value == MergeStatus.InProgress)
-            error("trying to start merge while it is already started")
-
-        _mergeStatus.value = MergeStatus.InProgress
-        runCatching {
+    override suspend fun mergeItems(token: String): Result<Unit> {
+        return runCatching {
             val localItems = itemsLocalDataSource.getAll()
             val mergedItems = remoteDataSource.mergeItems(
                 localItems.map { localItem -> localItem.item.id.toInt() },
@@ -174,15 +170,10 @@ class ItemsRepositoryImpl @Inject constructor(
             )
             saveMergedItems(localItems, mergedItems)
         }
-            .onSuccess { _mergeStatus.value = MergeStatus.Success }
-            .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
     }
 
-    override suspend fun mergeItemsDebug(userId: String) {
-        if (_mergeStatus.value == MergeStatus.InProgress)
-            error("trying to start merge while it is already started")
-        _mergeStatus.value = MergeStatus.InProgress
-        runCatching {
+    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
+        return runCatching {
             val localItems = itemsLocalDataSource.getAll()
             val mergedItems = remoteDataSource.mergeItemsDebug(
                 localItems.map { localItem -> localItem.item.id.toInt() },
@@ -190,8 +181,10 @@ class ItemsRepositoryImpl @Inject constructor(
             )
             saveMergedItems(localItems, mergedItems)
         }
-            .onSuccess { _mergeStatus.value = MergeStatus.Success }
-            .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
+    }
+
+    override fun setMergeStatus(status: MergeStatus) {
+        _mergeStatus.value = status
     }
 
     override fun observeAd(): Flow<Ad?> {
