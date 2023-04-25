@@ -58,15 +58,11 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signIn(idToken: String) {
-        viewModelScope.launch {
-            signInUseCase(idToken)
-        }
+        signInUseCase(idToken)
     }
 
     fun signInDebug(userId: String) {
-        viewModelScope.launch {
-            signInDebugUseCase(userId)
-        }
+        signInDebugUseCase(userId)
     }
 
     fun setError(t: Throwable) {

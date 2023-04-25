@@ -165,38 +165,33 @@ class ItemsRepositoryImpl @Inject constructor(
         if (_mergeStatus.value == MergeStatus.InProgress)
             error("trying to start merge while it is already started")
 
-        return withContext(scope.coroutineContext) {
-            _mergeStatus.value = MergeStatus.InProgress
-            runCatching {
-                val localItems = itemsLocalDataSource.getAll()
-                val mergedItems = remoteDataSource.mergeItems(
-                    localItems.map { localItem -> localItem.item.id.toInt() },
-                    token
-                )
-                saveMergedItems(localItems, mergedItems)
-            }
-                .onSuccess { _mergeStatus.value = MergeStatus.Success }
-                .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
+        _mergeStatus.value = MergeStatus.InProgress
+        runCatching {
+            val localItems = itemsLocalDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItems(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                token
+            )
+            saveMergedItems(localItems, mergedItems)
         }
+            .onSuccess { _mergeStatus.value = MergeStatus.Success }
+            .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
     }
 
     override suspend fun mergeItemsDebug(userId: String) {
         if (_mergeStatus.value == MergeStatus.InProgress)
             error("trying to start merge while it is already started")
-
-        return withContext(scope.coroutineContext) {
-            _mergeStatus.value = MergeStatus.InProgress
-            runCatching {
-                val localItems = itemsLocalDataSource.getAll()
-                val mergedItems = remoteDataSource.mergeItemsDebug(
-                    localItems.map { localItem -> localItem.item.id.toInt() },
-                    userId
-                )
-                saveMergedItems(localItems, mergedItems)
-            }
-                .onSuccess { _mergeStatus.value = MergeStatus.Success }
-                .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
+        _mergeStatus.value = MergeStatus.InProgress
+        runCatching {
+            val localItems = itemsLocalDataSource.getAll()
+            val mergedItems = remoteDataSource.mergeItemsDebug(
+                localItems.map { localItem -> localItem.item.id.toInt() },
+                userId
+            )
+            saveMergedItems(localItems, mergedItems)
         }
+            .onSuccess { _mergeStatus.value = MergeStatus.Success }
+            .onFailure { _mergeStatus.value = MergeStatus.Error(it) }
     }
 
     override fun observeAd(): Flow<Ad?> {
