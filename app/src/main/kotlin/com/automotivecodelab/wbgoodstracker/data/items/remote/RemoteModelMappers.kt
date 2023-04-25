@@ -67,7 +67,7 @@ fun ItemRemoteModel.toDBModel(
                 quantityDelta = quantityDelta[it.sizeName] ?: 0,
                 price = it.price,
                 priceWithSale = it.priceWithSale,
-                storesWithQuantity = it.storeIds?.joinToString(" \u2022 ")
+                storesWithQuantity = it.storeIds?.joinToString("\n")
             )
         }
     )

@@ -80,17 +80,22 @@
                     tools:text="25"
                     android:gravity="center"
                     android:textAppearance="@style/Big"/>
+
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/quantity_delta"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/default_margin"
+                    android:layout_marginEnd="@dimen/default_margin"
                     android:text="@{ExtensionsKt.toStringWithSign(size.quantityDelta) ?? ``}"
+                    android:textAppearance="@style/Accent"
                     android:textColor="@color/red"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="10sp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/count2"
                     app:layout_constraintTop_toTopOf="@+id/count2"
                     tools:text="+5"
-                    android:textAppearance="@style/Accent"/>
+                    android:maxLines="1"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
@@ -183,10 +188,10 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Екатеринбург"
-                    android:gravity="center"
+                    tools:text="Екатеринбург\nЕкатеринбург\nЕкатеринбург\nЕкатеринбург\nЕкатеринбург"
+                    android:textIsSelectable="true"
                     android:textAppearance="@style/Body"
-                    android:textSize="20sp"/>
+                    android:textSize="16sp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </GridLayout>
     </com.google.android.material.card.MaterialCardView>

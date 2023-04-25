@@ -53,15 +53,19 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/delta"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/default_margin"
+                android:layout_marginEnd="@dimen/default_margin"
                 android:text="@{delta}"
+                android:textAppearance="@style/Accent"
                 android:textColor="@color/red"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/count"
                 app:layout_constraintTop_toTopOf="@+id/count"
-                tools:text="+5"
-                android:textAppearance="@style/Accent"/>
+                android:maxLines="1"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="10sp"
+                tools:text="+5" />
 
             <ImageView
                 android:layout_width="wrap_content"

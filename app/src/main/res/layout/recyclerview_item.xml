@@ -55,54 +55,61 @@
                     android:layout_marginHorizontal="@dimen/default_margin"
                     tools:text="namenamenamenamenamenamenamenamenamenamenamename" />
 
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/flow_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/name"
+                    android:layout_margin="@dimen/default_margin"
+                    app:flow_wrapMode="chain"
+                    app:flow_horizontalStyle="packed"
+                    app:flow_horizontalBias="0"
+                    app:flow_horizontalGap="@dimen/half_default_margin"
+                    app:constraint_referenced_ids="price_hint,price,average_price_delta"/>
+
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/price_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{@string/price + `: `}"
+                    android:text="@{@string/price + `:`}"
                     android:textAppearance="@style/Body"
-                    app:layout_constraintBottom_toBottomOf="@+id/price"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/price"
-                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/price" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
-                    android:layout_marginTop="@dimen/default_margin"
                     android:text="@{`` + item.averagePrice}"
                     android:textAppearance="@style/Accent"
-                    app:layout_constraintStart_toEndOf="@+id/price_hint"
-                    app:layout_constraintTop_toBottomOf="@+id/name"
-                    tools:text="1990" />
+                    tools:text="19900" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/average_price_delta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/name"
-                    android:layout_marginStart="@dimen/default_margin"
                     android:text="@{ExtensionsKt.toStringWithSign(item.averagePriceDelta) ?? ``}"
                     android:textAppearance="@style/Accent"
                     android:textColor="@color/red"
-                    app:layout_constraintBottom_toBottomOf="@+id/price"
-                    app:layout_constraintStart_toEndOf="@+id/price"
-                    app:layout_constraintTop_toTopOf="@+id/price"
                     tools:text="+1000" />
+
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/flow_orders_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/flow_price"
+                    android:layout_margin="@dimen/default_margin"
+                    app:flow_wrapMode="chain"
+                    app:flow_horizontalStyle="packed"
+                    app:flow_horizontalBias="0"
+                    app:flow_horizontalGap="@dimen/half_default_margin"
+                    app:constraint_referenced_ids="orders_count_hint,orders_count,orders_count_delta"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orders_count_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{@string/orders_count + `: `}"
+                    android:text="@{@string/orders_count + `:`}"
                     android:textAppearance="@style/Body"
-                    app:layout_constraintBottom_toBottomOf="@+id/orders_count"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/orders_count"
-                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/orders_count" />
 
 
@@ -110,86 +117,82 @@
                     android:id="@+id/orders_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
-                    android:layout_marginTop="@dimen/default_margin"
                     android:text="@{`` + item.ordersCount}"
                     android:textAppearance="@style/Accent"
-                    app:layout_constraintStart_toEndOf="@+id/orders_count_hint"
-                    app:layout_constraintTop_toBottomOf="@+id/price"
                     tools:text="20" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orders_count_delta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
                     android:text="@{ExtensionsKt.toStringWithSign(item.ordersCountDelta) ?? ``}"
                     android:textAppearance="@style/Accent"
                     android:textColor="@color/red"
-                    app:layout_constraintBottom_toBottomOf="@+id/orders_count"
-                    app:layout_constraintStart_toEndOf="@+id/orders_count"
-                    app:layout_constraintTop_toTopOf="@+id/orders_count"
                     tools:text="+50" />
+
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/flow_average_orders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/flow_orders_count"
+                    android:layout_margin="@dimen/default_margin"
+                    app:flow_wrapMode="chain"
+                    app:flow_horizontalStyle="packed"
+                    app:flow_horizontalBias="0"
+                    app:flow_horizontalGap="@dimen/half_default_margin"
+                    app:constraint_referenced_ids="average_orders_count_per_day_hint,average_orders_count_per_day"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/average_orders_count_per_day_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{@string/average_orders_count_per_day + `: `}"
+                    android:text="@{@string/average_orders_count_per_day + `:`}"
                     android:textAppearance="@style/Body"
-                    app:layout_constraintBottom_toBottomOf="@+id/average_orders_count_per_day"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/average_orders_count_per_day"
-                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/average_orders_count_per_day" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/average_orders_count_per_day"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
-                    android:layout_marginTop="@dimen/default_margin"
                     android:text="@{`` + item.averageOrdersCountPerDay}"
                     android:textAppearance="@style/Accent"
-                    app:layout_constraintStart_toEndOf="@+id/average_orders_count_per_day_hint"
-                    app:layout_constraintTop_toBottomOf="@+id/orders_count"
                     tools:text="1" />
+
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/flow_quantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/flow_average_orders"
+                    android:layout_margin="@dimen/default_margin"
+                    app:flow_wrapMode="chain"
+                    app:flow_horizontalStyle="packed"
+                    app:flow_horizontalBias="0"
+                    app:flow_horizontalGap="@dimen/half_default_margin"
+                    app:constraint_referenced_ids="total_quantity_hint,total_quantity,total_quantity_delta"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/total_quantity_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{@string/quantity_in_warehouse + `: `}"
+                    android:text="@{@string/quantity_in_warehouse + `:`}"
                     android:textAppearance="@style/Body"
-                    app:layout_constraintBottom_toBottomOf="@+id/total_quantity"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/total_quantity"
-                    android:layout_marginStart="@dimen/default_margin"
                     tools:text="@string/quantity_in_warehouse" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/total_quantity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
-                    android:layout_marginTop="@dimen/default_margin"
                     android:text="@{`` + item.totalQuantity}"
                     android:textAppearance="@style/Accent"
-                    app:layout_constraintStart_toEndOf="@+id/total_quantity_hint"
-                    app:layout_constraintTop_toBottomOf="@+id/average_orders_count_per_day"
                     tools:text="17" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/total_quantity_delta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/default_margin"
                     android:text="@{ExtensionsKt.toStringWithSign(item.totalQuantityDelta) ?? ``}"
                     android:textAppearance="@style/Accent"
                     android:textColor="@color/red"
-                    app:layout_constraintBottom_toBottomOf="@+id/total_quantity"
-                    app:layout_constraintStart_toEndOf="@+id/total_quantity"
-                    app:layout_constraintTop_toTopOf="@+id/total_quantity"
                     tools:text="+5" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
