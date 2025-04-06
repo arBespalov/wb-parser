@@ -1,28 +1,9 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:7.4.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3")
-        // ===crashlytics===
-        classpath("com.google.gms:google-services:4.3.15")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.4")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-    }
-}
-
-tasks.register<Delete>("clean") {
-    delete(rootProject.buildDir)
+plugins {
+    id("com.android.application") version "8.9.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.10"  apply false
+    id("androidx.navigation.safeargs") version "2.8.9" apply false
+    // ===crashlytics===
+    id("com.google.gms.google-services") version "4.4.2" apply false
+    id("com.google.firebase.crashlytics") version "3.0.3" apply false
+    id("com.google.devtools.ksp") version "2.1.10-1.0.29" apply false
 }

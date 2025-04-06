@@ -233,7 +233,7 @@ class ItemsFragment : Fragment() {
                         null
                     )
                     icon?.setTint(
-                        requireContext().themeColor(R.attr.colorOnSurface)
+                        requireContext().themeColor(com.google.android.material.R.attr.colorOnSurface)
                     )
                     menuItem.icon = icon
                 }

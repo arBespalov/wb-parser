@@ -321,7 +321,7 @@ class UITest {
         onView(isAssignableFrom(AutoCompleteTextView::class.java))
             .check(matches(withText(stringToBeTyped)))
         // goto detail
-        Thread.sleep(1500)
+        Thread.sleep(3000)
         onView(withId(R.id.recycler_view_items))
             .perform(
                 RecyclerViewActions.actionOnItemAtPosition<ItemsAdapter.ItemViewHolder>(
@@ -329,6 +329,7 @@ class UITest {
                     click()
                 )
             )
+        Thread.sleep(3000)
         onView(withId(R.id.collapsing_toolbar))
             .check { view, _ ->
                 assert((view as CollapsingToolbarLayout).title.toString() == stringToBeTyped)

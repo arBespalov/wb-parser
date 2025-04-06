@@ -12,6 +12,10 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
     override val mergeStatus: Flow<MergeStatus>
         get() = TODO("Not yet implemented")
 
+    override fun setMergeStatus(status: MergeStatus) {
+        TODO("Not yet implemented")
+    }
+
     override fun observeItems(): Flow<Pair<List<Item>, String?>> {
         TODO("Not yet implemented")
     }
@@ -52,7 +56,7 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun mergeItems(token: String) {
+    override suspend fun mergeItems(token: String): Result<Unit> {
         TODO("Not yet implemented")
     }
 
@@ -95,7 +99,7 @@ class ItemsRepositoryImplFake(val totalItemsCount: Int) : ItemsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun mergeItemsDebug(userId: String) {
+    override suspend fun mergeItemsDebug(userId: String): Result<Unit> {
         TODO("Not yet implemented")
     }
 

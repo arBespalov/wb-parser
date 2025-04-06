@@ -74,7 +74,7 @@ abstract class PartialSwipeCallback : ItemTouchHelper.SimpleCallback(
             context.theme
         )
         if (editIcon != null) {
-            editIcon.setTint(context.themeColor(R.attr.colorOnBackground))
+            editIcon.setTint(context.themeColor(com.google.android.material.R.attr.colorOnBackground))
             val rect = Rect(
                 card.right - editIcon.intrinsicWidth - (
                         card.height - editIcon

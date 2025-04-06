@@ -3,11 +3,11 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-kapt")
     id("androidx.navigation.safeargs")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.devtools.ksp")
 }
 
 ktlint {
@@ -16,32 +16,37 @@ ktlint {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.automotivecodelab.wbgoodstracker"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 35
         versionCode = 8
         versionName = "1.3.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField(
             "String", "SERVER_URL",
-            gradleLocalProperties(rootDir).getProperty("SERVER_URL")
+            gradleLocalProperties(rootDir, providers).getProperty("SERVER_URL")
         )
         buildConfigField(
             "String", "SERVER_CLIENT_ID",
-            gradleLocalProperties(rootDir).getProperty("SERVER_CLIENT_ID")
+            gradleLocalProperties(rootDir, providers).getProperty("SERVER_CLIENT_ID")
         )
         buildConfigField(
             "String", "USER_ID_FOR_DEBUG",
-            gradleLocalProperties(rootDir).getProperty("USER_ID_FOR_DEBUG")
+            gradleLocalProperties(rootDir, providers).getProperty("USER_ID_FOR_DEBUG")
         )
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
             }
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
+
         // uncomment to run ktlint. It also shows kotlin packages as java ones
 //        sourceSets {
 //            val kotlinAdditionalSourceSets = project.file("src/main/kotlin")
@@ -70,13 +75,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
+    kotlinOptions {
+        jvmTarget = "11"
     }
     dataBinding {
         enable = true
@@ -88,56 +91,55 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
-    implementation("com.google.android.gms:play-services-auth:20.4.1")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("androidx.core:core-splashscreen:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     // ===retrofit===
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
     // ===room===
-    implementation("androidx.room:room-runtime:2.5.0")
-    annotationProcessor("androidx.room:room-compiler:2.5.0")
-    kapt("androidx.room:room-compiler:2.5.0")
-    implementation("androidx.room:room-ktx:2.5.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     // ===navigation===
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
 
     // ===dagger===
-    implementation("com.google.dagger:dagger:2.45")
-    kapt("com.google.dagger:dagger-compiler:2.45")
+    implementation("com.google.dagger:dagger:2.55")
+    ksp("com.google.dagger:dagger-compiler:2.55")
 
     // ===testing===
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
-    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.10")
-    androidTestImplementation("androidx.room:room-testing:2.5.0")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.1")
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
+    androidTestImplementation("androidx.room:room-testing:2.6.1")
 
     // ===for in-app-review===
-    implementation("com.google.android.play:core:1.10.3")
-    implementation("com.google.android.play:core-ktx:1.8.1")
+    implementation("com.google.android.play:review-ktx:2.0.2")
 
     // ===crashlytics===
-    implementation(platform("com.google.firebase:firebase-bom:29.3.1"))
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
 }

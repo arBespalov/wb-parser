@@ -31,7 +31,7 @@ class CustomMarkerView @JvmOverloads constructor(
     @SuppressLint("PrivateResource")
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = context.themeColor(R.attr.colorSurfaceVariant)
+        color = context.themeColor(com.google.android.material.R.attr.colorSurfaceVariant)
     }
 
     @SuppressLint("RestrictedApi")

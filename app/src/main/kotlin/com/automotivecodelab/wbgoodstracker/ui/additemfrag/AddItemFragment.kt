@@ -41,10 +41,10 @@ class AddItemFragment : Fragment() {
         }
         postponeEnterTransition()
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            endContainerColor = requireContext().themeColor(R.attr.colorSurface)
+            endContainerColor = requireContext().themeColor(com.google.android.material.R.attr.colorSurface)
         }
         sharedElementReturnTransition = MaterialContainerTransform().apply {
-            startContainerColor = requireContext().themeColor(R.attr.colorSurface)
+            startContainerColor = requireContext().themeColor(com.google.android.material.R.attr.colorSurface)
         }
         return view
     }

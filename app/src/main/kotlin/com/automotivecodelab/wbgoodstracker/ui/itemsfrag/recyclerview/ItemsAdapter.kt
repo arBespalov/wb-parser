@@ -234,14 +234,14 @@ class ItemsAdapter(
         tracker?.let { selectionTracker ->
             val context = holder.itemView.context
             val backgroundColor = if (selectionTracker.isSelected(item.id))
-                context.themeColor(R.attr.colorSecondary)
+                context.themeColor(com.google.android.material.R.attr.colorSecondary)
             else
             // colorSurfaceVariant - default material3 card background
-                context.themeColor(R.attr.colorSurfaceVariant)
+                context.themeColor(com.google.android.material.R.attr.colorSurfaceVariant)
             holder.recyclerViewItemBinding.card.setCardBackgroundColor(backgroundColor)
 
             val indicatorColor = if (selectionTracker.isSelected(item.id))
-                context.themeColor(R.attr.colorOnSecondary)
+                context.themeColor(com.google.android.material.R.attr.colorOnSecondary)
             else
                 ContextCompat.getColor(context, R.color.red)
             holder.recyclerViewItemBinding.updateIndicator.background.setTint(indicatorColor)
@@ -258,7 +258,7 @@ class ItemsAdapter(
             holder.itemView.allViews.forEach { view ->
                 if (view is MaterialTextView) {
                     if (selectionTracker.isSelected(item.id)) {
-                        view.setTextColor(context.themeColor(R.attr.colorOnSecondary))
+                        view.setTextColor(context.themeColor(com.google.android.material.R.attr.colorOnSecondary))
                     } else {
                         val colorStateList = defaultTextViewColors[
                             context.resources.getResourceEntryName(view.id)

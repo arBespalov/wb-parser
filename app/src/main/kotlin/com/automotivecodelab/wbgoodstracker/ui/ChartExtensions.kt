@@ -24,7 +24,7 @@ fun LineChart.init(@StringRes noDataText: Int) {
     axisLeft.apply {
         setDrawAxisLine(false)
         textSize = 8f
-        textColor = context.themeColor(R.attr.colorOnBackground)
+        textColor = context.themeColor(com.google.android.material.R.attr.colorOnBackground)
     }
     axisRight.isEnabled = false
     xAxis.apply {
@@ -36,7 +36,7 @@ fun LineChart.init(@StringRes noDataText: Int) {
     }
     legend.isEnabled = false
     marker = CustomMarkerView(context)
-    setNoDataTextColor(context.themeColor(R.attr.colorOnBackground))
+    setNoDataTextColor(context.themeColor(com.google.android.material.R.attr.colorOnBackground))
     setPinchZoom(true)
 }
 
@@ -52,7 +52,7 @@ fun LineChart.updateData(chartData: List<Pair<Long, Int>>) {
         set(Calendar.MINUTE, 0)
         set(Calendar.HOUR_OF_DAY, 0)
     }
-    val labelColor = context.themeColor(R.attr.colorOnBackground)
+    val labelColor = context.themeColor(com.google.android.material.R.attr.colorOnBackground)
     val weekdayColor = ContextCompat.getColor(context, R.color.red)
     xAxis.setDrawLimitLinesBehindData(true)
     val formatter = SimpleDateFormat("dd.MM", Locale("en"))
@@ -80,12 +80,12 @@ fun LineChart.updateData(chartData: List<Pair<Long, Int>>) {
     }
 
     val dataSet = LineDataSet(entries, "exampleLabel").apply {
-        val primaryColor = context.themeColor(R.attr.colorPrimary)
+        val primaryColor = context.themeColor(com.google.android.material.R.attr.colorPrimary)
         this.color = primaryColor
         setCircleColor(primaryColor)
         circleHoleColor = context.themeColor(android.R.attr.colorBackground)
         setDrawValues(false)
-        highLightColor = context.themeColor(R.attr.colorSurfaceVariant)
+        highLightColor = context.themeColor(com.google.android.material.R.attr.colorSurfaceVariant)
     }
     data = LineData(dataSet)
     invalidate()
